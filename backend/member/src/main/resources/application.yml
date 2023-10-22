@@ -1,0 +1,4 @@
+# 각 서버 master server에 commit할 때에는 spring.config.import 주석처리 하고 commit 하기
+spring:
+  config:
+    import: env.yml
