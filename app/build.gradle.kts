@@ -79,6 +79,8 @@ dependencies {
     // Dependency implementation for navigator
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
+    // Dependency implementation for kakao
+    implementation("com.kakao.sdk:v2-all:2.17.0") // 전체 모듈 설치, 2.11.0 버전부터 지원
 
 }
 
