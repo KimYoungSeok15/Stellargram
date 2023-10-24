@@ -5,7 +5,7 @@ COPY ./backend/example/settings.gradle ./
 COPY ./backend/example/build.gradle ./
 COPY ./backend/example/src ./src
 
-RUN gradle build -x test --parallel
+RUN gradle clean build -x test --parallel
 
 FROM azul/zulu-openjdk:11
 WORKDIR /app
