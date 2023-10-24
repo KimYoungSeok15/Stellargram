@@ -1,4 +1,4 @@
-package com.ssafy.instargram.ui
+package com.ssafy.stellargram.ui
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -8,8 +8,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ssafy.instargram.ui.screen.kakao.KakaoScreen
-import com.ssafy.instargram.ui.screen.landing.LandingScreen
+import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
+import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 
 @Composable
 fun NavGraph(
@@ -18,7 +18,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = Screen.Landing.route,
         modifier = modifier
     ) {
         composable(route= Screen.Landing.route){

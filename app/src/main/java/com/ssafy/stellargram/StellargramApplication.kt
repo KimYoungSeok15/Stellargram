@@ -1,12 +1,12 @@
-package com.ssafy.instargram
+package com.ssafy.stellargram
 
 import android.app.Application
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class InstargramApplication : Application() {
-    private var instance: InstargramApplication? = null
+class StellargramApplication : Application() {
+    private var instance: StellargramApplication? = null
 
     companion object {
         const val INSTARGRAM_APP_URI = ""

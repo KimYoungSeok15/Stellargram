@@ -1,4 +1,4 @@
-package com.ssafy.instargram.ui.screen.kakao
+package com.ssafy.stellargram.ui.screen.kakao
 
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize

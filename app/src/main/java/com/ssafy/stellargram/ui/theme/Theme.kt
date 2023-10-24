@@ -1,4 +1,4 @@
-package com.ssafy.instargram.ui.theme
+package com.ssafy.stellargram.ui.theme
 
 import android.app.Activity
 import android.os.Build

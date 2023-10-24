@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ssafy.instargram"
+    namespace = "com.ssafy.stellargram"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ssafy.instargram"
+        applicationId = "com.ssafy.stellargram"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.ssafy.instargram.ui
+package com.ssafy.stellargram.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
-import com.ssafy.instargram.ui.theme.INSTARGRAMTheme
+import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
 import dagger.hilt.android.AndroidEntryPoint
 import com.kakao.sdk.common.util.Utility
 

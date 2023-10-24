@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "INSTARGRAM"
+rootProject.name = "STELLARGRAM"
 include(":app")
  

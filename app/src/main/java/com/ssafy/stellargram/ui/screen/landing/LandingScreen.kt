@@ -1,4 +1,4 @@
-package com.ssafy.instargram.ui.screen.landing
+package com.ssafy.stellargram.ui.screen.landing
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.ssafy.instargram.R
+import com.ssafy.stellargram.R
 
 @Composable
 fun LandingScreen(navController: NavController){
@@ -29,15 +28,15 @@ fun LandingScreen(navController: NavController){
     ){
         Image(
             painter =
-            painterResource(
-                id = R.drawable.logo1),
+            painterResource(id = R.drawable.stellargram),
             contentDescription = "LOGO",
             modifier = Modifier
-                .fillMaxWidth()
+
         )
         Spacer(modifier = Modifier.height(16.dp))
         Image(
-            painter = painterResource(id = R.drawable.kakao_login_large_narrow),
+            painter =
+            painterResource(id = R.drawable.kakao_login_large_narrow),
             contentDescription = null,
             modifier = Modifier
                 .clickable { navController.navigate("kakao") }

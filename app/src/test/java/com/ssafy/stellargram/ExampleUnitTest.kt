@@ -1,4 +1,4 @@
-package com.ssafy.instargram
+package com.ssafy.stellargram
 
 import org.junit.Test
 

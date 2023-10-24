@@ -1,6 +1,6 @@
-package com.ssafy.instargram.data.remote
+package com.ssafy.stellargram.data.remote
 
-import com.ssafy.instargram.InstargramApplication
+import com.ssafy.stellargram.StellargramApplication
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL: String =InstargramApplication.INSTARGRAM_APP_URI
+    private const val BASE_URL: String = StellargramApplication.INSTARGRAM_APP_URI
     @Provides
     @Singleton
     fun provideHttpClient(): OkHttpClient {

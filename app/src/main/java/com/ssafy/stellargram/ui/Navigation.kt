@@ -1,4 +1,4 @@
-package com.ssafy.instargram.ui
+package com.ssafy.stellargram.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
