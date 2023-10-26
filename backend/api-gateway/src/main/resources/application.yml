@@ -32,3 +32,10 @@ spring:
             - Path=/starcard/**
           filters:
             - RewritePath=/starcard/(?<path>.*),/$\{path}
+        - id: chat
+          uri: lb://CHAT/
+          predicates:
+            - Path=/chat/**
+          filters:
+            - RewritePath=/chat/(?<path>.*),/$\{path}
+
