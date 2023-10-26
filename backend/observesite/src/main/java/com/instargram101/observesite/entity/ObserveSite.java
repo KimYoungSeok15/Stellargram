@@ -22,8 +22,11 @@ public class ObserveSite {
     @Column(length = 20)
     private String name;
 
-    @Column(length = 50)
-    private String exactLocation;
+    @Column
+    private Float latitude;
+
+    @Column
+    private Float longitude;
 
     @ColumnDefault("0")
     private Long reviewCount;

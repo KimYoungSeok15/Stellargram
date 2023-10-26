@@ -16,3 +16,9 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
           default_batch_fetch_size: 1000
+  application:
+    name: ${DOMAIN_NAME}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
