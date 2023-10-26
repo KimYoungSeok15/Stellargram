@@ -1,0 +1,34 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: member
+          uri: lb://MEMBER/
+          predicates:
+            - Path=/member/**
+          filters:
+            - RewritePath=/member/(?<path>.*),/$\{path}
+        - id: observe-search
+          uri: lb://OBSERVE-SEARCH/
+          predicates:
+            - Path=/observe-search/**
+          filters:
+            - RewritePath=/observe-search/(?<path>.*),/$\{path}
+        - id: observe-site
+          uri: lb://OBSERVE-SITE/
+          predicates:
+            - Path=/observe-site/**
+          filters:
+            - RewritePath=/observe-site/(?<path>.*),/$\{path}
+        - id: sample
+          uri: lb://SAMPLE/
+          predicates:
+            - Path=/sample/**
+          filters:
+            - RewritePath=/sample/(?<path>.*),/$\{path}
+        - id: starcard
+          uri: lb://STARCARD/
+          predicates:
+            - Path=/starcard/**
+          filters:
+            - RewritePath=/starcard/(?<path>.*),/$\{path}
