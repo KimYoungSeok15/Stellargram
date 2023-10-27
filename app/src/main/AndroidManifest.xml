@@ -20,7 +20,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.INSTARGRAM"
-        tools:targetApi="31">
+        tools:targetApi="34">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
@@ -46,6 +49,7 @@
                     android:scheme="kakao36c2ac2060a5b0da3ece614fcae40854" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
