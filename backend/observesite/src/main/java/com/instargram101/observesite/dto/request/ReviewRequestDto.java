@@ -18,7 +18,4 @@ public class ReviewRequestDto {
 
     @NotBlank
     private Long rating;
-
-    @NotBlank
-    private Long memberId;
 }
