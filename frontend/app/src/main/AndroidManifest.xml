@@ -2,7 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 인터넷 사용 권한 설정-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--  위치 사용 권한 설정  -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
+        android:name=".StellargramApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,11 +20,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.INSTARGRAM"
-        tools:targetApi="31">
+        tools:targetApi="34">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.INSTARGRAM">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +34,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--   카카오 로그인을 위한 액티비티 선언  -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
+                <data android:host="oauth"
+                    android:scheme="kakao36c2ac2060a5b0da3ece614fcae40854" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
