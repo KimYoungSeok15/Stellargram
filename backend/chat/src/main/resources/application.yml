@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: ${DOMAIN_NAME}
   config:
     import: env.yml
   datasource:
@@ -11,6 +13,8 @@ spring:
       host: ${MONGO_HOST}
       port: ${MONGO_PORT}
       database: ${MONGO_DATABASE}
+      username: ${DB_USER}
+      password: ${DB_PASSWORD}
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
@@ -24,3 +28,7 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
           default_batch_fetch_size: 1000
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
