@@ -1,12 +1,4 @@
 package com.instargram101.observesite.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class ObserveSiteService implements ObserveSiteServiceImpl{
-
+public interface ObserveSiteService {
 }

@@ -1,4 +1,4 @@
-package com.instargram101.observesite.dto.request;
+package com.instargram101.observesite.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ObserveSiteInfoRequest {
+public class ObserveSiteResponse {
 
     @NotNull
     private Float latitude;
@@ -22,4 +22,11 @@ public class ObserveSiteInfoRequest {
 
     @NotBlank
     private String name;
+
+    @NotBlank
+    private Long reviewCount;
+
+    @NotBlank
+    private Long ratingSum;
+
 }

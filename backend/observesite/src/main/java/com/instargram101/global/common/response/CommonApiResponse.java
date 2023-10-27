@@ -37,6 +37,22 @@ public class CommonApiResponse<T> {
         return response;
     }
 
+    public static <T> CommonApiResponse<T> WELL_CREATED(T data) {
+        var response = new CommonApiResponse<T>();
+        response.code = ErrorCode.WELL_CREATED.getCode();
+        response.message = ErrorCode.WELL_CREATED.getMessage();
+        response.data = data;
+        return response;
+    }
+
+    public static <T> CommonApiResponse<T> WELL_CREATED(String message, T data) {
+        var response = new CommonApiResponse<T>();
+        response.code = ErrorCode.WELL_CREATED.getCode();
+        response.message = message;
+        response.data = data;
+        return response;
+    }
+
     public static CommonApiResponse<Object> ERROR(ErrorCodeInterface errorCodeInterface) {
         var response = new CommonApiResponse<Object>();
         response.code = errorCodeInterface.getCode();

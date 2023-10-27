@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode implements ErrorCodeInterface{
     OK(200, "OK"),
+    WELL_CREATED(201, "OK"),
     NULL_POINT(500, "NULL POINT EXCEPTION"),
     SERVER_ERROR(500, "SERVER ERROR");
 
