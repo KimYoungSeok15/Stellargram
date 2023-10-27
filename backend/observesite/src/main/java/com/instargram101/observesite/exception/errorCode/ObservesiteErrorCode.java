@@ -22,7 +22,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ObservesiteErrorCode implements ErrorCodeInterface {
 
-    Observesite_Not_Found(404, "User Not Found.") //TODO: 추가로 여기다 채워넣으면 됩니다.
+    Observesite_Not_Found(404, "User Not Found."), //TODO: 추가로 여기다 채워넣으면 됩니다.
+    Already_Write_Comment(400, "User already wrote comment")
     ;
 
     private final Integer code;

@@ -1,7 +1,9 @@
 package com.instargram101.observesite;
 
 import com.instargram101.observesite.dto.request.ObserveSiteInfoRequestDto;
+import com.instargram101.observesite.dto.request.ReviewRequestDto;
 import com.instargram101.observesite.mapper.ObserveSiteRequestMapper;
+import com.instargram101.observesite.mapper.ReviewRequestMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class MapperTest {
 
     private final ObserveSiteRequestMapper observeSiteRequestMapper = Mappers.getMapper(ObserveSiteRequestMapper.class);
+
+    private final ReviewRequestMapper reviewRequestMapper = Mappers.getMapper(ReviewRequestMapper.class);
 
     @Test
     void observeSiteMapper(){
@@ -29,5 +33,17 @@ public class MapperTest {
         System.out.println("longitude: " + observeSite.getLongitude().toString());
         System.out.println("review count: " + observeSite.getReviewCount().toString());
         System.out.println("Total rating: "+ observeSite.getRatingSum().toString());
+    }
+
+    @Test
+    void reviewRequsetMapperTest(){
+        ReviewRequestDto request = ReviewRequestDto
+                .builder()
+                .rating(Long.valueOf("5"))
+                .content("Good place")
+                .memberId(Long.valueOf("1"))
+                .build();
+
+        var review = reviewRequestMapper.toEntity(request);
     }
 }
