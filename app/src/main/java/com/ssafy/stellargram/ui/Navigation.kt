@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
     object Kakao : Screen("kakao")
     object Home : Screen("home")
     object Example : Screen("example")
+    object GoogleMap : Screen("googlemap")
 }
 
 @Composable
