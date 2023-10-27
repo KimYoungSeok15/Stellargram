@@ -1,7 +1,7 @@
 package com.instargram101.observesite.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
-import com.instargram101.observesite.dto.request.ReviewRequest;
+import com.instargram101.observesite.dto.request.ReviewRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +20,7 @@ public class ObservesiteReviewController {
     @PostMapping("/latitude/{latitude}/longitude/{longitude}")
     public ResponseEntity<CommonApiResponse> createReviews(@PathVariable Float latitude,
                                                            @PathVariable Float longitude,
-                                                           @RequestBody ReviewRequest request){
+                                                           @RequestBody ReviewRequestDto request){
         return null;
     }
 
@@ -29,7 +29,7 @@ public class ObservesiteReviewController {
     public ResponseEntity<CommonApiResponse> modifyReviews(@PathVariable Long reviewId,
                                                            @PathVariable Float latitude,
                                                            @PathVariable Float longitude,
-                                                           @RequestBody ReviewRequest request){
+                                                           @RequestBody ReviewRequestDto request){
         return null;
     }
 

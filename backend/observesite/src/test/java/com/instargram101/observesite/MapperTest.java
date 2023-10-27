@@ -1,6 +1,6 @@
 package com.instargram101.observesite;
 
-import com.instargram101.observesite.dto.request.ObserveSiteInfoRequest;
+import com.instargram101.observesite.dto.request.ObserveSiteInfoRequestDto;
 import com.instargram101.observesite.mapper.ObserveSiteRequestMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -13,7 +13,7 @@ public class MapperTest {
 
     @Test
     void observeSiteMapper(){
-        var request = ObserveSiteInfoRequest.builder()
+        var request = ObserveSiteInfoRequestDto.builder()
                 .name("ppsrac")
                 .latitude(Float.valueOf("37.1234"))
                 .longitude(Float.valueOf("127.1234"))
