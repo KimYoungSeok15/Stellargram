@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ObserveSiteResponse {
+public class ObserveSiteResponseDto {
 
     @NotNull
     private Float latitude;

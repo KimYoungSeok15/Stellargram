@@ -1,11 +1,6 @@
 package com.instargram101.observesite.service;
 
-import com.instargram101.global.common.response.CommonApiResponse;
-import com.instargram101.observesite.dto.request.ObserveSiteInfoRequest;
-import com.instargram101.observesite.dto.response.ObserveSiteResponse;
 import com.instargram101.observesite.entity.ObserveSite;
-import com.instargram101.observesite.mapper.ObserveSiteRequestMapper;
-import com.instargram101.observesite.mapper.ObserveSiteResponseMapper;
 import com.instargram101.observesite.repoository.ObserveSiteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

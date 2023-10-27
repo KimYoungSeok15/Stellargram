@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SampleResponse {
+public class SampleResponseDto {
 
     @NotBlank
     private String status;

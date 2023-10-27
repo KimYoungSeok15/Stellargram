@@ -2,15 +2,12 @@ package com.instargram101.observesite.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.observesite.business.ObservesiteBusiness;
-import com.instargram101.observesite.dto.request.ObserveSiteInfoRequest;
-import com.instargram101.observesite.dto.response.SampleResponse;
-import com.instargram101.observesite.service.ObserveSiteService;
+import com.instargram101.observesite.dto.request.ObserveSiteInfoRequestDto;
+import com.instargram101.observesite.dto.response.SampleResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +19,7 @@ public class ObservesiteController {
     @GetMapping("test")
     public ResponseEntity<CommonApiResponse> sampleController(){ //ResponseEntity로 안 감싸줘도 됨.
 
-        var data = SampleResponse.builder()
+        var data = SampleResponseDto.builder()
                 .status("OK")
                 .build();
 
@@ -32,9 +29,9 @@ public class ObservesiteController {
     }
 
 
-    //TODO: ObserveSiteInfoRequest request를 받아 관측지 정보와 함께 사용자 정보를 넘겨줄 예정.
+    //TODO: ObserveSiteInfoRequestDto request를 받아 관측지 정보와 함께 사용자 정보를 넘겨줄 예정.
     @PostMapping("")
-    public ResponseEntity<CommonApiResponse> createObserveSite(@RequestBody ObserveSiteInfoRequest request,
+    public ResponseEntity<CommonApiResponse> createObserveSite(@RequestBody ObserveSiteInfoRequestDto request,
                                                                @RequestHeader("myId") Long memberId){
         return new ResponseEntity(observeSiteBusiness.createObserveSite(request, memberId), HttpStatus.valueOf(201));
     }
@@ -50,7 +47,7 @@ public class ObservesiteController {
     @PatchMapping("latitude/{latitude}/longitude/{longitude}")
     public ResponseEntity<CommonApiResponse> modifyObserveSite(@PathVariable Float latitude,
                                                                @PathVariable Float longitude,
-                                                               @RequestBody ObserveSiteInfoRequest request){
+                                                               @RequestBody ObserveSiteInfoRequestDto request){
         return null;
     }
 
