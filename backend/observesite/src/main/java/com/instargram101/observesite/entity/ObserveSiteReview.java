@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "observe_site_review")
@@ -30,4 +31,7 @@ public class ObserveSiteReview {
 
     @Column
     private Long memberId;
+
+    @Column
+    private LocalDateTime createdAt;
 }
