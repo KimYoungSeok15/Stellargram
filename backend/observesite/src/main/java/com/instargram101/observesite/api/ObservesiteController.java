@@ -28,19 +28,16 @@ public class ObservesiteController {
         return ResponseEntity.ok(response);
     }
 
-
-    //TODO: ObserveSiteInfoRequestDto request를 받아 관측지 정보와 함께 사용자 정보를 넘겨줄 예정.
     @PostMapping("")
     public ResponseEntity<CommonApiResponse> createObserveSite(@RequestBody ObserveSiteInfoRequestDto request,
                                                                @RequestHeader("myId") Long memberId){
         return new ResponseEntity(observeSiteBusiness.createObserveSite(request, memberId), HttpStatus.valueOf(201));
     }
 
-    //TODO: Latitude와 Longitude를 Path Variable로 받아 그 근처의 관측지를 반환
     @GetMapping("latitude/{latitude}/longitude/{longitude}")
     public ResponseEntity<CommonApiResponse> searchObserveSite(@PathVariable Float latitude,
                                                                @PathVariable Float longitude){
-        return null;
+        return ResponseEntity.ok(observeSiteBusiness.getObserveSite(latitude, longitude));
     }
 
     //TODO: Latitude와 Longitude를 Path Variable로 받아 내용 수정(테스트 용)

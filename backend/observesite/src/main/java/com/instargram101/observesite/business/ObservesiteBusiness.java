@@ -25,4 +25,10 @@ public class ObservesiteBusiness {
         var response = observeSiteResponseMapper.toResponse(newObserveSite);
         return CommonApiResponse.WELL_CREATED(response);
     }
+
+    public CommonApiResponse<ObserveSiteResponseDto> getObserveSite(Float latitude, Float longitude){
+        var observeSite = observeSiteService.getObserveSite(latitude, longitude);
+        var response = observeSiteResponseMapper.toResponse(observeSite);
+        return CommonApiResponse.OK(response);
+    }
 }
