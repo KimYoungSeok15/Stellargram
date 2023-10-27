@@ -4,8 +4,8 @@ import com.instargram101.global.annotation.Business;
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.observesite.dto.request.ObserveSiteInfoRequestDto;
 import com.instargram101.observesite.dto.response.ObserveSiteResponseDto;
-import com.instargram101.observesite.mapper.ObserveSiteRequestMapper;
-import com.instargram101.observesite.mapper.ObserveSiteResponseMapper;
+import com.instargram101.observesite.converter.mapper.ObserveSiteRequestMapper;
+import com.instargram101.observesite.converter.mapper.ObserveSiteResponseMapper;
 import com.instargram101.observesite.service.ObserveSiteServiceImpl;
 import lombok.RequiredArgsConstructor;
 

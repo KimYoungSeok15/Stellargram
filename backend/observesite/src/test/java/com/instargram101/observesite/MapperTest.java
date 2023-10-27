@@ -2,8 +2,8 @@ package com.instargram101.observesite;
 
 import com.instargram101.observesite.dto.request.ObserveSiteInfoRequestDto;
 import com.instargram101.observesite.dto.request.ReviewRequestDto;
-import com.instargram101.observesite.mapper.ObserveSiteRequestMapper;
-import com.instargram101.observesite.mapper.ReviewRequestMapper;
+import com.instargram101.observesite.converter.mapper.ObserveSiteRequestMapper;
+import com.instargram101.observesite.converter.mapper.ReviewRequestMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.SpringBootTest;

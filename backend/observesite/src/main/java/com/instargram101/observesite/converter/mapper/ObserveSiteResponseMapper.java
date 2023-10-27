@@ -1,4 +1,4 @@
-package com.instargram101.observesite.mapper;
+package com.instargram101.observesite.converter.mapper;
 
 import com.instargram101.observesite.dto.response.ObserveSiteResponseDto;
 import com.instargram101.observesite.entity.ObserveSite;

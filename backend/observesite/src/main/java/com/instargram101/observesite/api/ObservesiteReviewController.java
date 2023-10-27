@@ -15,11 +15,10 @@ public class ObservesiteReviewController {
 
     private final ObservesiteReviewBusiness observesiteReviewBusiness;
 
-    //TODO: 특정 site의 longitude, latitude를 받아 review 목록 반환
     @GetMapping("/latitude/{latitude}/longitude/{longitude}")
     public ResponseEntity<CommonApiResponse> getReviews(@PathVariable Float latitude,
                                                         @PathVariable Float longitude){
-        return null;
+        return ResponseEntity.ok(observesiteReviewBusiness.getReviews(latitude, longitude));
     }
 
     @PostMapping("/latitude/{latitude}/longitude/{longitude}")
@@ -31,7 +30,7 @@ public class ObservesiteReviewController {
         return new ResponseEntity(response, HttpStatus.valueOf(201));
     }
 
-    //TODO: 특정 site의 review 수정
+    //TODO: 특정 site의 review 수정 (디버깅 용)
     @PutMapping("{reviewId}/latitude/{latitude}/longitude/{longitude}")
     public ResponseEntity<CommonApiResponse> modifyReviews(@PathVariable Long reviewId,
                                                            @PathVariable Float latitude,
@@ -40,7 +39,7 @@ public class ObservesiteReviewController {
         return null;
     }
 
-    //TODO: 특정 site의 review 삭제
+    //TODO: 특정 site의 review 삭제 (디버깅 용)
     @DeleteMapping("{reviewId}/latitude/{latitude}/longitude/{longitude}")
     public ResponseEntity<CommonApiResponse> deleteReviews(@PathVariable Long reviewId,
                                                            @PathVariable Float latitude,
