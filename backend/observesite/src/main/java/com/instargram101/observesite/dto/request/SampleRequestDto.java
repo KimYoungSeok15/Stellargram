@@ -1,4 +1,4 @@
 package com.instargram101.observesite.dto.request;
 
-public class SampleRequest {
+public class SampleRequestDto {
 }
