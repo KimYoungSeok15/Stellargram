@@ -25,3 +25,5 @@ eureka:
       defaultZone: ${EUREKA_URL}
 value:
   chunk_size: 1000
+  minimum_review_count: 5
+  maximum_rendering_observe_site: 10
