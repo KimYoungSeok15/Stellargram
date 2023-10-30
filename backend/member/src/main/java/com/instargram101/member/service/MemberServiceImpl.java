@@ -60,4 +60,12 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
 
     }
+
+    public Boolean deleteMember(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        member.setActivated(false);
+        memberRepository.save(member);
+        return true;
+    }
 }

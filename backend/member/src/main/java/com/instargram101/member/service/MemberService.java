@@ -12,5 +12,6 @@ public interface MemberService {
     Boolean checkNickname(String nickname);
     Member searchMember(Long memberId);
     Member updateNickname(Long memberId, String nickname);
+    Boolean deleteMember(Long memberId);
 
 }
