@@ -1,6 +1,7 @@
 package com.instargram101.member.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
+import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.dto.response.SampleResponse;
 import com.instargram101.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,13 @@ public class MemberController {
     public ResponseEntity<CommonApiResponse<Boolean>> checkById(@RequestHeader("myId") Long memberId) {
         boolean isExist = memberServiceImpl.checkMember(memberId);
         var response = CommonApiResponse.OK(isExist);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<CommonApiResponse> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
+        var member = memberServiceImpl.createMember(memberId, request);
+        var response = CommonApiResponse.OK(member);
         return ResponseEntity.ok(response);
     }
 }
