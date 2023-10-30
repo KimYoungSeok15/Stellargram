@@ -68,4 +68,12 @@ public class MemberController {
 //        var member = memberServiceImpl.searchMember(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
+
+    @PatchMapping("/nickname")
+    public ResponseEntity<CommonApiResponse> updateNickname(@RequestHeader("myId") Long memberId, @RequestBody Map<String, Object> request) {
+        var nickname = (String) request.get("nickname");
+        var member = memberServiceImpl.updateNickname(memberId, nickname);
+        var response = CommonApiResponse.OK(member);
+        return ResponseEntity.ok(response);
+    }
 }

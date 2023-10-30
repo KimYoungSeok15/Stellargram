@@ -11,4 +11,5 @@ public interface MemberService {
     Member createMember(Long memberId, SignMemberRequestDto request);
     Boolean checkNickname(String nickname);
     Optional<Member> searchMember(Long memberId);
+    Optional<Member> updateNickname(Long memberId, String nickname);
 }

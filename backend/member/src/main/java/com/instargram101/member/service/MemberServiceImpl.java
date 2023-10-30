@@ -48,4 +48,17 @@ public class MemberServiceImpl implements MemberService {
     public Optional<Member> searchMember(Long memberId) {
         return memberRepository.findByMemberId(memberId);
     }
+
+    public Optional<Member> updateNickname(Long memberId, String nickname) {
+        Optional<Member> ismember = memberRepository.findById(memberId);
+//                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        if (ismember.isPresent()) {
+            Member member = ismember.get();
+            member.setNickname(nickname);
+            memberRepository.save(member);
+            return Optional.of(member);
+        } else {
+            return Optional.empty();
+        }
+    }
 }
