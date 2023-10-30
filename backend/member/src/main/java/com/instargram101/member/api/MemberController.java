@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -32,14 +34,19 @@ public class MemberController {
     @GetMapping("/check")
     public ResponseEntity<CommonApiResponse<Boolean>> checkById(@RequestHeader("myId") Long memberId) {
         boolean isExist = memberServiceImpl.checkMember(memberId);
-        var response = CommonApiResponse.OK(isExist);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(CommonApiResponse.OK(isExist));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<CommonApiResponse> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
         var member = memberServiceImpl.createMember(memberId, request);
-        var response = CommonApiResponse.OK(member);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
+
+    @GetMapping("/check-duplicate")
+    public ResponseEntity<CommonApiResponse<Boolean>> checkByNickname(@RequestBody Map<String, Object> request) {
+        var nickname = (String) request.get("nickname");
+        boolean isSuccess = memberServiceImpl.checkNickname(nickname);
+        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
     }
 }

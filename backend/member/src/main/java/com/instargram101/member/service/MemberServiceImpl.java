@@ -38,4 +38,8 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.save(member);
     }
+
+    public Boolean checkNickname(String nickname) {
+        return !memberRepository.existsByNickname(nickname);
+    }
 }
