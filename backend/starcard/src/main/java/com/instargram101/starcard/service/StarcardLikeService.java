@@ -1,9 +1,6 @@
 package com.instargram101.starcard.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
-@Service
-public class StarcardLikeService implements StarcardLikeServiceImpl {
+public interface StarcardLikeService {
+
 }

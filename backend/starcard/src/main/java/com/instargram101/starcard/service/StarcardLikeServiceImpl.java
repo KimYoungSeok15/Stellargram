@@ -1,4 +1,8 @@
 package com.instargram101.starcard.service;
 
-public interface StarcardLikeServiceImpl {
+import org.springframework.stereotype.Service;
+
+@Service
+public class StarcardLikeServiceImpl implements StarcardLikeService {
+
 }

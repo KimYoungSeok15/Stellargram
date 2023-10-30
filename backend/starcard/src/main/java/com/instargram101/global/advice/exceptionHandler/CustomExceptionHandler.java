@@ -31,6 +31,6 @@ public class CustomExceptionHandler {
 
         return ResponseEntity
                 .status(status)
-                .body(CommonApiResponse.ERROR(ErrorCode.SERVER_ERROR, description));
+                .body(CommonApiResponse.ERROR(exception.getErrorCodeInterface(), description));
     }
 }
