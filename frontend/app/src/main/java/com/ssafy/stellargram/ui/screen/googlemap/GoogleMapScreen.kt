@@ -22,6 +22,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.ssafy.stellargram.ui.screen.base.BaseFrame
 
 @Composable
 fun GoogleMapScreen(navController: NavController){
@@ -40,23 +41,28 @@ fun GoogleMapScreen(navController: NavController){
             MapUiSettings(mapToolbarEnabled = false)
         )
     }
-    Box(Modifier.fillMaxSize()) {
-        GoogleMap(properties = mapProperties, uiSettings = mapUiSettings, cameraPositionState = cameraPositionState, modifier = Modifier.width(300.dp).height(500.dp))
-        Column {
-            Button(onClick = {
-                mapProperties = mapProperties.copy(
-                    isBuildingEnabled = !mapProperties.isBuildingEnabled
-                )
-            }) {
-                Text(text = "Toggle isBuildingEnabled")
-            }
-            Button(onClick = {
-                mapUiSettings = mapUiSettings.copy(
-                    mapToolbarEnabled = !mapUiSettings.mapToolbarEnabled
-                )
-            }) {
-                Text(text = "Toggle mapToolbarEnabled")
+    BaseFrame(navController=navController) {
+        Box(Modifier.fillMaxSize()) {
+            GoogleMap(properties = mapProperties, uiSettings = mapUiSettings, cameraPositionState = cameraPositionState, modifier = Modifier
+                .width(300.dp)
+                .height(500.dp))
+            Column {
+                Button(onClick = {
+                    mapProperties = mapProperties.copy(
+                        isBuildingEnabled = !mapProperties.isBuildingEnabled
+                    )
+                }) {
+                    Text(text = "Toggle isBuildingEnabled")
+                }
+                Button(onClick = {
+                    mapUiSettings = mapUiSettings.copy(
+                        mapToolbarEnabled = !mapUiSettings.mapToolbarEnabled
+                    )
+                }) {
+                    Text(text = "Toggle mapToolbarEnabled")
+                }
             }
         }
+
     }
 }
