@@ -28,4 +28,5 @@ public enum MemberErrorCode implements ErrorCodeInterface {
     private final Integer code;
 
     private final String message;
+
 }

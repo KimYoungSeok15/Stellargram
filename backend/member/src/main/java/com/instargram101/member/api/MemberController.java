@@ -1,15 +1,20 @@
 package com.instargram101.member.api;
 
+import com.instargram101.global.common.exception.customException.CustomException;
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.dto.response.SampleResponse;
+import com.instargram101.member.entity.Member;
+import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -48,5 +53,12 @@ public class MemberController {
         var nickname = (String) request.get("nickname");
         boolean isSuccess = memberServiceImpl.checkNickname(nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<CommonApiResponse> searchByMemberId(@RequestHeader("myId") Long memberId) {
+        var member = memberServiceImpl.searchMember(memberId);
+//        var member = memberServiceImpl.searchMember(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 }
