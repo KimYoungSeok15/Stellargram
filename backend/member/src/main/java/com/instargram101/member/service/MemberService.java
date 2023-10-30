@@ -7,4 +7,5 @@ public interface MemberService {
 
     Boolean checkMember(Long memberId);
     Member createMember(Long memberId, SignMemberRequestDto request);
+    Boolean checkNickname(String nickname);
 }

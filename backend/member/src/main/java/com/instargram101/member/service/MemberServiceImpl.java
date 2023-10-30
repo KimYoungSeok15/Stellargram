@@ -38,4 +38,9 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.save(member);
     }
+
+    public Boolean checkNickname(String nickname) {
+        Optional<Member> member = memberRepository.findByNickname(nickname);
+        return member.isEmpty();
+    }
 }

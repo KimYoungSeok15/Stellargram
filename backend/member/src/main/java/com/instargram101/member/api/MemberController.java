@@ -1,6 +1,7 @@
 package com.instargram101.member.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
+import com.instargram101.member.dto.request.NicknameRequestDto;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.dto.response.SampleResponse;
 import com.instargram101.member.service.MemberService;
@@ -40,6 +41,13 @@ public class MemberController {
     public ResponseEntity<CommonApiResponse> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
         var member = memberServiceImpl.createMember(memberId, request);
         var response = CommonApiResponse.OK(member);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/check-duplicate")
+    public ResponseEntity<CommonApiResponse<Boolean>> checkByNickname(@RequestBody NicknameRequestDto request) {
+        boolean isSuccess = memberServiceImpl.checkNickname(request.getNickname());
+        var response = CommonApiResponse.OK(isSuccess);
         return ResponseEntity.ok(response);
     }
 }
