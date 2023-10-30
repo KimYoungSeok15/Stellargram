@@ -56,7 +56,14 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<CommonApiResponse> searchByMemberId(@RequestHeader("myId") Long memberId) {
+    public ResponseEntity<CommonApiResponse> searchByMemberIdMe(@RequestHeader("myId") Long memberId) {
+        var member = memberServiceImpl.searchMember(memberId);
+//        var member = memberServiceImpl.searchMember(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
+
+    @GetMapping("/others/{memberId}")
+    public ResponseEntity<CommonApiResponse> searchByMemberIdOthers(@PathVariable Long memberId) {
         var member = memberServiceImpl.searchMember(memberId);
 //        var member = memberServiceImpl.searchMember(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return ResponseEntity.ok(CommonApiResponse.OK(member));
