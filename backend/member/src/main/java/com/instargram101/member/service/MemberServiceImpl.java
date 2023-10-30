@@ -9,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
 
 @RequiredArgsConstructor
 @Service
@@ -19,7 +22,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     public Boolean checkMember(Long memberId) {
-        Optional<Member> member = memberRepository.findByMemberId(memberId);
+        Optional<Member> member = memberRepository.findById(memberId);
         return !member.isEmpty();
 
     }
@@ -37,7 +40,6 @@ public class MemberServiceImpl implements MemberService {
                 .followingCount(0L)
                 .cardCount(0L)
                 .build();
-
         return memberRepository.save(member);
     }
 
@@ -45,7 +47,17 @@ public class MemberServiceImpl implements MemberService {
         return !memberRepository.existsByNickname(nickname);
     }
 
-    public Optional<Member> searchMember(Long memberId) {
-        return memberRepository.findByMemberId(memberId);
+    public Member searchMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+    }
+
+
+    public Member updateNickname(Long memberId, String nickname) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        member.setNickname(nickname);
+        return memberRepository.save(member);
+
     }
 }

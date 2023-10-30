@@ -58,14 +58,19 @@ public class MemberController {
     @GetMapping("/me")
     public ResponseEntity<CommonApiResponse> searchByMemberIdMe(@RequestHeader("myId") Long memberId) {
         var member = memberServiceImpl.searchMember(memberId);
-//        var member = memberServiceImpl.searchMember(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 
     @GetMapping("/others/{memberId}")
     public ResponseEntity<CommonApiResponse> searchByMemberIdOthers(@PathVariable Long memberId) {
         var member = memberServiceImpl.searchMember(memberId);
-//        var member = memberServiceImpl.searchMember(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
+
+    @PatchMapping("/nickname")
+    public ResponseEntity<CommonApiResponse> updateNickname(@RequestHeader("myId") Long memberId, @RequestBody Map<String, Object> request) {
+        var nickname = (String) request.get("nickname");
+        var member = memberServiceImpl.updateNickname(memberId, nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 }
