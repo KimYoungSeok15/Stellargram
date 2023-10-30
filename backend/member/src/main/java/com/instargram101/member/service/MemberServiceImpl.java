@@ -37,7 +37,6 @@ public class MemberServiceImpl implements MemberService {
                 .followingCount(0L)
                 .cardCount(0L)
                 .build();
-
         return memberRepository.save(member);
     }
 
@@ -45,20 +44,17 @@ public class MemberServiceImpl implements MemberService {
         return !memberRepository.existsByNickname(nickname);
     }
 
-    public Optional<Member> searchMember(Long memberId) {
-        return memberRepository.findByMemberId(memberId);
+    public Member searchMember(Long memberId) {
+        Member member = memberRepository.findMemberByMemberId(memberId);
+        if(member == null) throw new CustomException(MemberErrorCode.Member_Not_Found);
+        return member;
     }
 
-    public Optional<Member> updateNickname(Long memberId, String nickname) {
-        Optional<Member> ismember = memberRepository.findById(memberId);
-//                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
-        if (ismember.isPresent()) {
-            Member member = ismember.get();
-            member.setNickname(nickname);
-            memberRepository.save(member);
-            return Optional.of(member);
-        } else {
-            return Optional.empty();
-        }
+    public Member updateNickname(Long memberId, String nickname) {
+        Member member = memberRepository.findMemberByMemberId(memberId);
+        if(member == null) throw new CustomException(MemberErrorCode.Member_Not_Found);
+        member.setNickname(nickname);
+        return memberRepository.save(member);
+
     }
 }
