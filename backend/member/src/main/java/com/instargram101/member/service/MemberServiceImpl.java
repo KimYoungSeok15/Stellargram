@@ -40,7 +40,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Boolean checkNickname(String nickname) {
-        Optional<Member> member = memberRepository.findByNickname(nickname);
-        return member.isEmpty();
+        return !memberRepository.existsByNickname(nickname);
     }
 }
