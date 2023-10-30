@@ -1,7 +1,9 @@
 package com.instargram101.member.service;
 
+import com.instargram101.global.common.exception.customException.CustomException;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
+import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,5 +43,9 @@ public class MemberServiceImpl implements MemberService {
 
     public Boolean checkNickname(String nickname) {
         return !memberRepository.existsByNickname(nickname);
+    }
+
+    public Optional<Member> searchMember(Long memberId) {
+        return memberRepository.findByMemberId(memberId);
     }
 }
