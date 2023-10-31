@@ -73,4 +73,10 @@ public class MemberController {
         var member = memberServiceImpl.updateNickname(memberId, nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
+
+    @GetMapping("/nickname/search/{searchNickname}")
+    public ResponseEntity<List<Member>> searchMembersByNickname(@PathVariable String searchNickname) {
+        List<Member> members = memberService.searchMembersByNickname(searchNickkname);
+        return ResponseEntity.ok(members);
+    }
 }

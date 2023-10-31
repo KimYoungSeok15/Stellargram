@@ -60,4 +60,9 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
 
     }
+
+    public List<Member> searchMembersByNickname(String searchNickname) {
+        List<Member> members = memberRepository.findByNicknameContaining(searchNickname);
+        return members;
+    }
 }
