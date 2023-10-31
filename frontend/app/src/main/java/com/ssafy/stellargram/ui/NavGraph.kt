@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
@@ -29,13 +30,17 @@ fun NavGraph(
             KakaoScreen(navController = navController)
         }
         composable(route = Screen.Home.route) {
-            HomeScreen(navController = navController)
+            BaseFrame(navController) {
+                HomeScreen(navController = navController)
+            }
         }
         composable(route = Screen.Example.route) {
             ExampleScreen(navController = navController)
         }
         composable(route = Screen.GoogleMap.route){
-            GoogleMapScreen(navController = navController)
+            BaseFrame(navController) {
+                GoogleMapScreen(navController = navController)
+            }
         }
 
     }
