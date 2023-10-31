@@ -73,4 +73,10 @@ public class MemberController {
         var member = memberServiceImpl.updateNickname(memberId, nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
+
+    @PatchMapping("/withdrawal")
+    public ResponseEntity<CommonApiResponse> deleteMember(@RequestHeader("myId") Long memberId) {
+        boolean isSuccess = memberServiceImpl.deleteMember(memberId);
+        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
+    }
 }
