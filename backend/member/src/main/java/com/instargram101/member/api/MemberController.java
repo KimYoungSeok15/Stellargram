@@ -23,6 +23,7 @@ import java.util.Optional;
 public class MemberController {
 
     private final MemberService memberServiceImpl;
+    private final FollowService followServiceImpl;
 
     @GetMapping("/test")
     public ResponseEntity<CommonApiResponse> sampleController(){ //ResponseEntity로 안 감싸줘도 됨.
@@ -72,5 +73,11 @@ public class MemberController {
         var nickname = (String) request.get("nickname");
         var member = memberServiceImpl.updateNickname(memberId, nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
+
+    @PostMapping("/follow/{followingId}")
+    public ResponseEntity<CommonApiResponse> followUser(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
+        boolean isSuccess = followService.followUser(myId, followingId);
+        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
     }
 }
