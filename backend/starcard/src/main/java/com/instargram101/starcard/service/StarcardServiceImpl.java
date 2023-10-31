@@ -6,8 +6,10 @@ import com.instargram101.starcard.dto.request.SaveCardRequestDto;
 import com.instargram101.starcard.dto.response.FindCardsResponseDto;
 import com.instargram101.starcard.dto.response.StarcardElement;
 import com.instargram101.starcard.entity.Starcard;
+import com.instargram101.starcard.entity.StarcardLike;
 import com.instargram101.starcard.entity.enums.StarcardCategory;
 import com.instargram101.starcard.exception.StarcardErrorCode;
+import com.instargram101.starcard.repoository.StarcardLikeRepository;
 import com.instargram101.starcard.repoository.StarcardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
 public class StarcardServiceImpl implements StarcardService {
 
     private final StarcardRepository starcardRepository;
-
+    private final StarcardLikeRepository starcardLikeRepository;
     private final S3Util s3Util;
 
     @Override
@@ -98,5 +101,30 @@ public class StarcardServiceImpl implements StarcardService {
     public List<Long> findLikeedMembers(Long cardId) {
         List<Long> memberIds = starcardRepository.findLikedMembersByCardId(cardId);
         return memberIds;
+    }
+
+    @Override
+    public String likeCard(Long myId, Long cardId) {
+        AtomicReference<Boolean> notPresent = new AtomicReference<>(false);
+        starcardLikeRepository.findByMemberIdAndCardId(myId, cardId).ifPresentOrElse(
+                starcardLikeRepository::delete,
+                () ->{
+                    notPresent.set(true);
+                    Starcard starcard = starcardRepository.findById(cardId).orElseThrow(
+                            ()-> new CustomException(StarcardErrorCode.Starcard_Not_Found));
+
+                    StarcardLike starcardLike  = StarcardLike.builder()
+                            .memberId(myId)
+                            .card(starcard)
+                            .build();
+
+                    starcardLikeRepository.save(starcardLike);
+                }
+        );
+        if (notPresent.get().equals(false)){
+            return "좋아요해제완료";
+        } else {
+            return "좋아요설정완료";
+        }
     }
 }
