@@ -73,4 +73,10 @@ public class MemberController {
         var member = memberServiceImpl.updateNickname(memberId, nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
+
+    @PatchMapping("/profile-image")
+    public ResponseEntity<CommonApiResponse> updateProfileImage(@RequestHeader("myId") Long memberId, @RequestBody MultipartFile file) {
+        var member = memberService.updateProfileImagee(memberId, file);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
 }
