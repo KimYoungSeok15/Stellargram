@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -37,6 +36,7 @@ public class StarcardController {
     public ResponseEntity<CommonApiResponse> findLikedMembers(@PathVariable Long cardId) {
         return ResponseEntity.ok(CommonApiResponse.OK("조회성공", starcardService.findLikeedMembers(cardId)));
     }
+
     @DeleteMapping("/card/{cardId}")
     public ResponseEntity<CommonApiResponse> deleteCard(@RequestHeader("myId") Long myId, @PathVariable Long cardId) {
         return ResponseEntity.ok(CommonApiResponse.OK("삭제성공", starcardService.deleteCard(myId, cardId)));
@@ -46,5 +46,10 @@ public class StarcardController {
     @PostMapping("/card")
     public ResponseEntity<CommonApiResponse> saveCard(@RequestHeader("myId") Long myId, @RequestPart SaveCardRequestDto requestDto, @RequestPart MultipartFile imageFile) throws IOException {
         return ResponseEntity.ok(CommonApiResponse.OK("카드저장성공", starcardService.saveCard(myId, requestDto, imageFile)));
+    }
+
+    @GetMapping("/card/{cardId}/likes")
+    public ResponseEntity<CommonApiResponse> likeCard(@RequestHeader("myId") Long myId, @PathVariable Long cardId){
+        return ResponseEntity.ok(CommonApiResponse.OK("좋아요작업성공", starcardService.likeCard(myId, cardId)));
     }
 }

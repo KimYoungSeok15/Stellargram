@@ -19,4 +19,6 @@ public interface StarcardService {
     FindCardsResponseDto findLikeCards(Long myId, Long memberId);
 
     List<Long> findLikeedMembers(Long cardId);
+
+    String likeCard(Long myId, Long cardId);
 }
