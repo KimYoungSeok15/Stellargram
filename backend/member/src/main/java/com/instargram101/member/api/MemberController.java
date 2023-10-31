@@ -73,4 +73,11 @@ public class MemberController {
         var member = memberServiceImpl.updateNickname(memberId, nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
+
+    @GetMapping("/like-member/{cardId}")
+    public List<Member> getMembersByCardId(@PathVariable Long cardId) {
+        List<Long> memberIds = memberService.getMemberIdsByCardId(cardId);
+        List<Member> members = memberService.getMembersByMemberIds(memberIds);
+        return members;
+    }
 }

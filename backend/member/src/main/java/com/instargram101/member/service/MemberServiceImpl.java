@@ -60,4 +60,12 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
 
     }
+
+    public List<Long> getMemberIdsByCardId(Long cardId) {
+        return cardServiceClient.getMemberIdsByCardId(cardId);
+    }
+
+    public List<Member> getMembersByMemberIds(List<Long> memberIds) {
+        return memberRepository.findAllById(memberIds);
+    }
 }
