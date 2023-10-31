@@ -85,15 +85,17 @@ dependencies {
         implementation("com.kakao.sdk:v2-all:2.17.0") // 전체 모듈 설치, 2.11.0 버전부터 지원
 
     // Dependency implementation for maps
-        implementation ("com.google.maps.android:maps-compose:4.0.0")
+        implementation ("com.google.maps.android:maps-compose:4.1.1")
 
         // Optionally, you can include the Compose utils library for Clustering,
         // Street View metadata checks, etc.
-        implementation ("com.google.maps.android:maps-compose-utils:4.0.0")
+        implementation ("com.google.maps.android:maps-compose-utils:4.1.1")
 
         // Optionally, you can include the widgets library for ScaleBar, etc.
-        implementation ("com.google.maps.android:maps-compose-widgets:4.0.0")
+        implementation ("com.google.maps.android:maps-compose-widgets:4.1.1")
 
+        // location service from google play
+        implementation ("com.google.android.gms:play-services-location:21.0.1")
     // Dependency implementation for video
         val media3v = "1.0.0-rc01"
 
@@ -107,6 +109,8 @@ dependencies {
         //noinspection GradleDependency
         implementation("androidx.media3:media3-common:$media3v")
 
+    // Dependency implementation for get permissions
+    implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 }
 
 // Dependency injection with Hilt
