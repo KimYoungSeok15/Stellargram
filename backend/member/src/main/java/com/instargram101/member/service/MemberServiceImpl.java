@@ -60,4 +60,10 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
 
     }
+
+    public Long getMemberIdByNickname(String nickname) {
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        return member.getMemberId();
+    }
 }
