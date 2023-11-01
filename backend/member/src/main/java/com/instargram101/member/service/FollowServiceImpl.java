@@ -10,6 +10,7 @@ import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -52,5 +53,12 @@ public class FollowServiceImpl implements FollowService {
     public void setFollowCount(Member member, int count) {
         member.setFollowCount(member.getFollowCount() + count);
         memberRepository.save(member);
+    }
+
+
+    public List<Member> getFollowers(Long memberId) {
+        List<Long> followerIds = followRepository.findFollowerIdsByFollowingId(memberId);
+        List<Member> followers = memberRepository.findAllById(followerIds);
+        return followers;
     }
 }

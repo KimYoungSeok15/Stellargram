@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -92,5 +93,11 @@ public class MemberController {
     public ResponseEntity<CommonApiResponse> deleteFollow(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
         boolean isSuccess = followServiceImpl.deleteFollow(myId, followingId);
         return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
+    }
+
+    @GetMapping("/follow/{memberId}")
+    public ResponseEntity<List<Member>> getFollowers(@PathVariable Long memberId) {
+        List<Member> followers = followServiceImpl.getFollowers(memberId);
+        return ResponseEntity.ok(followers);
     }
 }
