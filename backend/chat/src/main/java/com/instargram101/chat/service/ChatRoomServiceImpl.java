@@ -7,8 +7,6 @@ import com.instargram101.chat.entity.ChatRoom;
 import com.instargram101.chat.repository.ChatJoinRepository;
 import com.instargram101.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

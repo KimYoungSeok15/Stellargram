@@ -3,8 +3,6 @@ package com.instargram101.chat.service;
 import com.instargram101.chat.dto.response.MessageListResponse;
 import com.instargram101.chat.entity.ChatMessage;
 
-import java.util.List;
-
 public interface MessageService {
 
     // 특정 채팅방에 메세지 보내기
