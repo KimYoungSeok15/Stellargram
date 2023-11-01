@@ -106,4 +106,11 @@ public class MemberController {
         List<Member> followingMembers = followServiceImpl.getFollowingMembers(memberId);
         return ResponseEntity.ok(CommonApiResponse.OK(followingMembers));
     }
+
+    @GetMapping("/id")
+    public ResponseEntity<CommonApiResponse> getMemberIdByNickname(@RequestBody Map<String, Object> request) {
+        var nickname = (String) request.get("nickname");
+        Long memberId = memberServiceImpl.getMemberIdByNickname(nickname);
+        return ResponseEntity.ok(CommonApiResponse.OK(memberId));
+    }
 }
