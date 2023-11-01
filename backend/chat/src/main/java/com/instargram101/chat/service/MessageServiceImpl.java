@@ -8,6 +8,7 @@ import com.instargram101.chat.repository.ChatRoomRepository;
 import com.instargram101.chat.repository.CountersRepository;
 import com.instargram101.chat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -78,6 +80,7 @@ public class MessageServiceImpl implements MessageService {
 
         //페이징해서 정보 가져오기
         List<ChatMessage> searchResult = messageRepository.findByRoomIdOrderByUnixTimestampDesc(roomId,pageable).getContent();
+//        List<ChatMessage> searchResult = messageRepository.findByRoomId(roomId,pageable).getContent();
 
         // 마지막 페이지라면 다음커서 -1
         if (searchResult.size() < chattingConfig.getPageSize())

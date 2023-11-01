@@ -20,4 +20,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     
     // 채팅방id에 해당하는 채팅방 존재 확인
     boolean existsByRoomId(Long roomId);
+
+    // 비어있지 않은 채팅방 목록 조회
+    @Query("SELECT cr FROM ChatRoom AS cr WHERE cr.personnel > 0" )
+    List<ChatRoom> findChatRoomNotEmpty();
 }

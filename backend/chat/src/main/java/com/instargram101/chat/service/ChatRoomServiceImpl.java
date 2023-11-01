@@ -27,7 +27,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatJoinRepository chatJoinRepository;
     private final ChattingConfig chatRoomConfig;
-    private final RedisMessageListenerContainer listenerContainer;
     private final MessageListenerAdapter listenerAdapter;
     private final TopicService topicService;
 
