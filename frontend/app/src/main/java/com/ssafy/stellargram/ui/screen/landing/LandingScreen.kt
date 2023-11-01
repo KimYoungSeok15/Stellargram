@@ -8,7 +8,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,6 +30,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.ui.Screen
 import java.io.File
 
 @Composable
@@ -63,6 +67,16 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
             modifier = Modifier
                 .clickable { navController.navigate("kakao") }
         )
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.Example.route)
+            },
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = "move to sphere")
+        }
     }
 }
 
