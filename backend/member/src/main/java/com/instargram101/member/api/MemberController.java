@@ -107,9 +107,10 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(followingMembers));
     }
 
-    @GetMapping("/id/{nickname}")
-    public ResponseEntity<Long> getMemberIdByNickname(@PathVariable String nickname) {
-        Long memberId = memberService.getMemberIdByNickname(nickname);
-        return ResponseEntity.ok(memberId);
+    @GetMapping("/id")
+    public ResponseEntity<CommonApiResponse> getMemberIdByNickname(@RequestBody Map<String, Object> request) {
+        var nickname = (String) request.get("nickname");
+        Long memberId = memberServiceImpl.getMemberIdByNickname(nickname);
+        return ResponseEntity.ok(CommonApiResponse.OK(memberId));
     }
 }

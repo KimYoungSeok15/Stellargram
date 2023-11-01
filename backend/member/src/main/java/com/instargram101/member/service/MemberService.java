@@ -13,6 +13,6 @@ public interface MemberService {
     Member searchMember(Long memberId);
     Member updateNickname(Long memberId, String nickname);
     Boolean deleteMember(Long memberId);
-    Long getMemberIdByNickname(String nickname)
+    Long getMemberIdByNickname(String nickname);
 
 }
