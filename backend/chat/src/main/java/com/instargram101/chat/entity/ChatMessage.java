@@ -12,12 +12,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Message {
+public class ChatMessage {
 
     @Id
-    private Long id;
+    private String id;
 
-    private LocalDateTime sendAt;
+    private Long seq;
+
+    private Long unixTimestamp;
 
     private String content;
 
