@@ -8,6 +8,7 @@ import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,6 +22,7 @@ import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final S3Service s3Service;
 
     public Boolean checkMember(Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
@@ -80,4 +82,13 @@ public class MemberServiceImpl implements MemberService {
         List<Member> members = memberRepository.findByNicknameContaining(searchNickname);
         return members;
     }
+
+    public Member updateProfileImage(Long memberId, MultipartFile file) {
+        String imageUrl = s3Service.uploadImageToS3(file);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
+        member.setProfileImageUrl(imageUrl);
+        return memberRepository.save(member);
+    }
+
 }

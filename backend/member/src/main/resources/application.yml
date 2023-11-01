@@ -24,3 +24,6 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URL}
 
+aws.s3.bucketName: "stellagram-bucket-a101"
+aws.s3.accessKey: ${ACCESS_KEY}
+aws.s3.secretAccessKey: ${SECRET_ACCESS_KEY}

@@ -120,4 +120,10 @@ public class MemberController {
         List<Member> members = memberServiceImpl.searchMembersByNickname(searchNickname);
         return ResponseEntity.ok(CommonApiResponse.OK(members));
     }
+
+    @PatchMapping("/profile-image")
+    public ResponseEntity<CommonApiResponse> updateProfileImage(@RequestHeader("myId") Long memberId, @RequestBody MultipartFile file) {
+        var member = memberService.updateProfileImagee(memberId, file);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
 }
