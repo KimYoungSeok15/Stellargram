@@ -87,4 +87,10 @@ public class MemberController {
         boolean isSuccess = followServiceImpl.followUser(myId, followingId);
         return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
     }
+
+    @DeleteMapping("/follow/{followingId}")
+    public ResponseEntity<CommonApiResponse> deleteFollow(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
+        boolean isSuccess = followServiceImpl.deleteFollow(myId, followingId);
+        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
+    }
 }
