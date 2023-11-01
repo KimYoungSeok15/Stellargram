@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration;
 public class ChattingConfig {
 
     // 최대 채팅방 수
-    private int maxRoomCount = 5;
+    private final int maxRoomCount = 5;
 
     // 채팅방 별 최대 인원 수
-    private int maxPersonnelCount = 100;
+    private final int maxPersonnelCount = 100;
 
     // 페이지네이션 최대 갯수
-    private int pageSize = 300;
+    private final int pageSize = 300;
 }
