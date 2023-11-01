@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FindFollowersListResponseDto {
+public class FindFollowListResponseDto {
     @NotBlank
     private Long memberId;
     @NotBlank
