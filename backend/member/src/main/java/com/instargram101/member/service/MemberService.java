@@ -15,4 +15,5 @@ public interface MemberService {
     Boolean deleteMember(Long memberId);
     Long getMemberIdByNickname(String nickname);
 
+    List<Member> searchMembersByNickname(String searchNickname);
 }

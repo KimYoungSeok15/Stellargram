@@ -113,4 +113,10 @@ public class MemberController {
         Long memberId = memberServiceImpl.getMemberIdByNickname(nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(memberId));
     }
+
+    @GetMapping("/nickname/search/{searchNickname}")
+    public ResponseEntity<List<Member>> searchMembersByNickname(@PathVariable String searchNickname) {
+        List<Member> members = memberService.searchMembersByNickname(searchNickkname);
+        return ResponseEntity.ok(members);
+    }
 }

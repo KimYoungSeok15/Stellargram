@@ -74,4 +74,9 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return member.getMemberId();
     }
+
+    public List<Member> searchMembersByNickname(String searchNickname) {
+        List<Member> members = memberRepository.findByNicknameContaining(searchNickname);
+        return members;
+    }
 }
