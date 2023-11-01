@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -73,5 +74,10 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return member.getMemberId();
+    }
+
+    public List<Member> searchMembersByNickname(String searchNickname) {
+        List<Member> members = memberRepository.findByNicknameContaining(searchNickname);
+        return members;
     }
 }
