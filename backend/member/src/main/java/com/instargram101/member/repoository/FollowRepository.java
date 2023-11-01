@@ -13,8 +13,9 @@ import java.util.Optional;
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query("SELECT f from Follow as f where f.follower.memberId = :followerId and f.followee.memberId = :followeeId")
     Optional<Follow> findByFollowerIdAndFolloweeId(Long followerId, Long followeeId);
-    @Query("SELECT f.follower.memberId from Follow as f where f.followee.memberId = :followingId")
-    List<Long> findFollowerIdsByFollowingId(Long followingId);
-    @Query("SELECT f.followee.memberId from Follow as f where f.follower.memberId = :followerId")
-    List<Long> findFollowingIdsByFollowerId(Long followerId);
+    @Query("SELECT f.follower from Follow as f where f.followee.memberId = :followingId")
+    List<Member> findFollowersByFollowingId(Long followingId);
+    @Query("SELECT f.followee from Follow as f where f.follower.memberId = :followerId")
+    List<Member> findFollowingMembersByFollowerId(Long followerId);
+
 }
