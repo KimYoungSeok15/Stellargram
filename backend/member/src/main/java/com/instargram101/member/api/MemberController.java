@@ -96,14 +96,14 @@ public class MemberController {
     }
 
     @GetMapping("/follow/{memberId}")
-    public ResponseEntity<List<Member>> getFollowers(@PathVariable Long memberId) {
+    public ResponseEntity<CommonApiResponse> getFollowers(@PathVariable Long memberId) {
         List<Member> followers = followServiceImpl.getFollowers(memberId);
-        return ResponseEntity.ok(followers);
+        return ResponseEntity.ok(CommonApiResponse.OK(followers));
     }
 
     @GetMapping("/following/{memberId}")
-    public ResponseEntity<List<Member>> getFollowing(@PathVariable Long memberId) {
-        List<Member> followingMembers = followService.getFollowingMembers(memberId);
-        return ResponseEntity.ok(followingMembers);
+    public ResponseEntity<CommonApiResponse> getFollowing(@PathVariable Long memberId) {
+        List<Member> followingMembers = followServiceImpl.getFollowingMembers(memberId);
+        return ResponseEntity.ok(CommonApiResponse.OK(followingMembers));
     }
 }

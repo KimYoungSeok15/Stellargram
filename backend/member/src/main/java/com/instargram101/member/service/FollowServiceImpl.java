@@ -61,8 +61,6 @@ public class FollowServiceImpl implements FollowService {
         List<Member> followers = memberRepository.findAllById(followerIds);
         return followers;
     }
-    private final FollowRepository followRepository;
-    private final MemberRepository memberRepository;
 
     public List<Member> getFollowingMembers(Long memberId) {
         List<Long> followingIds = followRepository.findFollowingIdsByFollowerId(memberId);
