@@ -6,6 +6,7 @@ import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.dto.response.SampleResponse;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.exception.MemberErrorCode;
+import com.instargram101.member.service.FollowService;
 import com.instargram101.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class MemberController {
 
     private final MemberService memberServiceImpl;
+    private final FollowService followServiceImpl;
 
     @GetMapping("/test")
     public ResponseEntity<CommonApiResponse> sampleController(){ //ResponseEntity로 안 감싸줘도 됨.
@@ -77,6 +79,12 @@ public class MemberController {
     @PatchMapping("/withdrawal")
     public ResponseEntity<CommonApiResponse> deleteMember(@RequestHeader("myId") Long memberId) {
         boolean isSuccess = memberServiceImpl.deleteMember(memberId);
+        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
+    }
+
+    @PostMapping("/follow/{followingId}")
+    public ResponseEntity<CommonApiResponse> followUser(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
+        boolean isSuccess = followServiceImpl.followUser(myId, followingId);
         return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
     }
 }
