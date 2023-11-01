@@ -8,4 +8,5 @@ public interface FollowService {
     void setFollowingCount(Member member, int count);
     void setFollowCount(Member member, int count);
 
+    List<Member> getFollowers(Long memberId)
 }

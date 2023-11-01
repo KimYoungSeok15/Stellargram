@@ -53,4 +53,12 @@ public class FollowServiceImpl implements FollowService {
         member.setFollowCount(member.getFollowCount() + count);
         memberRepository.save(member);
     }
+    private final FollowRepository followRepository;
+    private final MemberRepository memberRepository;
+
+    public List<Member> getFollowers(Long memberId) {
+        List<Long> followerIds = followRepository.findFollowerIdsByFollowingId(memberId);
+        List<Member> followers = memberRepository.findAllById(followerIds);
+        return followers;
+    }
 }
