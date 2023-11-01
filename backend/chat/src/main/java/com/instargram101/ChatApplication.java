@@ -1,4 +1,4 @@
-package com.instargram101.chat;
+package com.instargram101;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
