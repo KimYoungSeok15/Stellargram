@@ -100,4 +100,10 @@ public class MemberController {
         List<Member> followers = followServiceImpl.getFollowers(memberId);
         return ResponseEntity.ok(followers);
     }
+
+    @GetMapping("/following/{memberId}")
+    public ResponseEntity<List<Member>> getFollowing(@PathVariable Long memberId) {
+        List<Member> followingMembers = followService.getFollowingMembers(memberId);
+        return ResponseEntity.ok(followingMembers);
+    }
 }
