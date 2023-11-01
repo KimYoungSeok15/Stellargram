@@ -28,12 +28,12 @@ public class FollowServiceImpl implements FollowService {
     }
 
     public void setFollowingCount(Member member, int count) {
-        member.setFollowingCount(member.getFollowingCount() + 1);
+        member.setFollowingCount(member.getFollowingCount() + count);
         memberRepository.save(member);
     }
 
     public void setFollowCount(Member member, int count) {
-        member.setFollowCount(member.getFollowCount() + 1);
+        member.setFollowCount(member.getFollowCount() + count);
         memberRepository.save(member);
     }
 }
