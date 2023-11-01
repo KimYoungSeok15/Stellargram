@@ -3,6 +3,7 @@ package com.instargram101.member.service;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberService {

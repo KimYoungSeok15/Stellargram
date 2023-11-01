@@ -114,9 +114,10 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(memberId));
     }
 
-    @GetMapping("/nickname/search/{searchNickname}")
-    public ResponseEntity<List<Member>> searchMembersByNickname(@PathVariable String searchNickname) {
-        List<Member> members = memberService.searchMembersByNickname(searchNickkname);
-        return ResponseEntity.ok(members);
+    @GetMapping("/nickname/search")
+    public ResponseEntity<CommonApiResponse> searchMembersByNickname(@RequestBody Map<String, Object> request) {
+        var searchNickname = (String) request.get("searchNickname");
+        List<Member> members = memberServiceImpl.searchMembersByNickname(searchNickname);
+        return ResponseEntity.ok(CommonApiResponse.OK(members));
     }
 }
