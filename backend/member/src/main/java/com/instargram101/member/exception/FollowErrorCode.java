@@ -12,10 +12,10 @@ import lombok.Getter;
  * <p> Ex) throw new CustomException(MemberErrorCode.Member_Not_Found);
  *
  * @author S.H.Kim
-* @param {code} Http 에러 코드
+ * @param {code} Http 에러 코드
  * @param {message} 안의 description
-* @type {(code: Integer, message: String) => enum}
-*/
+ * @type {(code: Integer, message: String) => enum}
+ */
 
 
 @Getter
