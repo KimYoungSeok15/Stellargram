@@ -6,6 +6,7 @@ import com.instargram101.member.dto.response.MemberIdResponse;
 import com.instargram101.member.dto.response.MemberListResponse;
 import com.instargram101.member.dto.response.MemberResponse;
 import com.instargram101.member.dto.response.StatusResponse;
+import com.instargram101.member.entity.Member;
 import com.instargram101.member.service.FollowService;
 import com.instargram101.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,9 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<CommonApiResponse<MemberResponse>> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
-        MemberResponse response = MemberResponse.builder().member(memberServiceImpl.createMember(memberId, request)).build();
-        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    public ResponseEntity<CommonApiResponse<Member>> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
+        Member member = memberServiceImpl.createMember(memberId, request);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 
     @GetMapping("/check-duplicate")
@@ -48,9 +49,9 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<CommonApiResponse<MemberResponse>> searchByMemberIdMe(@RequestHeader("myId") Long memberId) {
-        MemberResponse response = MemberResponse.builder().member(memberServiceImpl.searchMember(memberId)).build();
-        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    public ResponseEntity<CommonApiResponse<Member>> searchByMemberIdMe(@RequestHeader("myId") Long memberId) {
+        Member member = memberServiceImpl.searchMember(memberId);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 
     @GetMapping("/others/{memberId}")
@@ -60,10 +61,10 @@ public class MemberController {
     }
 
     @PatchMapping("/nickname")
-    public ResponseEntity<CommonApiResponse<MemberResponse>> updateNickname(@RequestHeader("myId") Long memberId, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<CommonApiResponse<Member>> updateNickname(@RequestHeader("myId") Long memberId, @RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
-        MemberResponse response = MemberResponse.builder().member(memberServiceImpl.updateNickname(memberId, nickname)).build();
-        return ResponseEntity.ok(CommonApiResponse.OK(response));
+        Member member = memberServiceImpl.updateNickname(memberId, nickname);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 
     @PatchMapping("/withdrawal")
