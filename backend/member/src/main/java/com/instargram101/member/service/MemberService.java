@@ -20,6 +20,6 @@ public interface MemberService {
     Member updateProfileImage(Long memberId, MultipartFile imageFile) throws IOException;
     List<Member> searchMembersByNickname(String searchNickname);
     List<Long> getMemberIdsByCardId(Long cardId);
-    List<Member> getMembersByMemberIds(List<Long> memberIds)
+    List<Member> getMembersByMemberIds(List<Long> memberIds);
 
 }
