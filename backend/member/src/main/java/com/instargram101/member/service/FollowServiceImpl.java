@@ -56,12 +56,10 @@ public class FollowServiceImpl implements FollowService {
 
 
     public List<Member> getFollowers(Long memberId) {
-        List<Member> followers = followRepository.findFollowersByFollowingId(memberId);
-        return followers;
+        return followRepository.findFollowersByFollowingId(memberId);
     }
 
     public List<Member> getFollowingMembers(Long memberId) {
-        List<Member> followingMembers = followRepository.findFollowingMembersByFollowerId(memberId);
-        return followingMembers;
+        return followRepository.findFollowingMembersByFollowerId(memberId);
     }
 }
