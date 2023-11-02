@@ -13,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -120,4 +122,11 @@ public class MemberController {
         List<Member> members = memberServiceImpl.searchMembersByNickname(searchNickname);
         return ResponseEntity.ok(CommonApiResponse.OK(members));
     }
+
+    @PatchMapping("/profile-image")
+    public ResponseEntity<CommonApiResponse> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
+        var member =  memberServiceImpl.updateProfileImage(myId, profileImageFile);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
+    }
+
 }
