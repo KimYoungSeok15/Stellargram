@@ -5,14 +5,12 @@ import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.repoository.MemberRepository;
-import com.instargram101.member.service.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.io.IOException;
 
@@ -23,6 +21,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final S3UploadService s3UploadService;
+    private final CardServiceClient cardServiceClient;
 
 
     public Boolean checkMember(Long memberId) {
@@ -90,5 +89,13 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setProfileImageUrl(imageUrl);
         return memberRepository.save(member);
+    }
+
+    public List<Long> getMemberIdsByCardId(Long cardId) {
+        return cardServiceClient.getMemberIdsByCardId(cardId);
+    }
+
+    public List<Member> getMembersByMemberIds(List<Long> memberIds) {
+        return memberRepository.findAllById(memberIds);
     }
 }
