@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
-import java.util.Map;
 
 @FeignClient(name = "card-service", url = "k9a101.p.ssafy.io:8000/starcard")
 public interface CardServiceClient {

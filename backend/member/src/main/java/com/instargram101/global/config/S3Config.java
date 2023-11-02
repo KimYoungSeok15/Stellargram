@@ -3,7 +3,6 @@ package com.instargram101.global.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,8 @@ public class S3Config {
     private String accessKey;
     @Value("${cloud.aws.credentials.secretKey}")
     private String secretKey;
-//    @Value("${cloud.aws.region.static}")
-    private String region = "ap-northeast-2";
+    @Value("${cloud.aws.region.static}")
+    private String region;
 
     @Bean
     public AmazonS3Client amazonS3Client() {
