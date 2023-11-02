@@ -5,7 +5,7 @@ import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.repoository.MemberRepository;
-//import com.instargram101.member.service.S3UploadService;
+import com.instargram101.member.service.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

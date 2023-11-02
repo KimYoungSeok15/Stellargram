@@ -14,12 +14,12 @@ import java.io.IOException;
 public class S3UploadService {
     private final AmazonS3 amazonS3;
 
-    @Value("${cloud.aws.w3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     public String saveFile(MultipartFile multipartFile) throws IOException {
         String originalFilename = multipartFile.getOriginalFilename();
-
+        System.out.println(originalFilename);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());

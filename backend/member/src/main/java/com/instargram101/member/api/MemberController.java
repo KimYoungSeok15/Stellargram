@@ -124,8 +124,9 @@ public class MemberController {
     }
 
     @PatchMapping("/profile-image")
-    public ResponseEntity<CommonApiResponse> updateProfileImage(@RequestHeader("myId") Long myId, @RequestPart MultipartFile imageFile) throws IOException {
-        return ResponseEntity.ok(CommonApiResponse.OK("프로필저장성공", memberServiceImpl.updateProfileImage(myId, imageFile)));
+    public ResponseEntity<CommonApiResponse> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
+        var member =  memberServiceImpl.updateProfileImage(myId, profileImageFile);
+        return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 
 }
