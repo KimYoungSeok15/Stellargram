@@ -8,6 +8,7 @@ plugins {
 
     // For use secret api key
     id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+//    id ("kotlin-kapt")
 }
 
 android {
@@ -22,6 +23,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        kapt{
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -66,6 +72,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("com.google.android.gms:play-services-wallet:19.2.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -74,9 +81,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+
+
     // Dependency injection with Hilt
         implementation("com.google.dagger:hilt-android:2.44")
         kapt("com.google.dagger:hilt-android-compiler:2.44")
+        implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
     // Dependency implementation for navigator
         implementation("androidx.navigation:navigation-compose:2.7.4")
@@ -85,15 +95,17 @@ dependencies {
         implementation("com.kakao.sdk:v2-all:2.17.0") // 전체 모듈 설치, 2.11.0 버전부터 지원
 
     // Dependency implementation for maps
-        implementation ("com.google.maps.android:maps-compose:4.0.0")
+        implementation ("com.google.maps.android:maps-compose:4.1.1")
 
         // Optionally, you can include the Compose utils library for Clustering,
         // Street View metadata checks, etc.
-        implementation ("com.google.maps.android:maps-compose-utils:4.0.0")
+        implementation ("com.google.maps.android:maps-compose-utils:4.1.1")
 
         // Optionally, you can include the widgets library for ScaleBar, etc.
-        implementation ("com.google.maps.android:maps-compose-widgets:4.0.0")
+        implementation ("com.google.maps.android:maps-compose-widgets:4.1.1")
 
+        // location service from google play
+        implementation ("com.google.android.gms:play-services-location:21.0.1")
     // Dependency implementation for video
         val media3v = "1.0.0-rc01"
 
@@ -106,7 +118,48 @@ dependencies {
         // Common functionality used across multiple media libraries
         //noinspection GradleDependency
         implementation("androidx.media3:media3-common:$media3v")
+    //
 
+    val room_version = "2.5.0"
+
+        implementation("androidx.room:room-runtime:$room_version")
+        annotationProcessor("androidx.room:room-compiler:$room_version")
+
+        // To use Kotlin annotation processing tool (kapt)
+        kapt("androidx.room:room-compiler:$room_version")
+
+        // optional - Kotlin Extensions and Coroutines support for Room
+        implementation("androidx.room:room-ktx:$room_version")
+
+        // optional - RxJava2 support for Room
+        implementation("androidx.room:room-rxjava2:$room_version")
+
+        // optional - RxJava3 support for Room
+        implementation("androidx.room:room-rxjava3:$room_version")
+
+        // optional - Guava support for Room, including Optional and ListenableFuture
+        implementation("androidx.room:room-guava:$room_version")
+
+        // optional - Test helpers
+        testImplementation("androidx.room:room-testing:$room_version")
+
+        // optional - Paging 3 Integration
+        implementation("androidx.room:room-paging:$room_version")
+
+    // livedata implementation
+    implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
+
+    // Other supported types of state
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")}
+
+    // Dependency implementation for get permissions
+    implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
+
+        // Gson for parsing JSON
+        implementation("com.google.code.gson:gson:2.10.1")
+
+    // Glide
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 }
 
 // Dependency injection with Hilt
