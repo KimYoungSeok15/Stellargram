@@ -1,20 +1,22 @@
 package com.instargram101.chat.api;
 
 import com.instargram101.chat.dto.response.SampleResponse;
+import com.instargram101.chat.service.ChatRoomService;
+import com.instargram101.chat.service.MessageService;
 import com.instargram101.global.common.response.CommonApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("")
 @RequiredArgsConstructor
 public class ChatController {
+    public final ChatRoomService chatRoomService;
+    public final MessageService messageService;
 
     @GetMapping("/test")
-    public ResponseEntity<CommonApiResponse> sampleController(){ //ResponseEntity로 안 감싸줘도 됨.
+    public ResponseEntity<CommonApiResponse> sampleController() { //ResponseEntity로 안 감싸줘도 됨.
 
         var data = SampleResponse.builder()
                 .status("OK")
@@ -23,6 +25,34 @@ public class ChatController {
         //var response = CommonApiResponse.OK(data); // 기본 message "ok" 출력.
         var response = CommonApiResponse.OK("sample message", data); //넣고 싶은 데이터를 넣으면 된다.
         return ResponseEntity.ok(response);
+    }
+
+    // 내 채팅방 목록 조회
+    @GetMapping("/rooms")
+    public ResponseEntity<CommonApiResponse> getMyRoomList(@RequestHeader("myId") Long myId) {
+
+        return ResponseEntity.ok(CommonApiResponse.OK("조회 성공", chatRoomService.findMyRooms(myId)));
+    }
+
+    // 특정 채팅방의 이전 메세지 가져오기
+    @GetMapping("open/{chatRoomId}/{cursor}")
+    public ResponseEntity<CommonApiResponse> findPastMessages(@PathVariable(name = "chatRoomId") Long chatRoomId, @PathVariable(name = "cursor") int cursor) {
+        return ResponseEntity.ok(CommonApiResponse.OK("조회성공 방:" + chatRoomId + " 페이지:" + cursor, messageService.getMessagesOfRoom(chatRoomId, cursor)));
+    }
+
+    // 채팅방 참여하기
+    @PostMapping("/join/{observeSiteId}")
+    public ResponseEntity<CommonApiResponse> joinRoom(@RequestHeader("myId") Long myId, @PathVariable(name = "observeSiteId") String siteId) {
+        var response = chatRoomService.joinRoomBySiteId(siteId, myId);
+        return ResponseEntity.ok(CommonApiResponse.OK("채팅방 참여 완료. 웹소켓 구독 필요", response));
+
+    }
+
+    // 채팅방 나가기
+    @DeleteMapping("/leave/{chatRoomId}")
+    public ResponseEntity<CommonApiResponse> leaveRoom(@RequestHeader("myId") Long myId, @PathVariable(name = "chatRoomId") Long chatRoomId) {
+        var response = chatRoomService.leaveRoom(chatRoomId, myId);
+        return ResponseEntity.ok(CommonApiResponse.OK("채팅방 퇴장 완료. 웹소켓 구독 해체 필요", response));
     }
 
 }
