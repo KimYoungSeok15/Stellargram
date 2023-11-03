@@ -12,7 +12,7 @@ import java.util.Arrays;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommonApiResponse<T> {
+public class  CommonApiResponse<T> {
 
     private Integer code; // http status 코드
 
