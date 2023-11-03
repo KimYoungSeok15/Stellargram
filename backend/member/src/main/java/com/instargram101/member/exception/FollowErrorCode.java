@@ -12,17 +12,17 @@ import lombok.Getter;
  * <p> Ex) throw new CustomException(MemberErrorCode.Member_Not_Found);
  *
  * @author S.H.Kim
-* @param {code} Http 에러 코드
+ * @param {code} Http 에러 코드
  * @param {message} 안의 description
-* @type {(code: Integer, message: String) => enum}
-*/
+ * @type {(code: Integer, message: String) => enum}
+ */
 
 
 @Getter
 @AllArgsConstructor
-public enum MemberErrorCode implements ErrorCodeInterface {
+public enum FollowErrorCode implements ErrorCodeInterface {
 
-    Member_Not_Found(404, "User Not Found.") //TODO: 추가로 여기다 채워넣으면 됩니다.
+    FOLLOW_Not_Found(404, "Follow Not Found.") //TODO: 추가로 여기다 채워넣으면 됩니다.
     ;
 
     private final Integer code;
