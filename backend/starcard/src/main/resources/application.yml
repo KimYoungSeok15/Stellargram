@@ -1,4 +1,37 @@
-# ? ?? master server? commit? ??? spring.config.import ???? ?? commit ??
 spring:
+  application:
+    name: ${DOMAIN_NAME}
   config:
     import: env.yml
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${DB_ADDRESS}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
+          default_batch_fetch_size: 1000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    region:
+      static: ${S3_SERVER_LOCATION}
+    stack:
+      auto: false
