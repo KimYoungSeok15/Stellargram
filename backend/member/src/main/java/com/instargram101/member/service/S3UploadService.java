@@ -20,7 +20,7 @@ public class S3UploadService {
 
     public String saveFile(MultipartFile multipartFile) throws IOException {
         UUID uuid = UUID.randomUUID();
-        String originalFilename = "profile_image/"+uuid+"_"+multipartFile.getOriginalFilename();
+        String originalFilename = "profile_image/"+uuid+"_"+ multipartFile.getOriginalFilename();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());

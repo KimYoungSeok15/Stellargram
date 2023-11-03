@@ -1,5 +1,6 @@
 package com.instargram101.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -22,11 +23,12 @@ public class Member {
     @Column(columnDefinition = "varchar(20)", nullable = false)
     private String nickname;
 
+    @JsonIgnore
     @Column(nullable = false)
     private boolean activated;
 
-    @Column(columnDefinition = "varchar(100)", nullable = false)
-    private String profileImageUrl; //안 넣는 경우 base url로 넣어주기.
+    @Column(columnDefinition = "varchar(1000)")
+    private String profileImageUrl;
 
     @ColumnDefault("0")
     private Long followCount;
