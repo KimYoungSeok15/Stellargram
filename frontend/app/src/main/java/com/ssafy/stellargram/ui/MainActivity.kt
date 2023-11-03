@@ -38,8 +38,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val db = StarDatabase.getDatabase(this)
-        Log.d("GETSTARDB","$db")
+//        val db = StarDatabase.getDatabase(this)
+//        Log.d("GETSTARDB","$db")
     }
 }
 
