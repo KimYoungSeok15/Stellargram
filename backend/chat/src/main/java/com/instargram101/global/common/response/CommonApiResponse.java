@@ -5,6 +5,7 @@ import com.instargram101.global.common.exception.errorCode.ErrorCodeInterface;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import javax.validation.Valid;
 import java.util.Arrays;
@@ -56,6 +57,14 @@ public class CommonApiResponse<T> {
         response.code = errorCodeInterface.getCode();
         response.message = errorCodeInterface.getMessage();
         response.data = description;
+        return response;
+    }
+
+    public static CommonApiResponse<Object> ERROR(HttpStatus httpStatus, String message){
+        var response = new CommonApiResponse<Object>();
+        response.code = httpStatus.value();
+        response.message = message;
+//        response.data = null;
         return response;
     }
 }

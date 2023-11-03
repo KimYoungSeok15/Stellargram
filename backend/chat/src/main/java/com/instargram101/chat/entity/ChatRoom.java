@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "chat-room")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +21,15 @@ public class ChatRoom {
     @Column
     private Long personnel;
 
-    @Column
-    private Long observeSiteId;
+    @Column(unique = true, name = "observe_site_id", length = 20, nullable = false)
+    private String observeSiteId;
+
+    public void increasePersonnel(){
+        this.personnel++;
+    }
+
+    public void decreasePersonnel(){
+        this.personnel--;
+    }
+
 }

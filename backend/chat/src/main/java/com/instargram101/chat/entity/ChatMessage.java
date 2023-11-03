@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
-import java.time.LocalDateTime;
 
 @Document(collection = "message")
 @Data
@@ -12,12 +11,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Message {
+public class ChatMessage {
 
     @Id
-    private Long id;
+    private String id;
 
-    private LocalDateTime sendAt;
+    private Long seq;
+
+    private Long unixTimestamp;
 
     private String content;
 
