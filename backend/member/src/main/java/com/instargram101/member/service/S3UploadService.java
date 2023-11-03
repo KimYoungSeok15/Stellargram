@@ -19,10 +19,8 @@ public class S3UploadService {
     private String bucket;
 
     public String saveFile(MultipartFile multipartFile) throws IOException {
-        //기본 주소 https://stellagram-bucket-a101.s3.ap-northeast-2.amazonaws.com/profile_image/
         UUID uuid = UUID.randomUUID();
-        //기본 주소 분리, uuid 추가만 디비에 저장 방식 수정 필요
-        String originalFilename = "profile_image/"+multipartFile.getOriginalFilename();
+        String originalFilename = "profile_image/"+uuid+"_"+multipartFile.getOriginalFilename();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());

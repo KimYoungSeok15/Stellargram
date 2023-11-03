@@ -85,9 +85,11 @@ public class MemberServiceImpl implements MemberService {
 
     public Member updateProfileImage(Long memberId, MultipartFile imageFile) throws IOException  {
         String imageUrl = s3UploadService.saveFile(imageFile);
+        //기본 주소 https://stellagram-bucket-a101.s3.ap-northeast-2.amazonaws.com/profile_image/
+        System.out.println(imageUrl);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
-        member.setProfileImageUrl(imageUrl);
+//        member.setProfileImageUrl(imageUrl);
         return memberRepository.save(member);
     }
 

@@ -29,7 +29,7 @@ public class MemberController {
     private final MemberService memberServiceImpl;
     private final FollowService followServiceImpl;
 
-    @GetMapping("/check")
+        @GetMapping("/check")
     public ResponseEntity<CommonApiResponse<StatusResponse>> checkById(@RequestHeader("myId") Long memberId) {
         StatusResponse response = StatusResponse.builder().status(memberServiceImpl.checkMember(memberId)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
