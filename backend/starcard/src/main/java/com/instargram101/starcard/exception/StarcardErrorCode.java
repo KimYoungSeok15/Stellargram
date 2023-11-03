@@ -22,10 +22,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StarcardErrorCode implements ErrorCodeInterface {
 
-    Starcard_Not_Found(404, "Starcard Not Found.") //TODO: 추가로 여기다 채워넣으면 됩니다.
+    Starcard_Not_Found(404, "Starcard Not Found."), //TODO: 추가로 여기다 채워넣으면 됩니다.
+    Starcard_Forbidden(403, "Permission Denied."),
+    Starcard_Not_Found_Category(404, "Category Not Found")
     ;
 
     private final Integer code;
-
     private final String message;
 }
