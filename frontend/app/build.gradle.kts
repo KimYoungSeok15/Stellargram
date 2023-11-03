@@ -23,6 +23,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        kapt{
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -141,7 +146,8 @@ dependencies {
     // livedata implementation
     implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
 
-}
+    // Other supported types of state
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")}
 
 // Dependency injection with Hilt
 kapt {
