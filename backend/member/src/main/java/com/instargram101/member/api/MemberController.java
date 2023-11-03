@@ -37,8 +37,7 @@ public class MemberController {
 
     @PostMapping("/signup")
     public ResponseEntity<CommonApiResponse<Member>> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
-        Member member = memberServiceImpl.createMember(memberId, request);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.createMember(memberId, request)));
     }
 
     @GetMapping("/check-duplicate")
@@ -50,21 +49,18 @@ public class MemberController {
 
     @GetMapping("/me")
     public ResponseEntity<CommonApiResponse<Member>> searchByMemberIdMe(@RequestHeader("myId") Long memberId) {
-        Member member = memberServiceImpl.searchMember(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.searchMember(memberId)));
     }
 
     @GetMapping("/others/{memberId}")
-    public ResponseEntity<CommonApiResponse<MemberResponse>> searchByMemberIdOthers(@PathVariable Long memberId) {
-        MemberResponse response = MemberResponse.builder().member(memberServiceImpl.searchMember(memberId)).build();
-        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    public ResponseEntity<CommonApiResponse<Member>> searchByMemberIdOthers(@PathVariable Long memberId) {
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.searchMember(memberId)));
     }
 
     @PatchMapping("/nickname")
     public ResponseEntity<CommonApiResponse<Member>> updateNickname(@RequestHeader("myId") Long memberId, @RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
-        Member member = memberServiceImpl.updateNickname(memberId, nickname);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateNickname(memberId, nickname)));
     }
 
     @PatchMapping("/withdrawal")
@@ -73,7 +69,7 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
-    @PostMapping("/follow/{followingId}")
+    @GetMapping ("/follow/{followingId}")
     public ResponseEntity<CommonApiResponse<StatusResponse>> followUser(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
         StatusResponse response = StatusResponse.builder().status(followServiceImpl.followUser(myId, followingId)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
@@ -85,13 +81,13 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
-    @GetMapping("/follow/{memberId}")
+    @GetMapping("/follow-list/{memberId}")
     public ResponseEntity<CommonApiResponse<MemberListResponse>> getFollowers(@PathVariable Long memberId) {
         MemberListResponse response = MemberListResponse.builder().members(followServiceImpl.getFollowers(memberId)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
-    @GetMapping("/following/{memberId}")
+    @GetMapping("/following-list/{memberId}")
     public ResponseEntity<CommonApiResponse<MemberListResponse>> getFollowing(@PathVariable Long memberId) {
         MemberListResponse response = MemberListResponse.builder().members(followServiceImpl.getFollowingMembers(memberId)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
@@ -112,9 +108,8 @@ public class MemberController {
     }
 
     @PatchMapping("/profile-image")
-    public ResponseEntity<CommonApiResponse<MemberResponse>> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
-        MemberResponse response = MemberResponse.builder().member(memberServiceImpl.updateProfileImage(myId, profileImageFile)).build();
-        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    public ResponseEntity<CommonApiResponse<Member>> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateProfileImage(myId, profileImageFile)));
     }
 
     @GetMapping("/like-member/{cardId}")
