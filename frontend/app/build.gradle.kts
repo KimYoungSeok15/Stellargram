@@ -150,7 +150,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
 
     // Other supported types of state
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")}
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")
 
     // Dependency implementation for get permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
