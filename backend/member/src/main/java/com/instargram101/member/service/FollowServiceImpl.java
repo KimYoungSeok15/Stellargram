@@ -3,7 +3,6 @@ package com.instargram101.member.service;
 import com.instargram101.global.common.exception.customException.CustomException;
 import com.instargram101.member.entity.Follow;
 import com.instargram101.member.entity.Member;
-import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.exception.FollowErrorCode;
 import com.instargram101.member.repoository.FollowRepository;
 import com.instargram101.member.repoository.MemberRepository;
