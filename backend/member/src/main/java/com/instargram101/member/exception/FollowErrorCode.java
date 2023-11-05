@@ -22,7 +22,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FollowErrorCode implements ErrorCodeInterface {
 
-    FOLLOW_Not_Found(404, "Follow Not Found.") //TODO: 추가로 여기다 채워넣으면 됩니다.
+    FOLLOW_Not_Found(404, "Follow Not Found."),
+    FOLLOWER_Not_Found(404, "Follower Not Found."),
+    FOLLOWEE_Not_Found(404, "Followee Not Found."),
+    FOLLOW_NOT_SUCCESS(403, "Unacceptable request"),
+    FOLLOW_Exist(403, "Already exist"),//TODO: 추가로 여기다 채워넣으면 됩니다.
     ;
 
     private final Integer code;
