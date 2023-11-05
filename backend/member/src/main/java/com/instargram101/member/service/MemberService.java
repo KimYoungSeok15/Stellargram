@@ -21,4 +21,5 @@ public interface MemberService {
     List<Long> getMemberIdsByCardId(Long cardId);
     List<Member> getMembersByMemberIds(List<Long> memberIds);
 
+
 }

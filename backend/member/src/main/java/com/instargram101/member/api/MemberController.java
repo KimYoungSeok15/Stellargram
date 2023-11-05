@@ -4,7 +4,6 @@ import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.dto.response.MemberIdResponse;
 import com.instargram101.member.dto.response.MemberListResponse;
-import com.instargram101.member.dto.response.MemberResponse;
 import com.instargram101.member.dto.response.StatusResponse;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.service.FollowService;
@@ -63,6 +62,11 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateNickname(memberId, nickname)));
     }
 
+    @PatchMapping("/profile-image")
+    public ResponseEntity<CommonApiResponse<Member>> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateProfileImage(myId, profileImageFile)));
+    }
+
     @PatchMapping("/withdrawal")
     public ResponseEntity<CommonApiResponse<StatusResponse>> deleteMember(@RequestHeader("myId") Long memberId) {
         StatusResponse response = StatusResponse.builder().status(memberServiceImpl.deleteMember(memberId)).build();
@@ -105,11 +109,6 @@ public class MemberController {
         var searchNickname = (String) request.get("searchNickname");
         MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.searchMembersByNickname(searchNickname)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
-    }
-
-    @PatchMapping("/profile-image")
-    public ResponseEntity<CommonApiResponse<Member>> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
-        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateProfileImage(myId, profileImageFile)));
     }
 
     @GetMapping("/like-member/{cardId}")

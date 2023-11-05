@@ -98,4 +98,5 @@ public class MemberServiceImpl implements MemberService {
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
         return memberRepository.findMembersByMemberIdInAndActivated(memberIds, true);
     }
+
 }
