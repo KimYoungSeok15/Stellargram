@@ -29,11 +29,8 @@ public class CustomExceptionHandler {
         var status = exception.getErrorCodeInterface().getCode();
         var description = exception.getDescription();
 
-        log.info(status.toString());
-        log.info(description);
-
         return ResponseEntity
                 .status(status)
-                .body(CommonApiResponse.ERROR(ErrorCode.SERVER_ERROR, description));
+                .body(CommonApiResponse.ERROR(exception.getErrorCodeInterface(), description));
     }
 }
