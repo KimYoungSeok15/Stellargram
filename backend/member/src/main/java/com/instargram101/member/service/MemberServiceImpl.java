@@ -24,8 +24,9 @@ public class MemberServiceImpl implements MemberService {
     private final CardServiceClient cardServiceClient;
 
 
+
     public Boolean checkMember(Long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
+        Optional<Member> member = memberRepository.findByMemberIdAndActivated(memberId, true);
         return !member.isEmpty();
 
     }
@@ -37,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = Member.builder()
                 .memberId(memberId)
                 .nickname(nickname)
-                .profileImageUrl(profileImageUrl)
+                .profileImageUrl(profileImageUrl.isEmpty() ? "https://stellagram-bucket-a101.s3.ap-northeast-2.amazonaws.com/profile_image/profile_stellagram.jpg" : profileImageUrl )
                 .activated(true)
                 .followCount(0L)
                 .followingCount(0L)
@@ -47,17 +48,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Boolean checkNickname(String nickname) {
-        return !memberRepository.existsByNickname(nickname);
+        return !memberRepository.existsByNicknameAndActivated(nickname, true);
     }
 
     public Member searchMember(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
     }
 
 
     public Member updateNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setNickname(nickname);
         return memberRepository.save(member);
@@ -65,7 +66,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Boolean deleteMember(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setActivated(false);
         memberRepository.save(member);
@@ -73,19 +74,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Long getMemberIdByNickname(String nickname) {
-        Member member = memberRepository.findByNickname(nickname)
+        Member member = memberRepository.findByNicknameAndActivated(nickname, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return member.getMemberId();
     }
 
     public List<Member> searchMembersByNickname(String searchNickname) {
-        List<Member> members = memberRepository.findByNicknameContaining(searchNickname);
-        return members;
+        return memberRepository.findByNicknameContainingAndActivated(searchNickname, true);
     }
 
     public Member updateProfileImage(Long memberId, MultipartFile imageFile) throws IOException  {
         String imageUrl = s3UploadService.saveFile(imageFile);
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setProfileImageUrl(imageUrl);
         return memberRepository.save(member);
@@ -96,6 +96,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
-        return memberRepository.findAllById(memberIds);
+        return memberRepository.findMembersByMemberIdInAndActivated(memberIds, true);
     }
+
 }

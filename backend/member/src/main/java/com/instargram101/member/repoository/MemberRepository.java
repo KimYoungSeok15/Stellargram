@@ -6,11 +6,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findById(Long memberId);
-    Boolean existsByNickname(String nickname);
-    Optional<Member> findByNickname(String nickname);
+    Optional<Member> findByMemberIdAndActivated(Long memberId, Boolean activated);
+    Boolean existsByNicknameAndActivated(String nickname, Boolean activated);
+    Optional<Member> findByNicknameAndActivated(String nickname, Boolean activated);
+    List<Member> findByNicknameContainingAndActivated(String searchNickname, Boolean activated);
+    List<Member> findMembersByMemberIdInAndActivated(List<Long> memberIds, Boolean activated);
 
-    List<Member> findByNicknameContaining(String searchNickname);
+
 }

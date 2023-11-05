@@ -2,6 +2,9 @@ package com.instargram101.member.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
+import com.instargram101.member.dto.response.MemberIdResponse;
+import com.instargram101.member.dto.response.MemberListResponse;
+import com.instargram101.member.dto.response.StatusResponse;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.service.FollowService;
 import com.instargram101.member.service.MemberService;
@@ -26,98 +29,92 @@ public class MemberController {
     private final FollowService followServiceImpl;
 
     @GetMapping("/check")
-    public ResponseEntity<CommonApiResponse<Boolean>> checkById(@RequestHeader("myId") Long memberId) {
-        boolean isExist = memberServiceImpl.checkMember(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(isExist));
+    public ResponseEntity<CommonApiResponse<StatusResponse>> checkById(@RequestHeader("myId") Long memberId) {
+        StatusResponse response = StatusResponse.builder().status(memberServiceImpl.checkMember(memberId)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<CommonApiResponse<Member>> createMember(@RequestHeader("myId") Long memberId, @RequestBody SignMemberRequestDto request) {
-        var member = memberServiceImpl.createMember(memberId, request);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.createMember(memberId, request)));
     }
 
     @GetMapping("/check-duplicate")
-    public ResponseEntity<CommonApiResponse<Boolean>> checkByNickname(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<CommonApiResponse<StatusResponse>> checkByNickname(@RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
-        boolean isSuccess = memberServiceImpl.checkNickname(nickname);
-        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
+        StatusResponse response = StatusResponse.builder().status(memberServiceImpl.checkNickname(nickname)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
     @GetMapping("/me")
     public ResponseEntity<CommonApiResponse<Member>> searchByMemberIdMe(@RequestHeader("myId") Long memberId) {
-        var member = memberServiceImpl.searchMember(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.searchMember(memberId)));
     }
 
     @GetMapping("/others/{memberId}")
     public ResponseEntity<CommonApiResponse<Member>> searchByMemberIdOthers(@PathVariable Long memberId) {
-        var member = memberServiceImpl.searchMember(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.searchMember(memberId)));
     }
 
     @PatchMapping("/nickname")
     public ResponseEntity<CommonApiResponse<Member>> updateNickname(@RequestHeader("myId") Long memberId, @RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
-        var member = memberServiceImpl.updateNickname(memberId, nickname);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
-    }
-
-    @PatchMapping("/withdrawal")
-    public ResponseEntity<CommonApiResponse<Boolean>> deleteMember(@RequestHeader("myId") Long memberId) {
-        boolean isSuccess = memberServiceImpl.deleteMember(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
-    }
-
-    @PostMapping("/follow/{followingId}")
-    public ResponseEntity<CommonApiResponse<Boolean>> followUser(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
-        boolean isSuccess = followServiceImpl.followUser(myId, followingId);
-        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
-    }
-
-    @DeleteMapping("/follow/{followingId}")
-    public ResponseEntity<CommonApiResponse<Boolean>> deleteFollow(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
-        boolean isSuccess = followServiceImpl.deleteFollow(myId, followingId);
-        return ResponseEntity.ok(CommonApiResponse.OK(isSuccess));
-    }
-
-    @GetMapping("/follow/{memberId}")
-    public ResponseEntity<CommonApiResponse<List<Member>>> getFollowers(@PathVariable Long memberId) {
-        List<Member> followers = followServiceImpl.getFollowers(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(followers));
-    }
-
-    @GetMapping("/following/{memberId}")
-    public ResponseEntity<CommonApiResponse<List<Member>>> getFollowing(@PathVariable Long memberId) {
-        List<Member> followingMembers = followServiceImpl.getFollowingMembers(memberId);
-        return ResponseEntity.ok(CommonApiResponse.OK(followingMembers));
-    }
-
-    @GetMapping("/id")
-    public ResponseEntity<CommonApiResponse<Long>> getMemberIdByNickname(@RequestBody Map<String, Object> request) {
-        var nickname = (String) request.get("nickname");
-        Long memberId = memberServiceImpl.getMemberIdByNickname(nickname);
-        return ResponseEntity.ok(CommonApiResponse.OK(memberId));
-    }
-
-    @GetMapping("/nickname/search")
-    public ResponseEntity<CommonApiResponse<List<Member>>> searchMembersByNickname(@RequestBody Map<String, Object> request) {
-        var searchNickname = (String) request.get("searchNickname");
-        List<Member> members = memberServiceImpl.searchMembersByNickname(searchNickname);
-        return ResponseEntity.ok(CommonApiResponse.OK(members));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateNickname(memberId, nickname)));
     }
 
     @PatchMapping("/profile-image")
     public ResponseEntity<CommonApiResponse<Member>> updateProfileImage(@RequestHeader("myId") Long myId, MultipartFile profileImageFile) throws IOException {
-        var member =  memberServiceImpl.updateProfileImage(myId, profileImageFile);
-        return ResponseEntity.ok(CommonApiResponse.OK(member));
+        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.updateProfileImage(myId, profileImageFile)));
     }
 
+    @PatchMapping("/withdrawal")
+    public ResponseEntity<CommonApiResponse<StatusResponse>> deleteMember(@RequestHeader("myId") Long memberId) {
+        StatusResponse response = StatusResponse.builder().status(memberServiceImpl.deleteMember(memberId)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping ("/follow/{followingId}")
+    public ResponseEntity<CommonApiResponse<StatusResponse>> followUser(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
+        StatusResponse response = StatusResponse.builder().status(followServiceImpl.followUser(myId, followingId)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @DeleteMapping("/follow/{followingId}")
+    public ResponseEntity<CommonApiResponse<StatusResponse>> deleteFollow(@RequestHeader("myId") Long myId, @PathVariable Long followingId) {
+        StatusResponse response = StatusResponse.builder().status(followServiceImpl.deleteFollow(myId, followingId)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping("/follow-list/{memberId}")
+    public ResponseEntity<CommonApiResponse<MemberListResponse>> getFollowers(@PathVariable Long memberId) {
+        MemberListResponse response = MemberListResponse.builder().members(followServiceImpl.getFollowers(memberId)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping("/following-list/{memberId}")
+    public ResponseEntity<CommonApiResponse<MemberListResponse>> getFollowing(@PathVariable Long memberId) {
+        MemberListResponse response = MemberListResponse.builder().members(followServiceImpl.getFollowingMembers(memberId)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping("/id")
+    public ResponseEntity<CommonApiResponse<MemberIdResponse>> getMemberIdByNickname(@RequestBody Map<String, Object> request) {
+        var nickname = (String) request.get("nickname");
+        MemberIdResponse response = MemberIdResponse.builder().memberId(memberServiceImpl.getMemberIdByNickname(nickname)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping("/nickname/search")
+    public ResponseEntity<CommonApiResponse<MemberListResponse>> searchMembersByNickname(@RequestBody Map<String, Object> request) {
+        var searchNickname = (String) request.get("searchNickname");
+        MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.searchMembersByNickname(searchNickname)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
 
     @GetMapping("/like-member/{cardId}")
-    public ResponseEntity<CommonApiResponse<List<Member>>> getMembersByCardId(@PathVariable Long cardId) {
+    public ResponseEntity<CommonApiResponse<MemberListResponse>> getMembersByCardId(@PathVariable Long cardId) {
         List<Long> memberIds = memberServiceImpl.getMemberIdsByCardId(cardId);
-        List<Member> members = memberServiceImpl.getMembersByMemberIds(memberIds);
-        return ResponseEntity.ok(CommonApiResponse.OK(members));
+        MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.getMembersByMemberIds(memberIds)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 }
