@@ -146,20 +146,20 @@ dependencies {
         // optional - Paging 3 Integration
         implementation("androidx.room:room-paging:$room_version")
 
-    // livedata implementation
-    implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
+        // livedata implementation
+        implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
 
-    // Other supported types of state
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")}
+        // Other supported types of state
+        implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")
 
-    // Dependency implementation for get permissions
-    implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
+        // Dependency implementation for get permissions
+        implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 
         // Gson for parsing JSON
         implementation("com.google.code.gson:gson:2.10.1")
 
-    // Glide
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+        // Glide
+        implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 }
 
 // Dependency injection with Hilt

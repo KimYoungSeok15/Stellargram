@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.base
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +25,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import com.ssafy.stellargram.ui.Screen
+import com.ssafy.stellargram.R
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +42,22 @@ fun BaseFrame(
         topBar = {
             CenterAlignedTopAppBar(
                 title= { Text(text = "title") },
-                modifier = Modifier
+                modifier = Modifier,
+                actions = {
+                    // 이곳에서 IconButton을 사용하여 클릭 가능한 아이콘을 추가합니다.
+                    IconButton(
+                        onClick = {
+                            // 클릭 이벤트 처리
+                        },
+                        modifier = Modifier.padding(13.dp)
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.search),
+                            contentDescription = "Search",
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+                }
             )
         },
         bottomBar = { NavigationBar(
@@ -44,7 +65,7 @@ fun BaseFrame(
                 val items = listOf(
                     Screen.Home,
                     Screen.SkyMap,
-                    Screen.CameraX,
+                    Screen.Camera,
                     Screen.GoogleMap,
                     Screen.MyPage
                 )
