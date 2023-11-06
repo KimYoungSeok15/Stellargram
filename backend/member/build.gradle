@@ -37,6 +37,8 @@ dependencies {
 	implementation "commons-io:commons-io:2.11.0"
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
 
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	annotationProcessor 'org.projectlombok:lombok'
