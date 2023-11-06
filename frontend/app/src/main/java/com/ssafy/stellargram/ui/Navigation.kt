@@ -17,7 +17,7 @@ sealed class Screen(
     object GoogleMap : Screen("googlemap", "지도", R.drawable.address)
     object MyPage : Screen("mypage", "마이페이지", R.drawable.account)
     object SkyMap : Screen("skymap", "천구", R.drawable.constellation)
-    object CameraX : Screen("camerax", "카메라X", R.drawable.google_images)
+    object Camera : Screen("camera", "사진", R.drawable.google_images)
 
 }
 
