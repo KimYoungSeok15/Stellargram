@@ -1,11 +1,7 @@
 package com.ssafy.stellargram.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,7 +11,7 @@ import com.ssafy.stellargram.ui.screen.camera.CameraScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
-import com.ssafy.stellargram.ui.screen.camera.CameraScreen
+import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
 import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
@@ -64,6 +60,9 @@ fun  NavGraph(
             BaseFrame(navController) {
                 MypageScreen(navController = navController)
             }
+        }
+        composable(route = Screen.ChatRoom.route){
+            ChatRoomScreen(navController = navController)
         }
     }
 }
