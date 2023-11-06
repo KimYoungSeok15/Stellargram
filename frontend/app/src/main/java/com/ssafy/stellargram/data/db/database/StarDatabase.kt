@@ -1,6 +1,9 @@
 package com.ssafy.stellargram.data.db.database
 
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.room.Database
@@ -69,7 +72,7 @@ object DatabaseModule {
         "stars"
     )
         .createFromAsset("StarData.db")
-        .fallbackToDestructiveMigration()
+//        .fallbackToDestructiveMigration()
         .build()
 
     @Singleton

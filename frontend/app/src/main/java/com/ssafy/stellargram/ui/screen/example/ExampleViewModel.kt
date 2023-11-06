@@ -13,12 +13,10 @@ class ExampleViewModel @Inject constructor(
 ) : ViewModel()  {
 
     val starList: LiveData<List<Star>> = repository.allstars
-    val findStar: LiveData<Star> = repository.foundStar
-    init {
-    }
-    fun getAllStars(){
-        repository.getAllStars()
-    }
+
+//    fun getAllStars(){
+//        repository.getAllStars()
+//    }
 
 
 }

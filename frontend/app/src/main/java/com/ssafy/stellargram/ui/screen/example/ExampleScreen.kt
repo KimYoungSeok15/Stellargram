@@ -23,28 +23,26 @@ import com.ssafy.stellargram.data.db.entity.Star
 
 @Composable
 fun ExampleScreen(navController : NavController, modifier: Modifier){
-    val viewModel: ExampleViewModel = hiltViewModel()
-    viewModel.getAllStars()
-    val starlist: List<Star> by viewModel.starList.observeAsState(initial = listOf())
-    Log.d("GETSTAR","$starlist")
+//    val viewModel: ExampleViewModel = hiltViewModel()
+//    val starlist: List<Star> by viewModel.starList.observeAsState(initial = listOf())
     val lazyListState = rememberLazyListState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier
     ){
-        Button(modifier=Modifier,onClick={viewModel.getAllStars()}){
-            Text("눌러서 데이터 반환")
-        }
+//        Button(modifier=Modifier,onClick={Log.d("GETSTAR","$starlist")}){
+//            Text("눌러서 데이터 반환")
+//        }
         Spacer(modifier = Modifier.height(20.dp))
         LazyColumn(
             modifier = Modifier.padding(vertical = 4.dp),
             state = lazyListState
         ){
-            items(items = starlist) {Star ->
-                Log.d("GETSTAR","${Star}")
-                Text("${Star.id}")
-            }
+//            items(items = starlist) {Star ->
+//                Log.d("GETSTAR","${Star}")
+//                Text("${Star.id}")
+//            }
 
         }
     }

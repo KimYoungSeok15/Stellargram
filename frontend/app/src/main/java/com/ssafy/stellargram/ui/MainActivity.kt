@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.kakao.sdk.common.util.Utility
-import com.ssafy.stellargram.data.db.database.StarDatabase
+import com.ssafy.stellargram.data.db.database.DatabaseModule
 import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -38,10 +40,24 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val db = StarDatabase.getDatabase(this)
-        Log.d("GETSTARDB","$db")
+
+        val db = DatabaseModule.provideDatabase(this)
+        lifecycleScope.launch {
+            val res = db.starDAO().readAll()
+            res.collect {it.forEach{ star ->
+                Log.d("GETSTARPROP", "ID: ${star.id}")
+                }
+            }
+        }
     }
+
+//        val lst = db.starDAO().findAll()
+//        val lst = this.getDatabasePath("stars").absolutePath
+//        Log.d("GETSTAR","$lst")
+//        val db = StarDatabase.getDatabase(this)
+//        Log.d("GETSTARDB","$db")
 }
+
 
 
 @Preview(showBackground = true)

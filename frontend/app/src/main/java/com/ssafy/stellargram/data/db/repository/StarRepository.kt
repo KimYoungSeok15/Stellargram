@@ -13,22 +13,15 @@ class StarRepository (private val starDAO: StarDAO) {
 
 
 
-    val readAll = starDAO.readAll()
 
     val allstars = MutableLiveData<List<Star>>()
-    val foundStar = MutableLiveData<Star>()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
-    fun initDB(){
-        coroutineScope.launch(Dispatchers.IO){
 
-        }
-    }
-
-    fun updateAllStars() {
-        coroutineScope.launch(Dispatchers.IO) {
-            starDAO.findAll()
-        }
-    }
+//    fun updateAllStars() {
+//        coroutineScope.launch(Dispatchers.IO) {
+//            starDAO.findAll()
+//        }
+//    }
 
     fun getAllStars() {
         coroutineScope.launch(Dispatchers.IO) {
