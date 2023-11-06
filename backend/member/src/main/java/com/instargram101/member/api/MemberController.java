@@ -2,6 +2,7 @@ package com.instargram101.member.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
+import com.instargram101.member.dto.request.findMemberListRequestDto;
 import com.instargram101.member.dto.response.MemberIdResponse;
 import com.instargram101.member.dto.response.MemberListResponse;
 import com.instargram101.member.dto.response.StatusResponse;
@@ -115,6 +116,12 @@ public class MemberController {
     public ResponseEntity<CommonApiResponse<MemberListResponse>> getMembersByCardId(@PathVariable Long cardId) {
         List<Long> memberIds = memberServiceImpl.getMemberIdsByCardId(cardId);
         MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.getMembersByMemberIds(memberIds)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping("/member-list")
+    public ResponseEntity<CommonApiResponse<MemberListResponse>> getMembersByMemberId(@RequestBody findMemberListRequestDto request) {
+        MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.getMembersByMemberIds(request.getMemberIds())).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 }
