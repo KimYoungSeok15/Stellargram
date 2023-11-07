@@ -18,7 +18,8 @@ sealed class Screen(
     object MyPage : Screen("mypage", "마이페이지", R.drawable.account)
     object SkyMap : Screen("skymap", "천구", R.drawable.constellation)
     object Camera : Screen("camera", "사진", R.drawable.google_images)
-
+    // TODO: 아이콘 지우기
+    object ChatRoom : Screen("chatroom","채팅", com.kakao.sdk.v2.all.R.drawable.kakao_sdk_ico_chattype_openchat)
 }
 
 @Composable
