@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.ui.common.ProfilePhoto
 import com.ssafy.stellargram.ui.theme.Purple80
 import com.ssafy.stellargram.ui.theme.Turquoise
 
@@ -30,17 +31,19 @@ import com.ssafy.stellargram.ui.theme.Turquoise
 @Composable
 fun ChatBox(
     isMine: Boolean = false,
-    imgUrl: String = "url",
+    imgUrl: String? = null,
     nickname: String = "유저의 닉네임",
     content: String = "메세지 내용"
 ) {
     val textSize = 22
     val messageBoxCornerSize = 10
 
-    // CSS
+    // css. 메세지 전체 컨테이너 modifier
     val containerModifier: Modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 10.dp)
+
+    // css. 메세지 박스 modifier
     val messageBoxModifier: Modifier =
         Modifier
             .fillMaxWidth(0.8f)
@@ -71,11 +74,8 @@ fun ChatBox(
 
         ) {
             Row {
-                Icon(
-                    painter = painterResource(id = R.drawable.account_active),
-                    contentDescription = "no Profile Image",
-                    Modifier.size(22.dp)
-                )
+                ProfilePhoto(imgUrl = imgUrl)
+
                 Text(
                     text = nickname,
 //                style = TextStyle(fontSize = textSize.sp),
