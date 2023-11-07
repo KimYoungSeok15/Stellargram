@@ -95,8 +95,7 @@ public class MemberServiceImpl implements MemberService {
 
     public List<Long> getMemberIdsByCardId(Long cardId) {
         ResponseEntity<CommonApiResponse> response = cardServiceClient.getMemberIdsByCardId(cardId);
-        List<Long> memberIds = (List<Long>) response.getBody().getData();
-        return memberIds;
+        return (List<Long>) response.getBody().getData();
     }
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
