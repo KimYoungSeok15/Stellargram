@@ -1,12 +1,14 @@
 package com.instargram101.member.service;
 
 import com.instargram101.global.common.exception.customException.CustomException;
+import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -92,7 +94,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public List<Long> getMemberIdsByCardId(Long cardId) {
-        return cardServiceClient.getMemberIdsByCardId(cardId);
+        ResponseEntity<CommonApiResponse> response = cardServiceClient.getMemberIdsByCardId(cardId);
+        return (List<Long>) response.getBody().getData();
     }
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
