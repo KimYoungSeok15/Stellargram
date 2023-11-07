@@ -160,6 +160,9 @@ dependencies {
 
         // Glide
         implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+        // STOMP 사용을 위한 라이브러리
+        implementation("com.github.bishoybasily:stomp:2.0.5")
 }
 
 // Dependency injection with Hilt
