@@ -2,6 +2,7 @@ package com.instargram101.member.api;
 
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
+import com.instargram101.member.dto.request.findMemberListRequestDto;
 import com.instargram101.member.dto.response.MemberIdResponse;
 import com.instargram101.member.dto.response.MemberListResponse;
 import com.instargram101.member.dto.response.StatusResponse;
@@ -11,7 +12,9 @@ import com.instargram101.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +26,8 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("")
+@Controller
+@EnableAspectJAutoProxy
 public class MemberController {
 
     private final MemberService memberServiceImpl;
@@ -115,6 +120,12 @@ public class MemberController {
     public ResponseEntity<CommonApiResponse<MemberListResponse>> getMembersByCardId(@PathVariable Long cardId) {
         List<Long> memberIds = memberServiceImpl.getMemberIdsByCardId(cardId);
         MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.getMembersByMemberIds(memberIds)).build();
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
+    }
+
+    @GetMapping("/member-list")
+    public ResponseEntity<CommonApiResponse<MemberListResponse>> getMembersByMemberId(@RequestBody findMemberListRequestDto request) {
+        MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.getMembersByMemberIds(request.getMemberIds())).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 }

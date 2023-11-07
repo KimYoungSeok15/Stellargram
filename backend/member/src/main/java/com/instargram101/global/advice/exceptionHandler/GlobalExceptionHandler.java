@@ -5,6 +5,8 @@ import com.instargram101.global.common.response.CommonApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -12,6 +14,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Order(value = Integer.MAX_VALUE)
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<CommonApiResponse<Object>> exception(HttpMessageNotReadableException exception) {
+        log.error("값이 없는 요청", exception);
+        return ResponseEntity
+                .status(400)
+                .body(CommonApiResponse.ERROR(ErrorCode.INVALID_REQUEST));
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<CommonApiResponse<Object>> exception(MissingRequestHeaderException exception) {
+        log.error("헤더 값 없음", exception);
+        return ResponseEntity
+                .status(400)
+                .body(CommonApiResponse.ERROR(ErrorCode.MISSING_HEADER));
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<CommonApiResponse<Object>> exception(Exception exception){
         log.error("", exception);
