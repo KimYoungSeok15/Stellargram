@@ -1,6 +1,8 @@
 package com.instargram101.member.service;
 
+import com.instargram101.global.common.response.CommonApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -10,6 +12,6 @@ import java.util.List;
 public interface CardServiceClient {
 
     @GetMapping("/card/like-member/{cardId}")
-    List<Long> getMemberIdsByCardId(@PathVariable("cardId") Long cardId);
+    ResponseEntity<CommonApiResponse> getMemberIdsByCardId(@PathVariable("cardId") Long cardId);
 
 }
