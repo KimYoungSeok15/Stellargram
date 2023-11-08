@@ -2,19 +2,14 @@ package com.ssafy.stellargram.ui.screen.landing
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +27,6 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.ssafy.stellargram.R
-import com.ssafy.stellargram.ui.Screen
 import java.io.File
 
 @Composable
@@ -79,7 +73,7 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
         ) {
             Text(text = "move to sphere")
         }
-        
+
         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
         Button(
             onClick = {
