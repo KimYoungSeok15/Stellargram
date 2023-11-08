@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.ssafy.stellargram.data.db.repository.StarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.lang.Math.PI
 import java.lang.Math.abs
@@ -20,7 +19,6 @@ import kotlin.math.ln
 
 @HiltViewModel
 class SkyMapViewModel @Inject constructor(
-    private val repository: StarRepository
 ) : ViewModel()  {
 
     var starData: MutableState<Array<DoubleArray>> = mutableStateOf(arrayOf())
