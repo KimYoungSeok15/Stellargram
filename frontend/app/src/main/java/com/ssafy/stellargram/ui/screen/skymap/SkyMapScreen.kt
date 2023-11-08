@@ -68,7 +68,7 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
-        Text(text = "array size: ${viewModel.starData.value.size}", color = Color.Black)
+        Text(text = "array size: ${starArray.size}", color = Color.Black)
     }
 
 }
