@@ -1,182 +1,145 @@
+import java.io.*
+import kotlin.math.*
+import kotlin.system.measureNanoTime
 
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.File
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.declaredMemberProperties
+fun readData(): MutableList<DoubleArray>{
+    val file = File("E:\\Kotlin\\kotlin-example\\src\\main\\kotlin\\hyg_v37.csv")
+    val br = BufferedReader(FileReader(file))
 
+//    val br = BufferedReader(InputStreamReader(System.`in`))
+    val bw = BufferedWriter(OutputStreamWriter(System.`out`))
 
-fun <T> changePrivateValField(instance: T, fieldName: String, changeValue: Any?) {
-    val declaredFields = instance!!::class.java.declaredFields
-    val findField = declaredFields.toList().first { it.name == fieldName }
-    findField.set(instance, changeValue)
-}
+    val header: List<String> = br.readLine().split(",")
+    var starData = mutableListOf<DoubleArray>()
 
-fun typeCast(origin: String, typeName: String): Any?{
-    when(typeName){
-        "Int?" -> return origin.toIntOrNull()
-        "Double?" -> return origin.toDoubleOrNull()
-        "String?" -> return origin
-        else -> throw IllegalArgumentException("Type mismatch")
+    br.lines().forEach{
+        val attrList = it.split(',')
+
+        val id = if(attrList[0] == "") -1.0 else attrList[0].toDouble()
+        val mag = if(attrList[13] == "") 999.0 else attrList[13].toDouble()
+        val ci = if(attrList[16] == "") 999.0 else attrList[16].toDouble()
+        val ra = if(attrList[16] == "") 999.0 else attrList[23].toDouble()
+        val dec = if(attrList[16] == "") 999.0 else attrList[24].toDouble()
+
+        starData.add(doubleArrayOf(ra, dec, ci, mag, id))
     }
+
+    val rowLeng: Int = starData.size
+    val colLeng: Int = 5
+    return starData
 }
 
-fun checkEntity(filename: String, typeList: List<String>, sourceNames: List<String>, targetNames: List<String>): MutableList<Star>{
+fun getMeanSiderealTime(longitude: Double): Double{
+    val JD: Double = (System.currentTimeMillis() * 0.001) / 86400.0 +  2440587.5
+    val GMST = 18.697374558 + 24.06570982441908*(JD - 2451545)
+    val theta = (GMST * 15.0 + (longitude)) % 360.0
+    return theta * PI / 180.0
+}
 
-    val replaceMap = HashMap<String, String>();
-    sourceNames.forEachIndexed { index, source -> replaceMap[source] = targetNames[index] }
+fun getAllRisedStars(longitude: Double, latitude: Double, sidereal: Double, starList: Array<DoubleArray>): Array<DoubleArray>{
 
-    val file = File(filename)
-    val inputStream = file.inputStream()
-    val reader = inputStream.bufferedReader()
-    val header = reader.readLine()
-    val attrList = header.split(',').toMutableList()
-    for((i, item) in attrList.withIndex()){
-        for((j, source) in sourceNames.withIndex()){
-            if(item == source){
-                attrList[i] = targetNames[j]
+    val new_latitude = latitude * PI / 180.0
+
+    val sinPhi = sin(new_latitude)
+    val cosPhi = cos(new_latitude)
+
+    var starArray = Array(starList.size) {DoubleArray(6)}
+
+    for (i in 0 until starList.size){
+        val hourAngle = sidereal - starList[i][0]
+        val sinDec = sin(starList[i][1])
+        val cosDec = cos(starList[i][1])
+        val sina = sinDec * sinPhi + cosDec * cosPhi * cos(hourAngle)
+        val cosa = sqrt(1.0 - (sina * sina))
+        val sinA = -sin(hourAngle) * cosDec / cosa
+        val cosA = (sinDec -(sinPhi * sina)) / (cosPhi * cosa)
+
+        starArray[i][0] = cosa * cosA
+        starArray[i][1] = cosa * sinA
+        starArray[i][2] = sina
+        starArray[i][3] = starList[i][2]
+        starArray[i][4] = starList[i][3]
+        starArray[i][5] = starList[i][4]
+    }
+    return starArray
+}
+
+fun getSight(_theta: Double, _phi: Double, starData: Array<DoubleArray>): Array<DoubleArray> {
+    val theta = _theta * PI / 180.0
+    val phi = _phi * PI / 180.0
+    val cosTheta = cos(theta)
+    val sinTheta = sin(theta)
+    val cosPhi = cos(phi)
+    val sinPhi = sin(phi)
+
+    val transMatrix = arrayOf(
+        doubleArrayOf(cosTheta * cosPhi, -cosTheta * sinPhi, sinTheta),
+        doubleArrayOf(sinTheta * cosPhi, -sinTheta * sinPhi, -cosTheta),
+        doubleArrayOf(sinPhi, cosPhi, 0.0)
+    )
+    val resultMatrix = Array(starData.size) {DoubleArray(5)}
+
+    for(i in 0 until starData.size){
+        resultMatrix[i][2] = starData[i][3]
+        resultMatrix[i][3] = starData[i][4]
+        resultMatrix[i][4] = starData[i][5]
+
+        val temp = DoubleArray(3)
+        for(j in 0 until 3){
+            for(k in 0 until 3){
+                temp[j] += (starData[i][k] * transMatrix[k][j])
             }
         }
-    }
-
-    var res = mutableListOf<Star>()
-
-    var line :String?
-    var i = 0
-    while(reader.readLine().also { line = it } != null){
-        i++
-        if(i > 100) break
-
-        val clazz = Class.forName("Star").kotlin
-
-        var newInstance = clazz.createInstance()
-        val values = line?.split(",")
-        for(i in 0..<values?.size as Int){
-            val newValue: Any? = typeCast(values[i], typeList[i])
-            val propertyName = attrList[i]
-            changePrivateValField(newInstance, propertyName, newValue)
-            println(attrList[i])
-            println(newValue)
+        val a = asin(temp[2])
+        val cosa = cos(a)
+        if(abs(cosa) <1.0E-6){
+            resultMatrix[i][0] = 0.0
+            resultMatrix[i][1] = 10000.0
+            continue
         }
-        println(newInstance.toString())
-        if(newInstance is Star)
-            res.add(newInstance)
+        val _sin = starData[i][1] / cosa
+        val _cos = starData[i][0] / cosa
+
+        val new_theta = if(_cos > 0) asin(_sin) else PI - asin(_sin)
+        resultMatrix[i][0] = new_theta
+        resultMatrix[i][1] = ln(abs((1 + sin(a)) / cosa))
     }
-    return res
+    return resultMatrix
 }
 
-fun insertStar(stars: MutableList<Star>) {
-    val properties = Star::class.declaredMemberProperties
-    var propertyNames: MutableList<String> = mutableListOf()
-    for (property in properties) {
-        propertyNames.add(property.name)
+fun main(){
+//    먼저 입출력을 받는다.
+    val readTime = measureNanoTime {
+        val _readData = readData()
+        var starData = _readData.toTypedArray()
     }
-    transaction {
-        SchemaUtils.create(Stars)
+    println("Read time: ${readTime * 0.000001} ms")
+    val _readData = readData()
+    var starData = _readData.toTypedArray()
+
+    val longitude: Double = 127.039611
+    val latitude: Double = 37.501254
+
+    val elapsedTime1 = measureNanoTime {
+        val LST = getMeanSiderealTime(longitude)
     }
-    var i = 0
-    for (star in stars) {
-        i++
-        if((i%1000) == 0) println(i)
-        val clazz = star.javaClass.kotlin
-        println(star.id)
-        transaction {
-            val insertStatement = Stars.insert {
-                it[absmag] = star.absmag
-                it[base] = star.base
-                it[bayer] = star.bayer
-                it[bf] = star.bf
-                it[ci] = star.ci
-                it[comp] = star.comp
-                it[comp_primary] = star.comp_primary
-                it[con] = star.con
-                it[dec] = star.dec
-                it[decrad] = star.decrad
-                it[dist] = star.dist
-                it[flam] = star.flam
-                it[gl] = star.gl
-                it[hd] = star.hd
-                it[hip] = star.hip
-                it[hr] = star.hr
-                it[id] = star.id?: 0
-                it[lum] = star.lum
-                it[mag] = star.mag
-                it[pmdec] = star.pmdec
-                it[pmdecrad] = star.pmdecrad
-                it[pmra] = star.pmra
-                it[pmrarad] = star.pmrarad
-                it[proper] = star.proper
-                it[ra] = star.ra
-                it[rarad] = star.rarad
-                it[rv] = star.rv
-                it[spect] = star.spect
-                it[var_max] = star.var_max
-                it[var_min] = star.var_min
-                it[variable] = star.variable
-                it[vx] = star.vx
-                it[vy] = star.vy
-                it[vz] = star.vz
-                it[x] = star.x
-                it[y] = star.y
-                it[z] = star.z
-            }
-        }
+    val LST = getMeanSiderealTime(longitude)
+    println("***** Get LST *****")
+    println("Elapsed time: ${elapsedTime1 * 0.000001} ms")
+
+    val elapsedTime2 = measureNanoTime {
+        val starArray = getAllRisedStars(longitude, latitude, LST, starData)
     }
-}
 
-fun main(args: Array<String>) {
-    val typeList = listOf("Int?", "Int?", "Int?", "Int?", "String?", "String?", "String?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "String?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "Double?", "String?", "Int?", "String?", "Int?", "Int?", "String?", "Double?", "String?", "Double?", "Double?")
+    println("***** Conversion between horizontal and equatorial systems *****")
+    println("Elapsed time: ${elapsedTime2 * 0.000001} ms")
+    val starArray = getAllRisedStars(longitude, latitude, LST, starData)
 
-    val currentPath = System.getProperty("user.dir")
-    println(currentPath)
+    val elapsedTime3 = measureNanoTime {
+        val result = getSight(30.0, 60.0, starArray)
+    }
 
-    var starList: MutableList<Star> = checkEntity("E:/Kotlin/kotlin-example/src/notebooks/hyg_v37.csv", typeList, listOf("var"), listOf("variable"))
-
-    val dat = Database.connect("jdbc:sqlite:E:/Kotlin/kotlin-example/src/notebooks/stellargram.db", driver = "org.sqlite.JDBC")
-    insertStar(starList)
-}
-
-object Stars: Table("stars") {
-	val id = integer("id")
-	val hip = integer("hip").nullable()
-	val hd = integer("hd").nullable()
-	val hr = integer("hr").nullable()
-	val gl = varchar("gl", 15).nullable()
-	val bf = varchar("bf", 15).nullable()
-	val proper = varchar("proper", 15).nullable()
-	val ra = double("ra").nullable()
-	val dec = double("dec").nullable()
-	val dist = double("dist").nullable()
-	val pmra = double("pmra").nullable()
-	val pmdec = double("pmdec").nullable()
-	val rv = double("rv").nullable()
-	val mag = double("mag").nullable()
-	val absmag = double("absmag").nullable()
-	val spect = varchar("spect", 15).nullable()
-	val ci = double("ci").nullable()
-	val x = double("x").nullable()
-	val y = double("y").nullable()
-	val z = double("z").nullable()
-	val vx = double("vx").nullable()
-	val vy = double("vy").nullable()
-	val vz = double("vz").nullable()
-	val rarad = double("rarad").nullable()
-	val decrad = double("decrad").nullable()
-	val pmrarad = double("pmrarad").nullable()
-	val pmdecrad = double("pmdecrad").nullable()
-	val bayer = varchar("bayer", 15).nullable()
-	val flam = integer("flam").nullable()
-	val con = varchar("con", 15).nullable()
-	val comp = integer("comp").nullable()
-	val comp_primary = integer("comp_primary").nullable()
-	val base = varchar("base", 15).nullable()
-	val lum = double("lum").nullable()
-	val variable = varchar("variable", 15).nullable()
-	val var_min = double("var_min").nullable()
-	val var_max = double("var_max").nullable()
-
-    override val primaryKey = PrimaryKey(id)
+    println("***** Conversion between x, y, z vectors to Mercator System *****")
+    println("Elapsed time: ${elapsedTime3 * 0.000001} ms")
+    val result = getSight(30.0, 60.0, starArray)
 }
