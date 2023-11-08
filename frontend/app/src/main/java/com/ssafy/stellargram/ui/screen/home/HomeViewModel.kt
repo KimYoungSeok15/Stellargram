@@ -127,7 +127,8 @@ fun TodaysPicture() {
             amILikeThis = false
         )
 
-        dummyCardsData = CardsData(listOf(card))
+        val dummyCards = mutableListOf(card)
+        dummyCardsData = CardsData(dummyCards)
     }
 
     // 제목 및 스타일 설정
@@ -180,7 +181,7 @@ fun TodaysPicture() {
                             append("팔로우")
                         }
                     }
-                        ClickableText(
+                    ClickableText(
                         text = text,
                         style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
                         softWrap = true,

@@ -10,10 +10,11 @@ sealed class Screen(
     val title: String = "",
     val icon: Int = 0
 ) {
-    object Landing : Screen("landing")
-    object Kakao : Screen("kakao")
+    object Landing : Screen("landing", "")
+    object Kakao : Screen("kakao", "")
     object Home : Screen("home", "메인", R.drawable.home_page)
-    object Example : Screen("example")
+    object Search : Screen("search", "")
+    object Example : Screen("example", "")
     object GoogleMap : Screen("googlemap", "지도", R.drawable.address)
     object MyPage : Screen("mypage", "마이페이지", R.drawable.account)
     object SkyMap : Screen("skymap", "천구", R.drawable.constellation)
