@@ -1,50 +1,89 @@
 package com.ssafy.stellargram.ui.screen.example
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.ssafy.stellargram.data.db.entity.Star
+import kotlinx.coroutines.delay
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExampleScreen(navController : NavController, modifier: Modifier){
-//    val viewModel: ExampleViewModel = hiltViewModel()
-//    val starlist: List<Star> by viewModel.starList.observeAsState(initial = listOf())
-    val lazyListState = rememberLazyListState()
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier
-    ){
-//        Button(modifier=Modifier,onClick={Log.d("GETSTAR","$starlist")}){
-//            Text("눌러서 데이터 반환")
-//        }
-        Spacer(modifier = Modifier.height(20.dp))
-        LazyColumn(
-            modifier = Modifier.padding(vertical = 4.dp),
-            state = lazyListState
-        ){
-//            items(items = starlist) {Star ->
-//                Log.d("GETSTAR","${Star}")
-//                Text("${Star.id}")
-//            }
+    val viewModel : ExampleViewModel = viewModel()
+    val context = LocalContext.current
+    LaunchedEffect(Unit){
+        viewModel.context = context
+    }
 
+    // TODO: 기기로부터 정보를 받는 거로 고쳐야 함.
+    val longitude: Double = 127.039611
+    val latitude: Double = 37.501254
+
+    var offsetX: Double by remember { mutableStateOf(0.0) }
+    var offsetY: Double by remember { mutableStateOf(0.0) }
+    var theta: Double by remember { mutableStateOf(0.0)}
+    var phi: Double by remember { mutableStateOf(0.0) }
+    var isDragging: Boolean by remember { mutableStateOf(false) }
+    var LST: Double by remember{mutableStateOf(viewModel.getMeanSiderealTime(longitude))}
+    var i: Int by remember{mutableStateOf(0)}
+
+
+    LaunchedEffect(Unit) {
+
+        while (true) {
+            i++
+            delay(1000L) // 1초마다 함수 호출
+            LST = viewModel.getMeanSiderealTime(longitude)
+            viewModel.getSight(longitude, latitude, LST, theta, phi, viewModel.starData)
         }
     }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ){
+        Text(text = "width: ${LST}", color = Color.Black)
+    }
+
 }
 
+//@Preview
+//@Composable
+//fun plotAllStars(){
+//
+//
+//    Canvas(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(color = Color.Black),
+//        onDraw = {
+//
+//            drawCircle(
+//                brush = Brush.radialGradient(colors = listOf(Color.Yellow, Color.Black), radius = 12.0f),
+//                radius = 12.0f
+//            )
+//            drawCircle(
+//                color = Color.Yellow,
+//                radius = 4.0F
+//            )
+//        }
+//    )
+//}

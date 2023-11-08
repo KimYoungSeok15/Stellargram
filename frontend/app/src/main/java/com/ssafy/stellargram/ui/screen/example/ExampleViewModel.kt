@@ -1,22 +1,152 @@
 package com.ssafy.stellargram.ui.screen.example
 
-import androidx.lifecycle.LiveData
+import android.content.Context
+import android.os.Build
+import android.util.DisplayMetrics
+import android.util.Log
+import android.view.WindowInsets
+import android.view.WindowManager
 import androidx.lifecycle.ViewModel
-import com.ssafy.stellargram.data.db.entity.Star
-import com.ssafy.stellargram.data.db.repository.StarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.ln
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @HiltViewModel
 class ExampleViewModel @Inject constructor(
-    private val repository: StarRepository
 ) : ViewModel()  {
+    lateinit var context: Context
+    var starData: Array<DoubleArray> = arrayOf()
+    var names: HashMap<Int, String> = hashMapOf()
+    var screenWidth = getScreenWidth(context).toFloat()
+    var screenHeight = getScreenHeight(context).toFloat()
+    fun setScreenSize(width: Int, height: Int){
+        Log.d("check", "${width} ${height}")
+        screenWidth = width.toFloat()
+        screenHeight = height.toFloat()
+        Log.d("check", "${screenWidth} ${screenHeight}")
+    }
 
-    val starList: LiveData<List<Star>> = repository.allstars
+    fun getScreenWidth(context: Context): Int {
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = wm.currentWindowMetrics
+            val insets = windowMetrics.windowInsets
+                .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+            println(windowMetrics.bounds.width() - insets.left - insets.right)
+            return windowMetrics.bounds.width() - insets.left - insets.right
+        } else {
+            val displayMetrics = DisplayMetrics()
+            wm.defaultDisplay.getMetrics(displayMetrics)
+            return displayMetrics.widthPixels
+        }
+    }
 
-//    fun getAllStars(){
-//        repository.getAllStars()
-//    }
+    fun getScreenHeight(context: Context): Int {
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = wm.currentWindowMetrics
+            val insets = windowMetrics.windowInsets
+                .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+            Log.d("check",(windowMetrics.bounds.width() - insets.left - insets.right).toString())
+            return windowMetrics.bounds.height() - insets.bottom - insets.top
 
+        } else {
+            val displayMetrics = DisplayMetrics()
+            wm.defaultDisplay.getMetrics(displayMetrics)
+            return displayMetrics.heightPixels
+        }
+    }
+
+
+
+    fun createStarData(Data: Array<DoubleArray>, Names: HashMap<Int, String>){
+        starData = Data
+        names = Names
+    }
+
+    fun getMeanSiderealTime(longitude: Double): Double{
+        val JD: Double = (System.currentTimeMillis() * 0.001) / 86400.0 +  2440587.5
+        val GMST = 18.697374558 + 24.06570982441908*(JD - 2451545)
+        val theta = (GMST * 15.0 + (longitude)) % 360.0
+        return theta * PI / 180.0
+    }
+
+    fun getAllStars(longitude: Double, latitude: Double, sidereal: Double, starList: Array<DoubleArray>): Array<DoubleArray>{
+
+        val new_latitude = latitude * PI / 180.0
+
+        val sinPhi = sin(new_latitude)
+        val cosPhi = cos(new_latitude)
+
+        var starArray = Array(starList.size) {DoubleArray(6)}
+
+        for (i in 0 until starList.size){
+            val hourAngle = sidereal - starList[i][0]
+            val sinDec = sin(starList[i][1])
+            val cosDec = cos(starList[i][1])
+            val sina = sinDec * sinPhi + cosDec * cosPhi * cos(hourAngle)
+            val cosa = sqrt(1.0 - (sina * sina))
+            val sinA = -sin(hourAngle) * cosDec / cosa
+            val cosA = (sinDec -(sinPhi * sina)) / (cosPhi * cosa)
+
+            starArray[i][0] = cosa * cosA
+            starArray[i][1] = cosa * sinA
+            starArray[i][2] = sina
+            starArray[i][3] = starList[i][2]
+            starArray[i][4] = starList[i][3]
+            starArray[i][5] = starList[i][4]
+        }
+        return starArray
+    }
+
+    fun getSight(longitude: Double, latitude: Double, sidereal: Double, _theta: Double, _phi: Double, starArray: Array<DoubleArray>): Array<DoubleArray> {
+        val starData = getAllStars(longitude, latitude, sidereal, starArray)
+        val theta = _theta * PI / 180.0
+        val phi = _phi * PI / 180.0
+        val cosTheta = cos(theta)
+        val sinTheta = sin(theta)
+        val cosPhi = cos(phi)
+        val sinPhi = sin(phi)
+
+        val transMatrix = arrayOf(
+            doubleArrayOf(cosTheta * cosPhi, -cosTheta * sinPhi, sinTheta),
+            doubleArrayOf(sinTheta * cosPhi, -sinTheta * sinPhi, -cosTheta),
+            doubleArrayOf(sinPhi, cosPhi, 0.0)
+        )
+        val resultMatrix = Array(starData.size) {DoubleArray(5)}
+
+        for(i in 0 until starData.size){
+            resultMatrix[i][2] = starData[i][3]
+            resultMatrix[i][3] = starData[i][4]
+            resultMatrix[i][4] = starData[i][5]
+
+            val temp = DoubleArray(3)
+            for(j in 0 until 3){
+                for(k in 0 until 3){
+                    temp[j] += (starData[i][k] * transMatrix[k][j])
+                }
+            }
+            val a = asin(temp[2])
+            val cosa = cos(a)
+            if(abs(cosa) <1.0E-6){
+                resultMatrix[i][0] = 0.0
+                resultMatrix[i][1] = 10000.0
+                continue
+            }
+            val _sin = starData[i][1] / cosa
+            val _cos = starData[i][0] / cosa
+
+            val new_theta = if(_cos > 0) asin(_sin) else PI - asin(_sin)
+            resultMatrix[i][0] = new_theta
+            resultMatrix[i][1] = ln(abs((1 + sin(a)) / cosa))
+        }
+        return resultMatrix
+    }
 
 }

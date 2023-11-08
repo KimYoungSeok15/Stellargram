@@ -115,9 +115,10 @@ dependencies {
         // Common functionality used across multiple media libraries
         //noinspection GradleDependency
         implementation("androidx.media3:media3-common:$media3v")
-    //
 
-    val room_version = "2.5.0"
+    // Dependency implementation for room
+
+        val room_version = "2.5.0"
 
         implementation("androidx.room:room-runtime:$room_version")
         annotationProcessor("androidx.room:room-compiler:$room_version")
@@ -142,6 +143,10 @@ dependencies {
 
         // optional - Paging 3 Integration
         implementation("androidx.room:room-paging:$room_version")
+    // Dependency implementation for multik
+//        val multik_version = "0.2.2"
+//        implementation ("org.jetbrains.kotlinx:multik-core:$multik_version")
+//        implementation ("org.jetbrains.kotlinx:multik-default:$multik_version")
 
     // livedata implementation
     implementation("androidx.compose.runtime:runtime-livedata:1.3.3")

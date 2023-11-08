@@ -14,13 +14,17 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.kakao.sdk.common.util.Utility
 import com.ssafy.stellargram.data.db.database.DatabaseModule
+import com.ssafy.stellargram.data.db.entity.Star
 import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
+import com.ssafy.stellargram.util.CreateStarName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window,false)
@@ -43,19 +47,26 @@ class MainActivity : ComponentActivity() {
 
         val db = DatabaseModule.provideDatabase(this)
         lifecycleScope.launch {
-            val res = db.starDAO().readAll()
-            res.collect {it.forEach{ star ->
-                Log.d("GETSTARPROP", "ID: ${star.id}")
+            db.starDAO().readAll().collect{
+                val _length = it.size
+                val starArray = Array(it.size){DoubleArray(5)}
+                val nameMap = hashMapOf<Int, String>()
+                it.forEachIndexed {
+                    index: Int, star: Star ->
+                    starArray[index][0] = star.rarad?:999.0
+                    starArray[index][1] = star.decrad?:999.0
+                    starArray[index][2] = star.ci?:999.0
+                    starArray[index][3] = star.mag?:999.0
+                    starArray[index][4] = star.id.toDouble()
+                    val name = CreateStarName.getStarName(star)
+                    nameMap.put(star.id, name)
                 }
+//                exampleViewModel.createStarData(starArray, nameMap)
             }
         }
-    }
 
-//        val lst = db.starDAO().findAll()
-//        val lst = this.getDatabasePath("stars").absolutePath
-//        Log.d("GETSTAR","$lst")
-//        val db = StarDatabase.getDatabase(this)
-//        Log.d("GETSTARDB","$db")
+
+    }
 }
 
 
