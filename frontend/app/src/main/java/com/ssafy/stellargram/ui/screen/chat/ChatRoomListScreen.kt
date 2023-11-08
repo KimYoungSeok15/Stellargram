@@ -49,7 +49,7 @@ fun ChatRoomListScreen(navController: NavController = rememberNavController()) {
                 ChatRoomCard(
                     roomId = room.roomId,
                     personnel = room.personnel,
-                    observeSite = room.observeSiteId,
+                    observeSiteId = room.observeSiteId,
                     navController = navController
                 )
             }

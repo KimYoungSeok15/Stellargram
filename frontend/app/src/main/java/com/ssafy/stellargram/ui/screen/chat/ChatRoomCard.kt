@@ -21,7 +21,7 @@ import com.ssafy.stellargram.ui.rememberAppNavigationController
 fun ChatRoomCard(
     roomId: Int,
     personnel: Int,
-    observeSite: String,
+    observeSiteId: String,
     navController: NavController
 ) {
 //    var navController: NavController = rememberAppNavigationController()
@@ -30,11 +30,11 @@ fun ChatRoomCard(
         Modifier
             .fillMaxWidth()
             .height(40.dp)
-            .clickable { onClickCard(roomId, navController) }
+            .clickable { onClickCard(roomId, personnel,observeSiteId,navController) }
 //    Button(onClick = { navController.navigate(route = Screen.ChatRoom.route + "/${roomId}") }) {
     Column(modifier = roomCardModifier) {
         Row {
-            Text(text = observeSite)
+            Text(text = observeSiteId)
             Text(text = personnel.toString() + "명")
         }
     }
@@ -43,6 +43,10 @@ fun ChatRoomCard(
 
 }
 
-fun onClickCard(roomId: Int, navController: NavController) {
-    navController.navigate(route = Screen.ChatRoom.route + "/"+roomId.toString())
+fun onClickCard(
+    roomId: Int,
+    personnel: Int,
+    observeSiteId: String, navController: NavController
+) {
+    navController.navigate(route = Screen.ChatRoom.route + "/${roomId}/${personnel}/${observeSiteId}")
 }

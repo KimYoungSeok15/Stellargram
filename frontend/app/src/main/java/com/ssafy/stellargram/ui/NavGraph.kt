@@ -67,12 +67,17 @@ fun NavGraph(
             }
         }
         composable(
-            route = Screen.ChatRoom.route + "/{roomId}",
-            arguments = listOf(navArgument("roomId") { type = NavType.IntType })
+            route = Screen.ChatRoom.route + "/{roomId}/{personnel}/{observeSiteId}",
+            arguments = listOf(
+                navArgument("roomId") { type = NavType.IntType },
+                navArgument("personnel") { type = NavType.IntType },
+                navArgument("observeSiteId") { type = NavType.StringType })
         ) { backStackEntry ->
             ChatRoomScreen(
                 navController = navController,
-                roomId = backStackEntry.arguments?.getInt("roomId")
+                roomId = backStackEntry.arguments?.getInt("roomId"),
+                personnel = backStackEntry.arguments?.getInt("personnel"),
+                observeSiteId = backStackEntry.arguments?.getString("observeSiteId"),
             )
         }
         composable(route = Screen.ChatRoomList.route) {
