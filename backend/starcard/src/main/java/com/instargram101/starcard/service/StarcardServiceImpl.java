@@ -3,6 +3,7 @@ package com.instargram101.starcard.service;
 import com.instargram101.global.common.exception.customException.CustomException;
 import com.instargram101.global.utils.S3Util;
 import com.instargram101.starcard.dto.request.SaveCardRequestDto;
+import com.instargram101.starcard.dto.response.FindCardResponseDto;
 import com.instargram101.starcard.dto.response.FindCardsResponseDto;
 import com.instargram101.starcard.dto.response.StarcardElement;
 import com.instargram101.starcard.entity.Starcard;
@@ -12,6 +13,7 @@ import com.instargram101.starcard.exception.StarcardErrorCode;
 import com.instargram101.starcard.repoository.StarcardLikeRepository;
 import com.instargram101.starcard.repoository.StarcardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -126,5 +128,11 @@ public class StarcardServiceImpl implements StarcardService {
         } else {
             return "좋아요설정완료";
         }
+    }
+
+    @Override
+    public FindCardResponseDto recommandCard(Long myId) {
+        StarcardElement starcardElement = starcardRepository.findOneRandomly(myId, PageRequest.of(0,1));
+        return FindCardResponseDto.of(starcardElement);
     }
 }
