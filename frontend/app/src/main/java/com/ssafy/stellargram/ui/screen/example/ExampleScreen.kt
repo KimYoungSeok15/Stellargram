@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,21 +14,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ssafy.stellargram.module.DBModule
+import com.ssafy.stellargram.module.ScreenModule
 import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExampleScreen(navController : NavController, modifier: Modifier){
-    val viewModel : ExampleViewModel = viewModel()
-    val context = LocalContext.current
-    LaunchedEffect(Unit){
-        viewModel.context = context
-    }
 
     // TODO: 기기로부터 정보를 받는 거로 고쳐야 함.
     val longitude: Double = 127.039611
@@ -40,17 +34,19 @@ fun ExampleScreen(navController : NavController, modifier: Modifier){
     var theta: Double by remember { mutableStateOf(0.0)}
     var phi: Double by remember { mutableStateOf(0.0) }
     var isDragging: Boolean by remember { mutableStateOf(false) }
-    var LST: Double by remember{mutableStateOf(viewModel.getMeanSiderealTime(longitude))}
+    var LST: Double by remember{mutableStateOf(0.0)}
     var i: Int by remember{mutableStateOf(0)}
 
+    val viewModel: ExampleViewModel = viewModel()
 
     LaunchedEffect(Unit) {
-
+        viewModel.createStarData(DBModule.gettingStarArray(), DBModule.gettingNameMap())
+        viewModel.setScreenSize(ScreenModule.gettingWidth(), ScreenModule.gettingHeight())
         while (true) {
             i++
             delay(1000L) // 1초마다 함수 호출
             LST = viewModel.getMeanSiderealTime(longitude)
-            viewModel.getSight(longitude, latitude, LST, theta, phi, viewModel.starData)
+            viewModel.getSight(longitude, latitude, LST, theta, phi, viewModel.starData.value)
         }
     }
     Column(
@@ -60,7 +56,7 @@ fun ExampleScreen(navController : NavController, modifier: Modifier){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
-        Text(text = "width: ${LST}", color = Color.Black)
+
     }
 
 }

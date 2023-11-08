@@ -1,11 +1,11 @@
 package com.ssafy.stellargram.ui.screen.example
 
-import android.content.Context
-import android.os.Build
-import android.util.DisplayMetrics
 import android.util.Log
-import android.view.WindowInsets
-import android.view.WindowManager
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -20,54 +20,22 @@ import kotlin.math.sqrt
 @HiltViewModel
 class ExampleViewModel @Inject constructor(
 ) : ViewModel()  {
-    lateinit var context: Context
-    var starData: Array<DoubleArray> = arrayOf()
-    var names: HashMap<Int, String> = hashMapOf()
-    var screenWidth = getScreenWidth(context).toFloat()
-    var screenHeight = getScreenHeight(context).toFloat()
+//    lateinit var context: Context
+    var starData: MutableState<Array<DoubleArray>> = mutableStateOf(arrayOf())
+    var names: MutableState<HashMap<Int, String>> = mutableStateOf(hashMapOf())
+    var screenWidth by mutableFloatStateOf(0f)
+    var screenHeight by mutableFloatStateOf(0f)
     fun setScreenSize(width: Int, height: Int){
         Log.d("check", "${width} ${height}")
         screenWidth = width.toFloat()
         screenHeight = height.toFloat()
         Log.d("check", "${screenWidth} ${screenHeight}")
     }
-
-    fun getScreenWidth(context: Context): Int {
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val windowMetrics = wm.currentWindowMetrics
-            val insets = windowMetrics.windowInsets
-                .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
-            println(windowMetrics.bounds.width() - insets.left - insets.right)
-            return windowMetrics.bounds.width() - insets.left - insets.right
-        } else {
-            val displayMetrics = DisplayMetrics()
-            wm.defaultDisplay.getMetrics(displayMetrics)
-            return displayMetrics.widthPixels
-        }
-    }
-
-    fun getScreenHeight(context: Context): Int {
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val windowMetrics = wm.currentWindowMetrics
-            val insets = windowMetrics.windowInsets
-                .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
-            Log.d("check",(windowMetrics.bounds.width() - insets.left - insets.right).toString())
-            return windowMetrics.bounds.height() - insets.bottom - insets.top
-
-        } else {
-            val displayMetrics = DisplayMetrics()
-            wm.defaultDisplay.getMetrics(displayMetrics)
-            return displayMetrics.heightPixels
-        }
-    }
-
-
-
     fun createStarData(Data: Array<DoubleArray>, Names: HashMap<Int, String>){
-        starData = Data
-        names = Names
+        Log.d("check", "ViewModel: ${starData.value.size}")
+        starData.value = Data
+        names.value = Names
+        Log.d("check", "ViewModel: ${starData.value.size}")
     }
 
     fun getMeanSiderealTime(longitude: Double): Double{

@@ -1,9 +1,15 @@
 package com.ssafy.stellargram.ui
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
+import android.view.WindowInsets
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,6 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import com.kakao.sdk.common.util.Utility
 import com.ssafy.stellargram.data.db.database.DatabaseModule
 import com.ssafy.stellargram.data.db.entity.Star
+import com.ssafy.stellargram.module.DBModule
+import com.ssafy.stellargram.module.ScreenModule
+import com.ssafy.stellargram.ui.screen.example.ExampleViewModel
 import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
 import com.ssafy.stellargram.util.CreateStarName
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,6 +33,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val exampleViewModel: ExampleViewModel by viewModels();
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,12 +71,44 @@ class MainActivity : ComponentActivity() {
                     val name = CreateStarName.getStarName(star)
                     nameMap.put(star.id, name)
                 }
-//                exampleViewModel.createStarData(starArray, nameMap)
+                DBModule.settingData(starArray, nameMap)
             }
         }
 
+        fun getScreenWidth(context: Context): Int {
+            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val windowMetrics = wm.currentWindowMetrics
+                val insets = windowMetrics.windowInsets
+                    .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+                println(windowMetrics.bounds.width() - insets.left - insets.right)
+                return windowMetrics.bounds.width() - insets.left - insets.right
+            } else {
+                val displayMetrics = DisplayMetrics()
+                wm.defaultDisplay.getMetrics(displayMetrics)
+                return displayMetrics.widthPixels
+            }
+        }
+
+        fun getScreenHeight(context: Context): Int {
+            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val windowMetrics = wm.currentWindowMetrics
+                val insets = windowMetrics.windowInsets
+                    .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+                Log.d("check",(windowMetrics.bounds.width() - insets.left - insets.right).toString())
+                return windowMetrics.bounds.height() - insets.bottom - insets.top
+
+            } else {
+                val displayMetrics = DisplayMetrics()
+                wm.defaultDisplay.getMetrics(displayMetrics)
+                return displayMetrics.heightPixels
+            }
+        }
+        ScreenModule.settingData(getScreenWidth(this), getScreenHeight(this))
 
     }
+
 }
 
 
