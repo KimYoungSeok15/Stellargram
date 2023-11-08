@@ -9,3 +9,14 @@ data class MessageInfo(
     val content: String,
 
 )
+
+data class MessagesData(
+    val nextCursor:Int,
+    val messageList:List<MessageInfo>
+)
+
+data class MessageListResponse(
+    val code: Int,
+    val message: String,
+    val data: MessagesData
+)
