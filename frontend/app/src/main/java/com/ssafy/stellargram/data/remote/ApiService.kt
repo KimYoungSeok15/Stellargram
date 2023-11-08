@@ -14,7 +14,7 @@ import retrofit2.http.Query
 
 interface ApiService {
  @GET("/member/check")
- fun getMemberCheck(): Response<MemberCheckResponse>
+ suspend fun getMemberCheck(): Response<MemberCheckResponse>
 
  @POST("/member/signup")
  fun postMemberSignUP(
