@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.ssafy.stellargram.ui.screen.example.ExampleScreen
 import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
+import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
@@ -63,6 +64,11 @@ fun  NavGraph(
         }
         composable(route = Screen.ChatRoom.route){
             ChatRoomScreen(navController = navController)
+        }
+        composable(route = Screen.ChatRoomList.route){
+            BaseFrame(navController){
+                ChatRoomListScreen(navController = navController)
+            }
         }
     }
 }
