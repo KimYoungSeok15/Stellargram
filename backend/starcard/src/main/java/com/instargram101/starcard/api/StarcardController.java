@@ -51,4 +51,9 @@ public class StarcardController {
     public ResponseEntity<CommonApiResponse> likeCard(@RequestHeader("myId") Long myId, @PathVariable Long cardId){
         return ResponseEntity.ok(CommonApiResponse.OK("좋아요작업성공", starcardService.likeCard(myId, cardId)));
     }
+
+    @GetMapping("/recommand")
+    public ResponseEntity<CommonApiResponse> recommandCard(@RequestHeader("myId") Long myId){
+        return ResponseEntity.ok(CommonApiResponse.OK("추천성공", starcardService.recommandCard(myId)));
+    }
 }
