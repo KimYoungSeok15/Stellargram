@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ssafy.stellargram.ui.screen.example.ExampleScreen
+import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
@@ -33,7 +33,7 @@ fun NavGraph(
             HomeScreen(navController = navController)
         }
         composable(route = Screen.Example.route) {
-            ExampleScreen(navController = navController, modifier = modifier)
+            SkyMapScreen(navController = navController, modifier = modifier)
         }
         composable(route = Screen.GoogleMap.route){
             GoogleMapScreen(navController = navController)
