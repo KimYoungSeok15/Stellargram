@@ -1,13 +1,16 @@
 package com.ssafy.stellargram.ui
 
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ssafy.stellargram.ui.screen.base.BaseFrame
+import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
-import com.ssafy.stellargram.ui.screen.example.ExampleScreen
+import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
@@ -43,7 +46,7 @@ fun  NavGraph(
             SearchScreen(navController = navController)
         }
         composable(route = Screen.Example.route) {
-            ExampleScreen(navController = navController, modifier = modifier)
+            SkyMapScreen(navController = navController, modifier = modifier)
         }
         composable(route = Screen.SkyMap.route){
             BaseFrame(navController, screen = Screen.SkyMap) {
@@ -55,8 +58,7 @@ fun  NavGraph(
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route){
-            BaseFrame(navController, screen = Screen.GoogleMap) {
+        composable(route = Screen.GoogleMap.route){            BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
         }
@@ -70,16 +72,4 @@ fun  NavGraph(
         }
     }
 }
-
-
-
-
-//@Composable
-//fun ExampleScreen(navController: NavController) {
-//    Button(onClick = { navController.navigate("Home") }) {
-//        Text(text = "Example")
-//    }
-//}
-
-
 

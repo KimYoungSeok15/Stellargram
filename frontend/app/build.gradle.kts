@@ -118,9 +118,10 @@ dependencies {
         // Common functionality used across multiple media libraries
         //noinspection GradleDependency
         implementation("androidx.media3:media3-common:$media3v")
-    //
 
-    val room_version = "2.5.0"
+    // Dependency implementation for room
+
+        val room_version = "2.5.0"
 
         implementation("androidx.room:room-runtime:$room_version")
         annotationProcessor("androidx.room:room-compiler:$room_version")

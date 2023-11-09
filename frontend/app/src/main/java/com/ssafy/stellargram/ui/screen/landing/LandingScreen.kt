@@ -79,7 +79,7 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
         ) {
             Text(text = "move to sphere")
         }
-        
+
         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
         Button(
             onClick = {
