@@ -37,7 +37,7 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(member));
     }
 
-    @GetMapping("/check-duplicate")
+    @PostMapping("/check-duplicate")
     public ResponseEntity<CommonApiResponse<Boolean>> checkByNickname(@RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
         boolean isSuccess = memberServiceImpl.checkNickname(nickname);
@@ -93,14 +93,14 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(followingMembers));
     }
 
-    @GetMapping("/id")
+    @PostMapping("/id")
     public ResponseEntity<CommonApiResponse<Long>> getMemberIdByNickname(@RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
         Long memberId = memberServiceImpl.getMemberIdByNickname(nickname);
         return ResponseEntity.ok(CommonApiResponse.OK(memberId));
     }
 
-    @GetMapping("/nickname/search")
+    @PostMapping("/nickname/search")
     public ResponseEntity<CommonApiResponse<List<Member>>> searchMembersByNickname(@RequestBody Map<String, Object> request) {
         var searchNickname = (String) request.get("searchNickname");
         List<Member> members = memberServiceImpl.searchMembersByNickname(searchNickname);
