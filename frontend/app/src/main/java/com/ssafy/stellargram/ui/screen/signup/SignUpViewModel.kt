@@ -27,9 +27,10 @@ class SignUpViewModel @Inject constructor(
 
     private val repository = SignUpRepository(viewModelScope)
     var textIpt by  mutableStateOf("")
-    var profileImageUrl by mutableStateOf("")
+    var profileImageUrl by mutableStateOf(StellargramApplication.prefs.getString("profileImageUrl",""))
     var Nickname_isvalid by  mutableStateOf(true)
     var Nickname_isChecked by mutableStateOf(false)
+    var dialogMessage by mutableStateOf("")
 
     fun IptisValid(){
         if (textIpt.isEmpty()){
@@ -61,7 +62,8 @@ class SignUpViewModel @Inject constructor(
             val memberSignUpRequest = MemberSignUpRequest(nickname = textIpt, profileImageUrl = profileImageUrl)
             SignInSubmit(memberSignUpRequest, navController)
         } else {
-
+            dialogMessage = "입력이 올바르지 않습니다."
+            TODO()// dialog 기능 추가후 구현 예정
         }
 
     }
