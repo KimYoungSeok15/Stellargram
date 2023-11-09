@@ -1,6 +1,8 @@
 package com.ssafy.stellargram.data.remote
 
 import com.ssafy.stellargram.model.CardsResponse
+import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
+import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
@@ -13,13 +15,14 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiService {
- @GET("/member/check")
- suspend fun getMemberCheck(): Response<MemberCheckResponse>
+     @GET("member/check")
+     suspend fun getMemberCheck(): Response<MemberCheckResponse>
 
- @POST("/member/signup")
- fun postMemberSignUP(
-     @Body postMemberSignUpRequest : MemberSignUpRequest
- ) : Response<MemberSignUpResponse>
+     @POST("member/check-duplicate/")
+     suspend fun getMemberCheckDuplicate(@Body getMemberCheckDuplicateRequest: MemberCheckDuplicateRequest): Response<MemberCheckDuplicateResponse>
+
+     @POST("member/signup")
+     suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
 }
 
 
