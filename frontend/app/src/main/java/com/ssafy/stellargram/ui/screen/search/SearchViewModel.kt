@@ -1,7 +1,8 @@
 package com.ssafy.stellargram.ui.screen.search
 
-import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,11 +27,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.UiComposable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -40,22 +40,23 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.Member
-import com.ssafy.stellargram.model.MembersData
 import com.ssafy.stellargram.model.Star
+import com.ssafy.stellargram.ui.Screen
+import com.ssafy.stellargram.ui.rememberAppNavigationController
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
@@ -91,7 +92,7 @@ fun TabLayout(viewModel: MainViewModel) {
 }
 // 게시물 탭
 @Composable
-fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<Card>>) {
+fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<Card>>, navController: NavController) {
 
     Column(
         modifier = Modifier
@@ -106,13 +107,13 @@ fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        ArticleUI(cardsState = cardResultsState)
+        ArticleUI(cardsState = cardResultsState, navController)
     }
 }
 
 // 계정 탭
 @Composable
-fun AccountScreen(viewModel: MainViewModel, accountCardsState: MutableState<List<Member>>) {
+fun AccountScreen(viewModel: MainViewModel, accountCardsState: MutableState<List<Member>>, navController:NavController) {
 
     Column(
         modifier = Modifier
@@ -127,14 +128,13 @@ fun AccountScreen(viewModel: MainViewModel, accountCardsState: MutableState<List
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AccountUI(accountCardState = accountCardsState) // accountCardsState.value 대신 accountCardsState 전달
+        AccountUI(accountCardState = accountCardsState, navController) // accountCardsState.value 대신 accountCardsState 전달
     }
 }
 
 // 별 탭
 @Composable
-fun StarScreen(viewModel: MainViewModel, starCardsState: MutableState<List<Star>>) {
-
+fun StarScreen(viewModel: MainViewModel, starCardsState: MutableState<List<Star>>, navController:NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,12 +148,12 @@ fun StarScreen(viewModel: MainViewModel, starCardsState: MutableState<List<Star>
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        StarUI(starCardsState = starCardsState) // starCardsState.value 대신 starCardsState 전달
+        StarUI(starCardsState = starCardsState, navController)
     }
 }
+
 // 탭의 뼈대와 동작을 정의
-
-
+@HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
     private val _tabIndex: MutableLiveData<Int> = MutableLiveData(0)
@@ -320,7 +320,7 @@ suspend fun getSearchResults(text: String, mainViewModel: MainViewModel): List<A
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ArticleUI(cardsState: MutableState<List<Card>>) {
+fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController) {
     // 각 검색 결과를 표시하는 UI 컴포넌트
     LazyColumn(
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
@@ -332,7 +332,8 @@ fun ArticleUI(cardsState: MutableState<List<Card>>) {
             Row(
                 modifier = Modifier
                     .padding(0.dp, 10.dp)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .clickable {},
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 회원 정보 표시 (이미지, 닉네임)
@@ -355,16 +356,16 @@ fun ArticleUI(cardsState: MutableState<List<Card>>) {
                             .width(150.dp)
                     )
                 }
-                val text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Color(0xFF9DC4FF))) {
-                        append("팔로우")
+                val followText = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = if (card.amILikeThis) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
+                        append(if (card.amILikeThis) "언팔로우" else "팔로우")
                     }
                 }
                 ClickableText(
-                    text = text,
+                    text = followText,
                     style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
                     onClick = { offset ->
-                        // Handle text click here
+                        // 팔로우 또는 언팔로우 이벤트 처리
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -410,7 +411,7 @@ fun ArticleUI(cardsState: MutableState<List<Card>>) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun AccountUI(accountCardState: MutableState<List<Member>>) {
+fun AccountUI(accountCardState: MutableState<List<Member>>, navController:NavController) {
     // 계정 탭의 검색 결과를 표시하는 UI 컴포넌트
     LazyColumn(
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
@@ -420,7 +421,10 @@ fun AccountUI(accountCardState: MutableState<List<Member>>) {
             val accountCard = accountCardState.value[index]
             // 계정 정보 및 UI 표시
             Row(
-                modifier = Modifier.fillMaxWidth().padding(0.dp, 14.dp),
+                modifier = Modifier
+                    .height(60.dp)
+                    .fillMaxWidth()
+                    .clickable {},
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 GlideImage(
@@ -474,7 +478,7 @@ fun AccountUI(accountCardState: MutableState<List<Member>>) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun StarUI(starCardsState: MutableState<List<Star>>) {
+fun StarUI(starCardsState: MutableState<List<Star>>, navController: NavController) {
     // 별 탭의 검색 결과를 표시하는 UI 컴포넌트
     LazyColumn(
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
@@ -482,9 +486,15 @@ fun StarUI(starCardsState: MutableState<List<Star>>) {
     ) {
         items(starCardsState.value.size) { index ->
             val starCard = starCardsState.value[index]
+            // Row를 클릭 가능하게 변경
             Row (
-                modifier = Modifier.padding(0.dp, 10.dp)
-            ){
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("${Screen.StarDetail.route}/${starCard.name}")
+                    }
+                    .padding(0.dp, 10.dp)
+            ) {
                 // 별자리 정보 표시
                 Text(
                     text = starCard.name,

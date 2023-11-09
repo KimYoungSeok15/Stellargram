@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.base
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -46,27 +47,32 @@ fun BaseFrame(
 {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+                CenterAlignedTopAppBar(
                 title = {
                     Text(text = screen.title, fontWeight = FontWeight.Bold)
                 },
                 modifier = Modifier,
                 navigationIcon = {
-                    val navIconResource = when (screen.route) {
-                        "skymap" -> R.drawable.menu
-                        "mypage" -> R.drawable.addphoto
+                    val navIconResource = when {
+                        screen.route.startsWith("stardetail") -> R.drawable.back
+                        screen.route == "skymap" -> R.drawable.menu
+                        screen.route == "mypage" -> R.drawable.addphoto
                         else -> null
                     }
+
                     // navigationIcon을 동적으로 설정
                     navIconResource?.let { iconRes ->
                         IconButton(
                             onClick = {
                                 // navigationIcon 클릭 이벤트 처리
-                                when (screen.route) {
-                                    "skymap" -> {
+                                when {
+                                    screen.route.startsWith("stardetail") -> {
+                                        navController.popBackStack()
+                                    }
+                                    screen.route == "skymap" -> {
                                         // "skymap" 화면인 경우 다른 동작 수행
                                     }
-                                    "mypage" -> {
+                                    screen.route == "mypage" -> {
                                         // "mypage" 화면인 경우 다른 동작 수행
                                     }
                                 }
