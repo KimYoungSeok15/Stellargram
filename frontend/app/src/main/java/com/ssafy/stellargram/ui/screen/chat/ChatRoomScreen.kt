@@ -42,8 +42,6 @@ fun ChatRoomScreen(
     personnel: Int? = 0,
     observeSiteId: String? = ""
 ) {
-    // TODO: 나의 아이디 임시 입력
-    val myId: Int = 1
 
     // 채팅 뷰모델 생성
     val viewModel: ChatViewModel = hiltViewModel()
@@ -89,7 +87,7 @@ fun ChatRoomScreen(
         LazyColumn() {
             items(messageList) { message ->
                 ChatBox(
-                    isMine = (myId == TestValue.myId),
+                    isMine = (message.memberId == TestValue.myId.toLong()),
                     imgUrl = message.memberImagePath,
                     nickname = message.memberNickName,
                     content = message.content

@@ -28,13 +28,11 @@ import kotlinx.coroutines.launch
 fun ChatRoomListScreen(navController: NavController = rememberNavController()) {
     var roomCount by remember { mutableIntStateOf(0) }
     var roomList by remember { mutableStateOf<List<ChatRoom>>(emptyList()) }
-    // TODO: 나의 아이디 임시 입력
-    val myId: Int = 1
 
 //    val roomListInfo = GetMyRooms()
     LaunchedEffect(key1 = true) {
         // API 호출을 비동기로 수행
-        val response = NetworkModule.provideRetrofitInstanceChat().getRoomList(myId = myId)
+        val response = NetworkModule.provideRetrofitInstanceChat().getRoomList(myId = TestValue.myId)
         if (response?.code == 200) {
             roomCount = response.data.roomCount
             roomList = response.data.roomList
