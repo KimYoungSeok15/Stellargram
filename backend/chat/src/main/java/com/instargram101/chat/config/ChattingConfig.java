@@ -14,5 +14,5 @@ public class ChattingConfig {
     private final int maxPersonnelCount = 100;
 
     // 페이지네이션 최대 갯수
-    private final int pageSize = 300;
+    private final int pageSize = 5;
 }
