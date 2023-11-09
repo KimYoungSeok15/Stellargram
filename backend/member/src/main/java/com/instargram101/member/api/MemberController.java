@@ -44,7 +44,7 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.createMember(memberId, request)));
     }
 
-    @GetMapping("/check-duplicate")
+    @PostMapping("/check-duplicate")
     public ResponseEntity<CommonApiResponse<StatusResponse>> checkByNickname(@RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
         StatusResponse response = StatusResponse.builder().status(memberServiceImpl.checkNickname(nickname)).build();
@@ -102,14 +102,14 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
-    @GetMapping("/id")
+    @PostMapping("/id")
     public ResponseEntity<CommonApiResponse<MemberIdResponse>> getMemberIdByNickname(@RequestBody Map<String, Object> request) {
         var nickname = (String) request.get("nickname");
         MemberIdResponse response = MemberIdResponse.builder().memberId(memberServiceImpl.getMemberIdByNickname(nickname)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
-    @GetMapping("/nickname/search")
+    @PostMapping("/nickname/search")
     public ResponseEntity<CommonApiResponse<MemberListResponse>> searchMembersByNickname(@RequestBody Map<String, Object> request) {
         var searchNickname = (String) request.get("searchNickname");
         MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.searchMembersByNickname(searchNickname)).build();

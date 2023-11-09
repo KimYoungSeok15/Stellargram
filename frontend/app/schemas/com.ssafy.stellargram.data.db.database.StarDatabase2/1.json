@@ -1,0 +1,250 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "e0a9ec25a63f05c6d6b08d70ca729a81",
+    "entities": [
+      {
+        "tableName": "stars",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `hip` INTEGER, `hd` INTEGER, `hr` INTEGER, `gl` TEXT, `bf` TEXT, `proper` TEXT, `ra` REAL, `dec` REAL, `dist` REAL, `pmra` REAL, `pmdec` REAL, `rv` REAL, `mag` REAL, `absmag` REAL, `spect` TEXT, `ci` REAL, `x` REAL, `y` REAL, `z` REAL, `vx` REAL, `vy` REAL, `vz` REAL, `rarad` REAL, `decrad` REAL, `pmrarad` REAL, `pmdecrad` REAL, `bayer` TEXT, `flam` INTEGER, `con` TEXT, `comp` INTEGER, `comp_primary` INTEGER, `base` TEXT, `lum` REAL, `variable` TEXT, `var_min` REAL, `var_max` REAL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hip",
+            "columnName": "hip",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hd",
+            "columnName": "hd",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hr",
+            "columnName": "hr",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "gl",
+            "columnName": "gl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bf",
+            "columnName": "bf",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "proper",
+            "columnName": "proper",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ra",
+            "columnName": "ra",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dec",
+            "columnName": "dec",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dist",
+            "columnName": "dist",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pmra",
+            "columnName": "pmra",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pmdec",
+            "columnName": "pmdec",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rv",
+            "columnName": "rv",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mag",
+            "columnName": "mag",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "absmag",
+            "columnName": "absmag",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "spect",
+            "columnName": "spect",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ci",
+            "columnName": "ci",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "x",
+            "columnName": "x",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "y",
+            "columnName": "y",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "z",
+            "columnName": "z",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vx",
+            "columnName": "vx",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vy",
+            "columnName": "vy",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vz",
+            "columnName": "vz",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rarad",
+            "columnName": "rarad",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "decrad",
+            "columnName": "decrad",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pmrarad",
+            "columnName": "pmrarad",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pmdecrad",
+            "columnName": "pmdecrad",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bayer",
+            "columnName": "bayer",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "flam",
+            "columnName": "flam",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "con",
+            "columnName": "con",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "comp",
+            "columnName": "comp",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "comp_primary",
+            "columnName": "comp_primary",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "base",
+            "columnName": "base",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lum",
+            "columnName": "lum",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "variable",
+            "columnName": "variable",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "var_min",
+            "columnName": "var_min",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "var_max",
+            "columnName": "var_max",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e0a9ec25a63f05c6d6b08d70ca729a81')"
+    ]
+  }
+}

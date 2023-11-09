@@ -11,9 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import com.kakao.sdk.common.util.Utility
+import com.ssafy.stellargram.data.db.database.StarDatabase
 import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
 import dagger.hilt.android.AndroidEntryPoint
-import com.kakao.sdk.common.util.Utility
 
 
 @AndroidEntryPoint
@@ -36,6 +37,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+//        val db = StarDatabase.getDatabase(this)
+//        Log.d("GETSTARDB","$db")
     }
 }
 
