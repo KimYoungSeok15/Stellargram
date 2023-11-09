@@ -7,7 +7,6 @@ import androidx.navigation.NavController
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.StellargramApplication
-import com.ssafy.stellargram.data.remote.ApiService
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.MemberCheckResponse
 import com.ssafy.stellargram.ui.Screen
@@ -16,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -36,15 +34,14 @@ class KakaoViewModel @Inject constructor(
      */
     fun handlelogin(token: OAuthToken?, error: Throwable?, navController: NavController) {
         if (error != null) {
+            // Handle login failure here
             Log.e(TAG, "카카오 서버 로그인 실패", error)
             navController.navigate(Screen.Landing.route)
-            // Handle login failure here
         } else if (token != null) {
             Log.i(TAG, "카카오 서버 로그인 성공 ${token.accessToken}")
             // After successful login, request user information
             getUserProfile()
             memberCheck(navController)
-//            navController.navigate(Screen.Home.route)
         }
     }
 
@@ -96,19 +93,11 @@ class KakaoViewModel @Inject constructor(
             } else if (user != null){
                 val oauthIdentifier = user.id.toString()
                 val profileImageUrl = user.properties?.get("profile_image") ?: ""
-                StellargramApplication.prefs.setString("myId","$oauthIdentifier")
-                Log.d(TAG, profileImageUrl)
+                StellargramApplication.prefs.setString("myId", oauthIdentifier)
+                StellargramApplication.prefs.setString("profileImageUrl",profileImageUrl)
             }
         }
     }
-
-    /**
-     * 제공 받은 유저 정보로 회원 가입 진행
-     */
-    private fun postSignUp() {
-
-    }
-
 }
 
 class AuthRepository(private val scope: CoroutineScope) {
@@ -122,54 +111,8 @@ class AuthRepository(private val scope: CoroutineScope) {
                 Log.d(tag,response.toString())
                 onComplete(response)
             } catch (e: Exception) {
-                // Handle network request exception
-//                Log.d(tag,e.toString())
-
                 Log.e(tag,e.toString())
             }
         }
     }
-//
-//    fun getUserInfo(){
-//        scope.launch(Dispatchers.IO) {
-//            val tag = "USER"
-//            try {
-//                val response = HDRetrofitBuilder.HDapiService().getUserInfo()
-//                val getUserResponse = response.body()
-//                if(getUserResponse != null){
-//                    Log.d(tag,"Success "+response.body().toString())
-//                    AirbankApplication.prefs.setString("name", getUserResponse.data.name)
-//                    AirbankApplication.prefs.setString("phoneNumber", getUserResponse.data.phoneNumber)
-//                    AirbankApplication.prefs.setString("creditScore", getUserResponse.data.creditScore.toString())
-//                    AirbankApplication.prefs.setString("imageUrl", getUserResponse.data.imageUrl ?: "https://thumbnews.nateimg.co.kr/view610///news.nateimg.co.kr/orgImg/nn/2022/06/24/202206241808393510_1.jpg")
-//                    AirbankApplication.prefs.setString("role", getUserResponse.data.role)
-//                }else {
-//                    Log.d(tag,"Fail "+response.body().toString())
-//                }
-//            } catch (e:Exception){
-//                Log.e(tag,e.toString())
-//            }
-//        }
-//    }
-//}
-//
-//
-//class SignUpRepository(private val scope: CoroutineScope) {
-//    private val tag = "SIGNUP"
-//    fun signUp(
-//        patchMembersRequest: PATCHMembersRequest,
-//        onComplete: (Response<PATCHMembersResponse>) -> Unit
-//    ) {
-//        scope.launch(Dispatchers.IO) {
-//            try {
-//                Log.d(tag,patchMembersRequest.toString())
-//                val response = HDRetrofitBuilder.HDapiService().signupUser(patchMembersRequest)
-//                Log.d(tag,response.toString())
-//
-//                onComplete(response)
-//            } catch (e: Exception) {
-//                onComplete(Response.error(500, (e.message ?: "Unknown error").toResponseBody(null)))
-//            }
-//        }
-//    }
 }
