@@ -32,12 +32,15 @@ class SignUpViewModel @Inject constructor(
     var Nickname_isChecked by mutableStateOf(false)
 
     fun IptisValid(){
+        if (textIpt.isEmpty()){
+            return
+        }
         val memberCheckDuplicateRequest = MemberCheckDuplicateRequest(
             nickname = textIpt
         )
         viewModelScope.launch(Dispatchers.IO){
             repository.checkDuplicate(memberCheckDuplicateRequest){ response ->
-                Log.d("SIGNUP","${response}")
+                Log.d("SIGNUP","$response")
                 try {
                     if (response.isSuccessful){
                         val checkStatus = response.body()
@@ -54,9 +57,11 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun handleSubmit(navController: NavController){
-        if(Nickname_isChecked == true && textIpt.isNotEmpty() && profileImageUrl.isNotEmpty()){
+        if(Nickname_isChecked && textIpt.isNotEmpty() && profileImageUrl.isNotEmpty()){
             val memberSignUpRequest = MemberSignUpRequest(nickname = textIpt, profileImageUrl = profileImageUrl)
             SignInSubmit(memberSignUpRequest, navController)
+        } else {
+
         }
 
     }
