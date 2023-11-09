@@ -1,17 +1,16 @@
 package com.instargram101.member.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "follow")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Follow {
     @Id
@@ -19,11 +18,11 @@ public class Follow {
     private Long followId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followee", referencedColumnName = "member_id")
-    private Member followee;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower", referencedColumnName = "member_id")
     private Member follower;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "followee", referencedColumnName = "member_id")
+    private Member followee;
 
 }

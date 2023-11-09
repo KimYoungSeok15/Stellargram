@@ -39,7 +39,8 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun INSTARGRAMTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true, // 언제나 darkTheme으로. 원치 않을 시 현재 줄 지우고 아래 주석 해제
+    // darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

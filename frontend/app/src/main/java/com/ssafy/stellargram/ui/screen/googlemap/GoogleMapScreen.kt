@@ -68,6 +68,7 @@ import com.google.maps.android.compose.widgets.DisappearingScaleBar
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.BuildConfig
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GoogleMapScreen(navController: NavController){
     val viewModel: GoogleMapViewModel = viewModel() // Create an instance of GoogleMapViewModel

@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "member")
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 public class Member {
 

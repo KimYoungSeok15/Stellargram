@@ -23,7 +23,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(500)
                 .body(CommonApiResponse.ERROR(ErrorCode.SERVER_ERROR, String.join("\n ", errors)));*/
-
         return ResponseEntity
                 .status(500)
                 .body(CommonApiResponse.ERROR(ErrorCode.SERVER_ERROR));
