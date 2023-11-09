@@ -1,10 +1,8 @@
 package com.ssafy.stellargram.ui
 
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +16,6 @@ import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
 import com.ssafy.stellargram.ui.screen.search.SearchScreen
-import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
@@ -50,7 +47,7 @@ fun  NavGraph(
         }
         composable(route = Screen.SkyMap.route){
             BaseFrame(navController, screen = Screen.SkyMap) {
-                SkyMapScreen(navController = navController)
+                SkyMapScreen(navController = navController, modifier = modifier)
             }
         }
         composable(route = Screen.Camera.route){

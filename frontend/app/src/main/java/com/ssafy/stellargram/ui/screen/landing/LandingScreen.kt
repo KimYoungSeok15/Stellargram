@@ -90,6 +90,16 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
         ) {
             Text(text = "채팅방")
         }
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.Camera.route)
+            },
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = "카메라")
+        }
     }
 }
 
