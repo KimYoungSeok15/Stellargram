@@ -1,6 +1,5 @@
 package com.ssafy.stellargram.ui.screen.skymap
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -22,20 +21,17 @@ class SkyMapViewModel @Inject constructor(
 ) : ViewModel()  {
 
     var starData: MutableState<Array<DoubleArray>> = mutableStateOf(arrayOf())
+    var starSight: MutableState<Array<DoubleArray>> = mutableStateOf(arrayOf())
     var names: MutableState<HashMap<Int, String>> = mutableStateOf(hashMapOf())
     var screenWidth by mutableFloatStateOf(0f)
     var screenHeight by mutableFloatStateOf(0f)
     fun setScreenSize(width: Int, height: Int){
-        Log.d("check", "${width} ${height}")
         screenWidth = width.toFloat()
         screenHeight = height.toFloat()
-        Log.d("check", "${screenWidth} ${screenHeight}")
     }
     fun createStarData(Data: Array<DoubleArray>, Names: HashMap<Int, String>){
-        Log.d("check", "ViewModel: ${starData.value.size}")
         starData.value = Data
         names.value = Names
-        Log.d("check", "ViewModel: ${starData.value.size}")
     }
 
     fun getMeanSiderealTime(longitude: Double): Double{
@@ -62,7 +58,6 @@ class SkyMapViewModel @Inject constructor(
             val cosa = sqrt(1.0 - (sina * sina))
             val sinA = -sin(hourAngle) * cosDec / cosa
             val cosA = (sinDec -(sinPhi * sina)) / (cosPhi * cosa)
-
             starArray[i][0] = cosa * cosA
             starArray[i][1] = cosa * sinA
             starArray[i][2] = sina
@@ -73,7 +68,7 @@ class SkyMapViewModel @Inject constructor(
         return starArray
     }
 
-    fun getSight(longitude: Double, latitude: Double, sidereal: Double, _theta: Double, _phi: Double, starArray: Array<DoubleArray>): Array<DoubleArray> {
+    fun getSight(longitude: Double, latitude: Double, sidereal: Double, _theta: Double, _phi: Double, starArray: Array<DoubleArray>){
         val starData = getAllStars(longitude, latitude, sidereal, starArray)
         val theta = _theta * PI / 180.0
         val phi = _phi * PI / 180.0
@@ -104,18 +99,30 @@ class SkyMapViewModel @Inject constructor(
             val cosa = cos(a)
             if(abs(cosa) <1.0E-6){
                 resultMatrix[i][0] = 0.0
-                resultMatrix[i][1] = 10000.0
+                resultMatrix[i][1] = 1000000.0
                 continue
             }
-            val _sin = starData[i][1] / cosa
-            val _cos = starData[i][0] / cosa
+            val _sin = temp[1] / cosa
+            val _cos = temp[0] / cosa
 
             val new_theta = if(_cos > 0) asin(_sin) else PI - asin(_sin)
-            resultMatrix[i][0] = new_theta
-            resultMatrix[i][1] = ln(abs((1 + sin(a)) / cosa))
+            resultMatrix[i][0] = -800.0 * new_theta
+            resultMatrix[i][1] = 800.0 * ln(abs((1 + sin(a)) / cosa))
         }
-        return resultMatrix
+        starSight.value = resultMatrix
     }
 
+    //TODO: 해당 좌표 범위에서 뽑아내기. (확대 구현 이후)
+    fun getVisibleStars(_limit: Double, _xrange: Double, _yrange: Double): List<DoubleArray> {
+        var visible: MutableList<DoubleArray> = mutableListOf()
+
+        for(i in 0 until starSight.value.size){
+            if(starSight.value[i][3] > _limit || starSight.value[i][1] <0.0){
+                continue
+            }
+            visible.add(starSight.value[i])
+        }
+        return visible
+    }
 
 }
