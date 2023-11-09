@@ -123,7 +123,7 @@ public class MemberController {
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
-    @GetMapping("/member-list")
+    @PostMapping("/member-list")
     public ResponseEntity<CommonApiResponse<MemberListResponse>> getMembersByMemberId(@RequestBody findMemberListRequestDto request) {
         MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.getMembersByMemberIds(request.getMemberIds())).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
