@@ -14,6 +14,7 @@ sealed class Screen(
     object Kakao : Screen("kakao", "")
     object Home : Screen("home", "메인", R.drawable.home_page)
     object Search : Screen("search", "")
+    object StarDetail : Screen("stardetail", "별 정보")
     object Example : Screen("example", "")
     object GoogleMap : Screen("googlemap", "지도", R.drawable.address)
     object MyPage : Screen("mypage", "마이페이지", R.drawable.account)

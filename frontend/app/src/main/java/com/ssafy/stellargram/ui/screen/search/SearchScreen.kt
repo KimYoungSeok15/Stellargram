@@ -31,9 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ssafy.stellargram.R
-import com.ssafy.stellargram.model.Card
-import com.ssafy.stellargram.model.Member
-import com.ssafy.stellargram.model.Star
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -113,13 +110,13 @@ fun SearchScreen(navController: NavController) {
         // 검색 결과에 따라 적절한 UI를 렌더링
         when (tabIndex) {
             0 -> {
-                ArticleScreen(viewModel = mainViewModel, cardResults)
+                ArticleScreen(viewModel = mainViewModel, cardResults, navController)
             }
             1 -> {
-                AccountScreen(viewModel = mainViewModel, memberResults)
+                AccountScreen(viewModel = mainViewModel, memberResults, navController)
             }
             2 -> {
-                StarScreen(viewModel = mainViewModel, starResults)
+                StarScreen(viewModel = mainViewModel, starResults, navController)
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
