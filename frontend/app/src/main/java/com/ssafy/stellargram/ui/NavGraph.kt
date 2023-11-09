@@ -1,16 +1,17 @@
 package com.ssafy.stellargram.ui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ssafy.stellargram.ui.screen.base.BaseFrame
+import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
-import com.ssafy.stellargram.ui.screen.example.ExampleScreen
+import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
@@ -53,14 +54,13 @@ fun  NavGraph(
         ) { backStackEntry ->
             val arguments = requireNotNull(backStackEntry.arguments)
             val starName = arguments.getString("name") ?: ""
-            Log.d("별", "$arguments $starName")
 
             BaseFrame(navController, screen = Screen.StarDetail) {
                 StarDetailScreen(navController = navController, name = starName)
             }
         }
         composable(route = Screen.Example.route) {
-            ExampleScreen(navController = navController, modifier = modifier)
+            SkyMapScreen(navController = navController, modifier = modifier)
         }
         composable(route = Screen.SkyMap.route){
             BaseFrame(navController, screen = Screen.SkyMap) {
@@ -72,8 +72,7 @@ fun  NavGraph(
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route){
-            BaseFrame(navController, screen = Screen.GoogleMap) {
+        composable(route = Screen.GoogleMap.route){            BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
         }
@@ -87,16 +86,4 @@ fun  NavGraph(
         }
     }
 }
-
-
-
-
-//@Composable
-//fun ExampleScreen(navController: NavController) {
-//    Button(onClick = { navController.navigate("Home") }) {
-//        Text(text = "Example")
-//    }
-//}
-
-
 

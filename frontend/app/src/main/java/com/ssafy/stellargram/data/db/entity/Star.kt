@@ -74,7 +74,7 @@ data class Star(
     val base : String?,
     @ColumnInfo
     val lum : Double?,
-    @ColumnInfo("var")
+    @ColumnInfo
     val variable : String?,
     @ColumnInfo
     val var_min : Double?,
