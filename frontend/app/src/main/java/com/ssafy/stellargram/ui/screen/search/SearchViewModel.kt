@@ -356,16 +356,16 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController)
                             .width(150.dp)
                     )
                 }
-                val text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Color(0xFF9DC4FF))) {
-                        append("팔로우")
+                val followText = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = if (card.amILikeThis) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
+                        append(if (card.amILikeThis) "언팔로우" else "팔로우")
                     }
                 }
                 ClickableText(
-                    text = text,
+                    text = followText,
                     style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
                     onClick = { offset ->
-                        // 팔로우 이벤트 처리
+                        // 팔로우 또는 언팔로우 이벤트 처리
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
