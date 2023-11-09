@@ -34,10 +34,17 @@ public class ChatController {
         return ResponseEntity.ok(CommonApiResponse.OK("조회 성공", chatRoomService.findMyRooms(myId)));
     }
 
+    // TODO: api명세서에 추가하기
+    // 특정 채팅방의 마지막 페이지 커서 조회하기
+    @GetMapping("/recentCurser/{chatRoomId}")
+    public ResponseEntity<CommonApiResponse> findRecentCursor(@PathVariable(name="chatRoomId") Long chatRoomId){
+        return ResponseEntity.ok(CommonApiResponse.OK("조회성공 방 번호:" + chatRoomId, messageService.getRecentCursor(chatRoomId)));
+    }
+
     // 특정 채팅방의 이전 메세지 가져오기
     @GetMapping("open/{chatRoomId}/{cursor}")
     public ResponseEntity<CommonApiResponse> findPastMessages(@PathVariable(name = "chatRoomId") Long chatRoomId, @PathVariable(name = "cursor") int cursor) {
-        return ResponseEntity.ok(CommonApiResponse.OK("조회성공 방:" + chatRoomId + " 페이지:" + cursor, messageService.getMessagesOfRoom(chatRoomId, cursor)));
+        return ResponseEntity.ok(CommonApiResponse.OK("조회성공 방 번호:" + chatRoomId + " 페이지:" + cursor, messageService.getMessagesOfRoom(chatRoomId, cursor)));
     }
 
     // 채팅방 참여하기
