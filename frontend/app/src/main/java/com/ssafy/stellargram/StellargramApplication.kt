@@ -15,7 +15,7 @@ class StellargramApplication : Application() {
     private var instance: StellargramApplication? = null
 
     companion object {
-        const val INSTARGRAM_APP_URI = "http://k9a101.p.ssafy.io:8000"
+        const val INSTARGRAM_APP_URI = "http://k9a101.p.ssafy.io:8000/"
         lateinit var prefs: PreferenceUtil
             private set
     }
