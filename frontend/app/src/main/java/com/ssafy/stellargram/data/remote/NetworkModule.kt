@@ -2,6 +2,7 @@ package com.ssafy.stellargram.data.remote
 
 import android.util.Log
 import com.ssafy.stellargram.StellargramApplication
+import com.ssafy.stellargram.StellargramApplication.Companion.INSTARGRAM_APP_URI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL: String = StellargramApplication.INSTARGRAM_APP_URI
+    private const val BASE_URL: String = INSTARGRAM_APP_URI
     //  Dagger Hilt를 통해 Singleton 스코프를 가진 OkHttpClient 인스턴스를 규정
     @Provides
     @Singleton
@@ -73,7 +74,7 @@ object NetworkModule {
             val myId = StellargramApplication.prefs.getString("myId","")
             Log.d("HEADER",myId)
             val newRequest = request().newBuilder()
-                .addHeader("myId", "$myId")
+                .addHeader("myId", myId)
                 .build()
             proceed(newRequest)
         }
