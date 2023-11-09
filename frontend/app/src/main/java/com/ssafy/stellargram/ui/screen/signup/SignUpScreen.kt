@@ -18,29 +18,27 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.ssafy.stellargram.R
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun SignUpScreen(){
-    var textIpt by remember { mutableStateOf("")}
-    var Nickname_isvalid by remember { mutableStateOf(true)}
+fun SignUpScreen(navController: NavHostController) {
+    val viewModel : SignUpViewModel = viewModel()
+    val keyboardController = LocalSoftwareKeyboardController.current
     Scaffold(
         containerColor = Color.DarkGray,
         topBar = {
@@ -53,72 +51,75 @@ fun SignUpScreen(){
             ) {
                 Text(text = "회원가입", style = MaterialTheme.typography.headlineMedium, color = Color.White)
             }
-                 },
-        content = {
-            Column(modifier = Modifier
+                 }
+    ) {
+        Column(
+            modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "환영합니다!",
-                    modifier = Modifier.padding(10.dp),
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White
-                )
-                Box(modifier = Modifier
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "환영합니다!",
+                modifier = Modifier.padding(10.dp),
+                style = MaterialTheme.typography.headlineLarge,
+                color = Color.White
+            )
+            Box(
+                modifier = Modifier
                     .size(150.dp)
                     .clip(RoundedCornerShape(150.dp))
                     .background(Color.LightGray)
-                ){
-                    Image(
-                        painter = painterResource(id = R.drawable.sunandcloud ),
-                        contentDescription = "UserImage" ,
-                        )
-                }
-                Column( ) {
-                    OutlinedTextField(
-                        modifier = Modifier.padding(30.dp,30.dp,30.dp,5.dp),
-                        value = textIpt ,
-                        onValueChange = { ipt ->
-                            textIpt = ipt
-                        },
-                        label = {Text(text = "닉네임을 입력하세요", color = Color(0xffD0BCFF))},
-                        singleLine = true,
-                        isError = !Nickname_isvalid,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xffD0BCFF),
-                            unfocusedBorderColor = Color(0xffD0BCFF),
-                            focusedTextColor = Color(0xFFD4CBE9)
-                        ),
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardActions = KeyboardActions(onDone = {
-//                            viewModel.submit(phoneNumberValue)
-//                            keyboardController?.hide()
-//                            navController.navigate(BottomNavItem.Main.screenRoute)
-                        })
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.sunandcloud),
+                    contentDescription = "UserImage",
+                )
+            }
+            Column() {
+                OutlinedTextField(
+                    modifier = Modifier.padding(30.dp, 30.dp, 30.dp, 5.dp).fillMaxWidth(),
+                    value = viewModel.textIpt,
+                    onValueChange = { ipt ->
+                        viewModel.textIpt = ipt
+                    },
+                    label = { Text(text = "닉네임을 입력하세요", color = Color(0xffD0BCFF)) },
+                    singleLine = true,
+                    isError = !viewModel.Nickname_isvalid,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFFD4CBE9),
+                        focusedBorderColor = Color(0xffD0BCFF),
+                        unfocusedBorderColor = Color(0xffD0BCFF),
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardActions = KeyboardActions(onDone = {
+                        viewModel.IptisValid()
+                        keyboardController?.hide()
+                    })
+                )
+                if (!viewModel.Nickname_isvalid) {
+                    Row(
+                        modifier = Modifier
+                            .padding(40.dp, 0.dp)
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.Start
                     )
-                    if (!Nickname_isvalid){
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(40.dp, 0.dp), horizontalArrangement = Arrangement.Start) {
-                            Text(text = "중복된 아이디 입니다.", color = Color.Red)
-                        }
+                    {
+                        Text(text = "중복된 아이디 입니다.", color = Color.Red)
                     }
-
                 }
-                Button(onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .width(100.dp)
-                        .padding(0.dp, 30.dp)
-                ) {
-                    Text(
-                        text = "가입",
-                        style = MaterialTheme.typography.labelMedium
-                        )
-                }
-
+            }
+            Button(
+                onClick = { viewModel.handleSubmit(navController) },
+                modifier = Modifier
+                    .width(100.dp)
+                    .padding(0.dp, 30.dp)
+            ) {
+                Text(
+                    text = "가입",
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
         }
-    )
+    }
 }
