@@ -41,6 +41,6 @@ interface ApiServiceForWeather{
 }
 
 interface ApiServiceForCards {
-    @GET("/api/cards")
+    @GET("/starcard")
     suspend fun getCards(): CardsResponse
 }

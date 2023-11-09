@@ -118,9 +118,10 @@ dependencies {
         // Common functionality used across multiple media libraries
         //noinspection GradleDependency
         implementation("androidx.media3:media3-common:$media3v")
-    //
 
-    val room_version = "2.5.0"
+    // Dependency implementation for room
+
+        val room_version = "2.5.0"
 
         implementation("androidx.room:room-runtime:$room_version")
         annotationProcessor("androidx.room:room-compiler:$room_version")
@@ -146,20 +147,23 @@ dependencies {
         // optional - Paging 3 Integration
         implementation("androidx.room:room-paging:$room_version")
 
-    // livedata implementation
-    implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
+        // livedata implementation
+        implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
 
-    // Other supported types of state
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")
+        // Other supported types of state
+        implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01")
 
-    // Dependency implementation for get permissions
-    implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
+        // Dependency implementation for get permissions
+        implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 
         // Gson for parsing JSON
         implementation("com.google.code.gson:gson:2.10.1")
 
-    // Glide
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+        // Glide
+        implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+        // STOMP 사용을 위한 라이브러리
+        implementation("com.github.bishoybasily:stomp:2.0.5")
 }
 
 // Dependency injection with Hilt
