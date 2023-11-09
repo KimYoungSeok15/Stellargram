@@ -18,7 +18,7 @@ sealed class Screen(
     object MyPage : Screen("mypage", "마이페이지", R.drawable.account)
     object SkyMap : Screen("skymap", "천구", R.drawable.constellation)
     object CameraX : Screen("camerax", "카메라X", R.drawable.google_images)
-
+    object SignUp : Screen("signup", "회원가입")
 }
 
 @Composable

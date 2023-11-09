@@ -1,11 +1,7 @@
 package com.ssafy.stellargram.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,6 +11,8 @@ import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
+import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
+
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun  NavGraph(
@@ -45,7 +43,9 @@ fun  NavGraph(
                 GoogleMapScreen(navController = navController)
             }
         }
-
+        composable(Screen.SignUp.route){
+            SignUpScreen(navController = navController)
+        }
     }
 }
 
