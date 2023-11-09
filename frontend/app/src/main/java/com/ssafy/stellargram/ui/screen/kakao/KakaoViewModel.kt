@@ -77,7 +77,7 @@ class KakaoViewModel @Inject constructor(
                         }
                     } else { //회원가입 필요
                         withContext(Dispatchers.Main) {
-                            navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.SignUp.route)
                         }
                     }
                 }
