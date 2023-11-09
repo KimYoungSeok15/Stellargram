@@ -1,12 +1,14 @@
 package com.instargram101.member.service;
 
 import com.instargram101.global.common.exception.customException.CustomException;
+import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.exception.MemberErrorCode;
 import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,8 +26,9 @@ public class MemberServiceImpl implements MemberService {
     private final CardServiceClient cardServiceClient;
 
 
+
     public Boolean checkMember(Long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
+        Optional<Member> member = memberRepository.findByMemberIdAndActivated(memberId, true);
         return !member.isEmpty();
 
     }
@@ -37,7 +40,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = Member.builder()
                 .memberId(memberId)
                 .nickname(nickname)
-                .profileImageUrl(profileImageUrl)
+                .profileImageUrl(profileImageUrl.isEmpty() ? "https://stellagram-bucket-a101.s3.ap-northeast-2.amazonaws.com/profile_image/profile_stellagram.jpg" : profileImageUrl )
                 .activated(true)
                 .followCount(0L)
                 .followingCount(0L)
@@ -47,17 +50,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Boolean checkNickname(String nickname) {
-        return !memberRepository.existsByNickname(nickname);
+        return !memberRepository.existsByNicknameAndActivated(nickname, true);
     }
 
     public Member searchMember(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
     }
 
 
     public Member updateNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setNickname(nickname);
         return memberRepository.save(member);
@@ -65,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Boolean deleteMember(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setActivated(false);
         memberRepository.save(member);
@@ -73,29 +76,30 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public Long getMemberIdByNickname(String nickname) {
-        Member member = memberRepository.findByNickname(nickname)
+        Member member = memberRepository.findByNicknameAndActivated(nickname, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         return member.getMemberId();
     }
 
     public List<Member> searchMembersByNickname(String searchNickname) {
-        List<Member> members = memberRepository.findByNicknameContaining(searchNickname);
-        return members;
+        return memberRepository.findByNicknameContainingAndActivated(searchNickname, true);
     }
 
     public Member updateProfileImage(Long memberId, MultipartFile imageFile) throws IOException  {
         String imageUrl = s3UploadService.saveFile(imageFile);
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByMemberIdAndActivated(memberId, true)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setProfileImageUrl(imageUrl);
         return memberRepository.save(member);
     }
 
     public List<Long> getMemberIdsByCardId(Long cardId) {
-        return cardServiceClient.getMemberIdsByCardId(cardId);
+        ResponseEntity<CommonApiResponse> response = cardServiceClient.getMemberIdsByCardId(cardId);
+        return (List<Long>) response.getBody().getData();
     }
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
-        return memberRepository.findAllById(memberIds);
+        return memberRepository.findMembersByMemberIdInAndActivated(memberIds, true);
     }
+
 }
