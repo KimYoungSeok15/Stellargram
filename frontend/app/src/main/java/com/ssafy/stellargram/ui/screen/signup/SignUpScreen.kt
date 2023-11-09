@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.signup
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -79,7 +83,9 @@ fun SignUpScreen(navController: NavHostController) {
             }
             Column() {
                 OutlinedTextField(
-                    modifier = Modifier.padding(30.dp, 30.dp, 30.dp, 5.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(30.dp, 30.dp, 30.dp, 5.dp)
+                        .fillMaxWidth(),
                     value = viewModel.textIpt,
                     onValueChange = { ipt ->
                         viewModel.textIpt = ipt
@@ -96,7 +102,12 @@ fun SignUpScreen(navController: NavHostController) {
                     keyboardActions = KeyboardActions(onDone = {
                         viewModel.IptisValid()
                         keyboardController?.hide()
-                    })
+                    }),
+                    trailingIcon = {
+                        if (viewModel.Nickname_isChecked){
+                            Icon(imageVector = Icons.Sharp.Done, contentDescription = "done", tint = Color.Green)
+                        }
+                    }
                 )
                 if (!viewModel.Nickname_isvalid) {
                     Row(
