@@ -1,6 +1,7 @@
 package com.instargram101.chat.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instargram101.chat.dto.response.MessageResponse;
 import com.instargram101.chat.entity.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class RedisSubscriber implements MessageListener {
             String publishedMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
 
             // ChatMessage 객체로 매핑
-            ChatMessage newMessage = objectMapper.readValue(publishedMessage,ChatMessage.class);
+            MessageResponse newMessage = objectMapper.readValue(publishedMessage,MessageResponse.class);
 
             // 해당 채널을 구독중인 웹소켓 연결로 메세지 보내기
             messageTemplate.convertAndSend("/subscribe/room/"+newMessage.getRoomId(),newMessage);
