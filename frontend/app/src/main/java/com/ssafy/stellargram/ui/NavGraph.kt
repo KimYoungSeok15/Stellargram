@@ -47,14 +47,13 @@ fun NavGraph(
             SearchScreen(navController = navController)
         }
         composable(
-            route = "${Screen.StarDetail.route}/{name}",
-            arguments = listOf(navArgument("name") { type = NavType.StringType })
+            route = "${Screen.StarDetail.route}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val arguments = requireNotNull(backStackEntry.arguments)
-            val starName = arguments.getString("name") ?: ""
-
+            val starID = arguments.getInt("id") ?: -1
             BaseFrame(navController, screen = Screen.StarDetail) {
-                StarDetailScreen(navController = navController, id = 1)
+                StarDetailScreen(navController = navController, id = starID)
             }
         }
 
