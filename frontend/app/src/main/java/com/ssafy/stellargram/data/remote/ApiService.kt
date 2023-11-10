@@ -4,18 +4,33 @@ import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
+import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
+import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
+import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.MemberSignUpRequest
+import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import retrofit2.Call
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiService {
+     @GET("member/check")
+     suspend fun getMemberCheck(): Response<MemberCheckResponse>
 
+     @POST("member/check-duplicate/")
+     suspend fun getMemberCheckDuplicate(@Body getMemberCheckDuplicateRequest: MemberCheckDuplicateRequest): Response<MemberCheckDuplicateResponse>
+
+     @POST("member/signup")
+     suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
 }
 
-interface ApiServiceForWeather {
+interface ApiServiceForWeather{
     @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst")
     fun getWeatherData(
         @Query("ServiceKey") serviceKey: String,
@@ -30,7 +45,7 @@ interface ApiServiceForWeather {
 }
 
 interface ApiServiceForCards {
-    @GET("/api/cards")
+    @GET("/starcard")
     suspend fun getCards(): CardsResponse
 }
 

@@ -16,4 +16,7 @@ interface StarDAO {
 
     @Query(value =  "SELECT * FROM stars")
     fun readAll() : Flow<List<Star>>
+
+    @Query(value = "SELECT * FROM stars where id = :id")
+    fun readById(id: Int): Flow<Star>
 }

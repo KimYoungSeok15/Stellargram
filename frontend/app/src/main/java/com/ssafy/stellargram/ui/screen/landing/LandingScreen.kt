@@ -72,14 +72,14 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
 
         Button(
             onClick = {
-                navController.navigate(Screen.Example.route)
+                navController.navigate(Screen.SkyMap.route)
             },
             modifier = Modifier
                 .padding(16.dp)
         ) {
             Text(text = "move to sphere")
         }
-        
+
         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
         Button(
             onClick = {

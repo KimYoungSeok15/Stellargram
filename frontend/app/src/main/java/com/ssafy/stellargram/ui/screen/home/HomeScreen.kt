@@ -136,6 +136,7 @@ fun getAddressFromLocation(context: Context, latitude: Double, longitude: Double
             addressText = "주소 정보 없음"
         }
     } catch (e: IOException) {
+        Log.d("Location1", "위치정보 받아오기 실패")
         e.printStackTrace()
         addressText = "주소 정보 없음"
     }
@@ -213,6 +214,7 @@ fun HomeScreen(navController: NavController) {
     LaunchedEffect(key1 = coordinatesXy) {
         coordinatesXy?.let { coordinates ->
             Log.d("Location1", "날짜: $baseDate 시간: $baseTime")
+            Log.d("weather response", "기상청API 요청 시작 전")
             CoroutineScope(Dispatchers.IO).launch {
                 val response = NetworkModule.provideRetrofitInstanceWeather().getWeatherData(
                     serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
@@ -226,15 +228,16 @@ fun HomeScreen(navController: NavController) {
                 ).execute()
                 Log.d("weather response", response.toString())
                 if (response.isSuccessful) {
-
                     val weatherResponse: WeatherResponse? = response.body()
                     // 파싱
                     val gson = Gson()
                     val itemType = object : TypeToken<List<WeatherItem>>() {}.type
+                    Log.d("weather response", "Gson 시작전")
                     val items = gson.fromJson<List<WeatherItem>>(
                         gson.toJson(weatherResponse?.response?.body?.items?.item),
                         itemType
                     )
+                    Log.d("weather response", "Gson 시작후")
                     // 필터링할 카테고리 목록
                     val targetCategories = setOf("T1H", "SKY", "PTY")
 

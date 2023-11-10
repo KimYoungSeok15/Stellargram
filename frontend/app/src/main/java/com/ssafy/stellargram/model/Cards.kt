@@ -7,7 +7,7 @@ package com.ssafy.stellargram.model
 )
 
 data class CardsData(
-    val starcards: List<Card>
+    val starcards: MutableList<Card>
 )
 
 data class Card(

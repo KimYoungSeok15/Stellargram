@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -31,6 +33,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "MAPS_API_KEY", getApiKey("MAPS_API_KEY"))
     }
 
     buildTypes {
@@ -51,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -103,23 +107,31 @@ dependencies {
     // Optionally, you can include the widgets library for ScaleBar, etc.
     implementation("com.google.maps.android:maps-compose-widgets:4.1.1")
 
-    // location service from google play
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+        // location service from google play
+        implementation ("com.google.android.gms:play-services-location:21.0.1")
+
+        // Places Android KTX for request geoSearch
+        implementation ("com.google.android.libraries.places:places:3.1.0")
+
     // Dependency implementation for video
     val media3v = "1.0.0-rc01"
 
-    // For media playback using ExoPlayer
-    //noinspection GradleDependency
-    implementation("androidx.media3:media3-exoplayer:$media3v")
-    // For building media playback UIs
-    //noinspection GradleDependency
-    implementation("androidx.media3:media3-ui:$media3v")
-    // Common functionality used across multiple media libraries
-    //noinspection GradleDependency
-    implementation("androidx.media3:media3-common:$media3v")
-    //
+        // For media playback using ExoPlayer
+        //noinspection GradleDependency
+        implementation("androidx.media3:media3-exoplayer:$media3v")
+        // For building media playback UIs
+        //noinspection GradleDependency
+        implementation("androidx.media3:media3-ui:$media3v")
+        // Common functionality used across multiple media libraries
+        //noinspection GradleDependency
+        implementation("androidx.media3:media3-common:$media3v")
 
-    val room_version = "2.5.0"
+    // Dependency implementation for get permissions
+    implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
+
+    // Dependency implementation for room
+
+        val room_version = "2.5.0"
 
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
@@ -173,4 +185,8 @@ dependencies {
 // Dependency injection with Hilt
 kapt {
     correctErrorTypes = true
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyKey)
 }

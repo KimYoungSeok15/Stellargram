@@ -9,17 +9,18 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.ssafy.stellargram.ui.screen.example.ExampleScreen
 import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
-import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
+import com.ssafy.stellargram.ui.screen.search.SearchScreen
+import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
 import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
+import com.ssafy.stellargram.ui.screen.stardetail.StarDetailScreen
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
@@ -39,30 +40,45 @@ fun NavGraph(
             KakaoScreen(navController = navController)
         }
         composable(route = Screen.Home.route) {
-            BaseFrame(navController) {
+            BaseFrame(navController, screen = Screen.Home) {
                 HomeScreen(navController = navController)
             }
         }
-        composable(route = Screen.Example.route) {
-            ExampleScreen(navController = navController, modifier = modifier)
+        composable(route = Screen.Search.route) {
+            SearchScreen(navController = navController)
         }
-        composable(route = Screen.SkyMap.route) {
-            BaseFrame(navController) {
+        composable(
+            route = "${Screen.StarDetail.route}/{name}",
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val arguments = requireNotNull(backStackEntry.arguments)
+            val starName = arguments.getString("name") ?: ""
+
+            BaseFrame(navController, screen = Screen.StarDetail) {
+                StarDetailScreen(navController = navController, name = starName)
+            }
+        }
+
+        composable(route = Screen.SkyMap.route){
+            BaseFrame(navController, screen = Screen.SkyMap) {
                 SkyMapScreen(navController = navController)
             }
         }
-        composable(route = Screen.Camera.route) {
-            BaseFrame(navController) {
+        composable(route = Screen.Camera.route){
+            BaseFrame(navController, screen = Screen.Camera) {
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route) {
-            BaseFrame(navController) {
+        composable(route = Screen.GoogleMap.route){            
+            BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
         }
-        composable(route = Screen.MyPage.route) {
-            BaseFrame(navController) {
+        composable(Screen.SignUp.route){
+            SignUpScreen(navController = navController)
+        }
+        composable(route = Screen.MyPage.route){
+            BaseFrame(navController, screen = Screen.MyPage) {
                 MypageScreen(navController = navController)
             }
         }
@@ -83,20 +99,10 @@ fun NavGraph(
             }
         }
         composable(route = Screen.ChatRoomList.route) {
-            BaseFrame(navController) {
+            BaseFrame(navController, screen = Screen.ChatRoomList) {
                 ChatRoomListScreen(navController = navController)
             }
         }
     }
 }
-
-
-//@Composable
-//fun ExampleScreen(navController: NavController) {
-//    Button(onClick = { navController.navigate("Home") }) {
-//        Text(text = "Example")
-//    }
-//}
-
-
 
