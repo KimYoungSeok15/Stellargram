@@ -152,10 +152,11 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                     Log.d("message parsed", result.toString())
                     val newMessage = MessageInfo(
                         seq = result.seq,
-                        time = result.unixTimestamp,
+                        time = result.time,
                         memberId = result.memberId,
-                        memberNickname = result.memberNickname,
-                        memberImagePath = result.memberImagePath
+                        memberNickName = result.memberNickName,
+                        memberImagePath = result.memberImagePath,
+                        content = result.content
                     )
                     privateMessages.add(newMessage)
                 }
