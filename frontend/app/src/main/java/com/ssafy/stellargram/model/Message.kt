@@ -7,11 +7,12 @@ data class MessageForSend(
 )
 
 data class MessageForReceive(
-    var id: String,
     var seq: Long,
-    var unixTimestamp: Long,
-    var content: String,
+    var time: Long,
     var memberId: Long,
+    var memberNickName: String,
+    var  memberImagePath:  String,
+    var content: String,
     var roomId: Int
 )
 
@@ -19,7 +20,7 @@ data class MessageInfo(
     val seq: Long,
     val time: Long,
     val memberId: Long,
-    val memberNickname: String,
+    val memberNickName: String,
     val memberImagePath: String,
     val content: String,
 )
