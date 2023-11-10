@@ -59,7 +59,7 @@ fun  NavGraph(
 
         composable(route = Screen.SkyMap.route){
             BaseFrame(navController, screen = Screen.SkyMap) {
-                SkyMapScreen(navController = navController)
+                SkyMapScreen(navController = navController, modifier = modifier)
             }
         }
         composable(route = Screen.Camera.route){
@@ -67,7 +67,7 @@ fun  NavGraph(
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route){            
+        composable(route = Screen.GoogleMap.route){
             BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
