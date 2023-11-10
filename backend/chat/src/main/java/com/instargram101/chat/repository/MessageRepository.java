@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MessageRepository extends MongoRepository<ChatMessage, String> {
 
-    Page<ChatMessage> findByRoomIdOrderByUnixTimestampDesc(Long roomId, Pageable pageable);
+    Page<ChatMessage> findByRoomIdOrderByUnixTimestampAsc(Long roomId, Pageable pageable);
 
-    Page<ChatMessage> findByRoomId(Long roomId, Pageable pageable);
+    Long countByRoomId(Long roomId);
 }
