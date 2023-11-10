@@ -21,6 +21,7 @@ object DBModule {
         nameMap = _nameMap
         starInfo = _starInfo
         starMap = _starMap
+        stars = _stars
         Log.d("check", "${starArray.size}")
     }
 
