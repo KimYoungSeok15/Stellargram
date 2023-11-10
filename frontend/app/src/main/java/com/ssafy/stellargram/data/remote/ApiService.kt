@@ -1,6 +1,9 @@
 package com.ssafy.stellargram.data.remote
 
 import com.ssafy.stellargram.model.CardsResponse
+import com.ssafy.stellargram.model.CursorResponse
+import com.ssafy.stellargram.model.MessageListResponse
+import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
 import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
@@ -11,6 +14,8 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -24,7 +29,6 @@ interface ApiService {
      @POST("member/signup")
      suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
 }
-
 
 interface ApiServiceForWeather{
     @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst")
@@ -44,3 +48,27 @@ interface ApiServiceForCards {
     @GET("/starcard")
     suspend fun getCards(): CardsResponse
 }
+
+// 채팅 관련
+interface ApiServiceForChat {
+    // 내 채팅방 목록 가져오기
+    @GET("chat/rooms")
+    suspend fun getRoomList(
+        @Header("myId") myId: Long
+    ): RoomListResponse
+
+    // 특정 채팅방의 이전 메세지 가져오기
+    @GET("chat/open/{chatRoomId}/{cursor}")
+    suspend fun getPrevChats(
+        @Header("myId") myId: Long,
+        @Path("chatRoomId") chatRoomId: Int,
+        @Path("cursor") cursor: Int,
+    ): MessageListResponse
+
+    // 특정 채팅방의 가장 마지막 커서 가져오기
+    @GET("chat/recentCurser/{chatRoomId}")
+    suspend fun getRecentCursor(
+        @Path("chatRoomId") chatRoomId: Int,
+    ): CursorResponse
+}
+

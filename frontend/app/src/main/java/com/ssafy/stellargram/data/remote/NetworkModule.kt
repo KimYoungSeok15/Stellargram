@@ -104,5 +104,18 @@ object NetworkModule {
             .build()
             .create(ApiServiceForCards::class.java)
     }
+
+    // 채팅 관련 API
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceChat(): ApiServiceForChat {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL) // 기본 URL을 여기에 설정해야 합니다.
+            .client(provideHttpClient())
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForChat::class.java)
+    }
+
 }
 
