@@ -119,7 +119,10 @@ fun SkyMapScreen(navController : NavController){
                             val new_x = it.x - (size.width / 2)
                             val new_y = it.y - (size.height / 2)
                             val ind = viewModel.gettingClickedStar(new_y, new_x, starSight)
-                            if(ind == null) clicked = false
+                            if(ind == null) {
+                                clicked = false
+                                //TODO: 밑에 navbar 추가. + 위에 햄버거 + 검색
+                            }
                             else{
                                 clicked = true
                                 clickedIndex = ind

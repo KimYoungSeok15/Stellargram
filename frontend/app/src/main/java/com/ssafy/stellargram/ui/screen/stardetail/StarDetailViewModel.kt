@@ -9,8 +9,7 @@ import javax.inject.Inject
 class StarDetailViewModel @Inject constructor() : ViewModel() {
     private val TAG = "STAR DETAIL"
     fun getStarResults(text: String): List<Star> {
-        // 별 검색 로직
-        // 현재는 더미 데이터. https://api-ninjas.com/api/stars에서 받아와야함.
+        // TODO: 별 검색.
         val results: List<Star> = listOf(
             Star(
                 name = "Vega",

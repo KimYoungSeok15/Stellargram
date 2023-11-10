@@ -59,7 +59,9 @@ class MainActivity : ComponentActivity() {
                 val _length = it.size
                 val starArray = Array(it.size){DoubleArray(5)}
                 val nameMap = hashMapOf<Int, String>()
+                val starMap = hashMapOf<Int, Star>()
                 val starInfo = hashMapOf<Int, Int>()
+                val stars : MutableList<Star> = mutableListOf()
                 it.forEachIndexed {
                     index: Int, star: Star ->
                     starArray[index][0] = star.rarad?:999.0
@@ -70,8 +72,10 @@ class MainActivity : ComponentActivity() {
                     val name = CreateStarName.getStarName(star)
                     starInfo.put(star.hip?:-1, index)
                     nameMap.put(star.id, name)
+                    starMap.put(star.id, star)
+                    stars.add(star)
                 }
-                DBModule.settingData(starArray, nameMap, starInfo)
+                DBModule.settingData(starArray, nameMap, starInfo, starMap, stars)
                 Log.d("Create", "Done")
             }
         }
