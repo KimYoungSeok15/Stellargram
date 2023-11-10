@@ -9,21 +9,29 @@ object TimeUtil {
     private val yearMonthDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yy.MM.dd")
     private val updateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    private fun calZonedTime(unixTimestamp:Long): ZonedDateTime?{
+    private fun calZonedTime(unixTimestamp: Long): ZonedDateTime? {
         val zoneId = ZoneId.systemDefault()
         val instant: Instant = Instant.ofEpochMilli(unixTimestamp)
         return ZonedDateTime.ofInstant(instant, zoneId)
     }
 
-    fun getYearMonth(unixTimestamp: Long, formatter: DateTimeFormatter = yearMonthDateFormatter): String{
-        return formatter.format(calZonedTime(unixTimestamp))
+    fun getYearMonth(unixTimestamp: Long): String {
+        return if (unixTimestamp.toString().length > 10) yearMonthDateFormatter.format(
+            calZonedTime(
+                unixTimestamp
+            )
+        )
+        else yearMonthDateFormatter.format(calZonedTime(unixTimestamp * 1000))
     }
 
-    fun getHourMinute(unixTimestamp: Long,formatter: DateTimeFormatter = updateTimeFormatter): String{
-        return formatter.format(calZonedTime(unixTimestamp))
+    fun getHourMinute(unixTimestamp: Long): String {
+        return if (unixTimestamp.toString().length > 10) updateTimeFormatter.format(
+            calZonedTime(
+                unixTimestamp
+            )
+        )
+        else updateTimeFormatter.format(calZonedTime(unixTimestamp * 1000))
     }
-
-
 
 
 }

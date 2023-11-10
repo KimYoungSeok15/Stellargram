@@ -1,6 +1,7 @@
 package com.ssafy.stellargram.data.remote
 
 import com.ssafy.stellargram.model.CardsResponse
+import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.WeatherResponse
@@ -45,9 +46,14 @@ interface ApiServiceForChat {
     @GET("chat/open/{chatRoomId}/{cursor}")
     suspend fun getPrevChats(
         @Header("myId") myId: Long,
-        @Path("chatRoomId")  chatRoomId:Int,
-        @Path("cursor")  cursor:Int,
-        ): MessageListResponse
-    //
+        @Path("chatRoomId") chatRoomId: Int,
+        @Path("cursor") cursor: Int,
+    ): MessageListResponse
+
+    // 특정 채팅방의 가장 마지막 커서 가져오기
+    @GET("chat/recentCurser/{chatRoomId}")
+    suspend fun getRecentCursor(
+        @Path("chatRoomId") chatRoomId: Int,
+    ): CursorResponse
 }
 

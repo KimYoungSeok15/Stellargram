@@ -26,14 +26,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.stellargram.R
-import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.model.MessageInfo
 import com.ssafy.stellargram.ui.theme.PurpleGrey40
-import com.ssafy.stellargram.util.StompUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
@@ -66,11 +61,12 @@ fun ChatRoomScreen(
                 observeSiteId = observeSiteId ?: ""
             )
         )
+        viewModel.getLastCursor()
 
         // 스톰프로 웹소켓 연결
         viewModel.makeConnect()
-        // 최초 실행시 메세지 가져오기
-        nextCursor = viewModel.getMessages(nextCursor) ?: -1
+        // 최초 실행시 메세지 가져오고 다음커서 세팅하기
+        viewModel.getMessages()
     }
 
     // 상수
@@ -99,7 +95,7 @@ fun ChatRoomScreen(
                 ChatBox(
                     isMine = (message.memberId == TestValue.myId.toLong()),
                     imgUrl = message.memberImagePath,
-                    nickname = message.memberNickName,
+                    nickname = message.memberNickname,
                     content = message.content
                 )
             }
