@@ -44,12 +44,6 @@ fun ChatRoomScreen(
 
     // 스톰프 저장용
 //    val stomp = StompUtil.getStompConnection()
-    // 다음 커서
-    var nextCursor: Int = 0
-
-    // TODO: 메세지 리스트 업데이트 방법 찾을 것
-    var messageList: List<MessageInfo> by remember { mutableStateOf<List<MessageInfo>>(viewModel.messages) }
-
 
     // 채팅방 열 때 실행
     LaunchedEffect(key1 = true) {
@@ -68,6 +62,10 @@ fun ChatRoomScreen(
         // 최초 실행시 메세지 가져오고 다음커서 세팅하기
         viewModel.getMessages()
     }
+    // TODO: 메세지 리스트 업데이트 방법 찾을 것
+    var messageList: List<MessageInfo> by remember { mutableStateOf<List<MessageInfo>>(viewModel.messages) }
+
+
 
     // 상수
     val inputBoxCornerSize = 10
@@ -93,9 +91,9 @@ fun ChatRoomScreen(
         LazyColumn() {
             items(messageList) { message ->
                 ChatBox(
-                    isMine = (message.memberId == TestValue.myId.toLong()),
+                    isMine = (message.memberId == TestValue.myId),
                     imgUrl = message.memberImagePath,
-                    nickname = message.memberNickname,
+                    nickname = message.memberNickName,
                     content = message.content
                 )
             }
@@ -126,6 +124,7 @@ fun ChatRoomScreen(
                         roomId = roomId,
                         messageContent = messageContent
                     )
+                    messageContent=""
                 },
             ) {
 //                Text(text = "전송")
