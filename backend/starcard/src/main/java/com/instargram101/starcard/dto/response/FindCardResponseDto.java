@@ -7,11 +7,11 @@ import lombok.Getter;
 @Builder
 public class FindCardResponseDto {
 
-    private StarcardElement starcard;
+    private FindCardResponseElement starcard;
 
-    public static FindCardResponseDto of(StarcardElement starcardElement) {
+    public static FindCardResponseDto of(FindCardResponseElement starcard) {
         return FindCardResponseDto.builder()
-                .starcard(starcardElement)
+                .starcard(starcard)
                 .build();
     }
 }
