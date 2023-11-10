@@ -1,6 +1,7 @@
 package com.ssafy.stellargram.module
 
 import android.util.Log
+import com.ssafy.stellargram.data.db.entity.Star
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -12,11 +13,14 @@ object DBModule {
     var nameMap: HashMap<Int, String> = hashMapOf()
     var constellation: Array<DoubleArray> = arrayOf()
     var starInfo: HashMap<Int, Int> = hashMapOf()
+    var starMap: HashMap<Int, Star> = hashMapOf()
+    var stars: MutableList<Star> = mutableListOf()
 
-    fun settingData(_starArray: Array<DoubleArray>, _nameMap: HashMap<Int, String>, _starInfo: HashMap<Int, Int>) {
+    fun settingData(_starArray: Array<DoubleArray>, _nameMap: HashMap<Int, String>, _starInfo: HashMap<Int, Int>, _starMap: HashMap<Int, Star>, _stars: MutableList<Star>) {
         starArray = _starArray
         nameMap = _nameMap
         starInfo = _starInfo
+        starMap = _starMap
         Log.d("check", "${starArray.size}")
     }
 
@@ -38,5 +42,9 @@ object DBModule {
 
     fun gettingConstellation(): Array<DoubleArray> {
         return constellation
+    }
+
+    fun gettingStarMap(): HashMap<Int, Star> {
+        return starMap
     }
 }
