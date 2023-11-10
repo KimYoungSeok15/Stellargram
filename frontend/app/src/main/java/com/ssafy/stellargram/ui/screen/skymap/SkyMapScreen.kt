@@ -21,7 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -156,12 +158,18 @@ fun SkyMapScreen(navController : NavController){
                     val radius = pow(10.0, 0.20 * (5.5 - star[3] + 0.2 * Random.nextFloat())).toFloat()
                     val center = Offset((size.width / 2) + y, (size.height / 2) + x)
                     val name = nameMap[star[4].toInt()]?:""
-                    //TODO: gradient 작동 안 함.
 
-//                drawCircle(center = center, radius = 3.0f * radius,
-//                    brush = Brush.radialGradient(colors = listOf(Color(starColor), Color.Black), radius = 3.0f * radius))
-                    drawCircle(center = center, radius = radius, color = Color(starColor))
-                    Log.d("calc", name)
+                    drawCircle(center = center, radius = radius,
+                        brush = Brush.radialGradient(colors = listOf(
+                            Color(starColor),
+                            Color(starColor - 30 * (256 * 256 * 256)),
+                            Color(starColor - 60 * (256 * 256 * 256)),
+                            Color(starColor - 90 * (256 * 256 * 256)),
+                            Color(starColor - 120 * (256 * 256 * 256)),
+                            Color(starColor - 150 * (256 * 256 * 256)),
+                            Color(starColor - 180 * (256 * 256 * 256)),
+                            Color.Black
+                        ), center = center, radius =  radius*1.1f, tileMode = TileMode.Repeated))
                 }
                 for(i in 0 until constSight.size / 2){
                     val x1 = constSight[2 * i][0]
