@@ -1,8 +1,6 @@
 package com.ssafy.stellargram.ui.screen.base
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -26,15 +24,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.R
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,48 +43,49 @@ fun BaseFrame(
                     Text(text = screen.title, fontWeight = FontWeight.Bold)
                 },
                 modifier = Modifier,
-                navigationIcon = {
-                    val navIconResource = when {
-                        screen.route.startsWith("stardetail") -> R.drawable.back
-                        screen.route == "skymap" -> R.drawable.menu
-                        screen.route == "mypage" -> R.drawable.addphoto
-                        else -> null
-                    }
-
-                    // navigationIcon을 동적으로 설정
-                    navIconResource?.let { iconRes ->
-                        IconButton(
-                            onClick = {
-                                // navigationIcon 클릭 이벤트 처리
-                                when {
-                                    screen.route.startsWith("stardetail") -> {
-                                        navController.popBackStack()
-                                    }
-                                    screen.route == "skymap" -> {
-                                        // "skymap" 화면인 경우 다른 동작 수행
-                                    }
-                                    screen.route == "mypage" -> {
-                                        // "mypage" 화면인 경우 다른 동작 수행
-                                    }
-                                }
-                            },
-                            modifier = Modifier.padding(13.dp)
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = iconRes),
-                                contentDescription = "Back", // 적절한 contentDescription 설정
-                                modifier = Modifier.size(36.dp)
-                            )
+                    navigationIcon = {
+                        val navIconResource = when {
+                            screen.route.startsWith("stardetail") -> R.drawable.back
+                            screen.route == "skymap" -> R.drawable.menu
+                            screen.route == "mypage" -> R.drawable.writing
+                            else -> null
                         }
-                    }
-                },
+
+                        // navigationIcon을 동적으로 설정
+                        navIconResource?.let { iconRes ->
+                            IconButton(
+                                onClick = {
+                                    // navigationIcon 클릭 이벤트 처리
+                                    when {
+                                        screen.route.startsWith("stardetail") -> {
+                                            navController.popBackStack()
+                                        }
+                                        screen.route == "skymap" -> {
+                                            // "skymap" 화면인 경우 다른 동작 수행
+                                        }
+                                        screen.route == "mypage" -> {
+                                            // "mypage" 화면인 경우 다른 동작 수행
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.padding(13.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = iconRes),
+                                    contentDescription = "Back", // 적절한 contentDescription 설정
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
+                        }
+                    },
+
                 actions = {
                     // IconButton 내에서 사용할 아이콘을 동적으로 선택합니다.
                     val iconResource = when (screen) {
                         is Screen.Home -> R.drawable.search
                         is Screen.SkyMap -> R.drawable.search
                         is Screen.GoogleMap -> R.drawable.add
-                        is Screen.MyPage -> R.drawable.chat
+                        is Screen.MyPage -> R.drawable.chat1
                         else -> null
                     }
                     IconButton(
@@ -101,8 +93,9 @@ fun BaseFrame(
                             // 클릭 이벤트 처리
                             when (screen) {
                                 is Screen.Home -> { navController.navigate("search") }
-                                is Screen.GoogleMap -> R.drawable.add
-                                is Screen.MyPage -> R.drawable.chat
+                                is Screen.SkyMap -> { navController.navigate("search") }
+                                is Screen.GoogleMap -> {}
+                                is Screen.MyPage -> {}
                                 else -> null
                             }
                         },
@@ -110,10 +103,10 @@ fun BaseFrame(
                     ) {
                         // iconResource가 null이 아닌 경우에만 아이콘을 렌더링합니다.
                         iconResource?.let { iconRes ->
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = iconRes),
-                                contentDescription = screen.title,
-                                modifier = Modifier.size(36.dp)
+                            Image(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp)
                             )
                         }
                     }
