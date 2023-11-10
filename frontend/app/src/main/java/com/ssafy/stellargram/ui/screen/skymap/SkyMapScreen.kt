@@ -119,14 +119,11 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                             val new_x = it.x - (size.width / 2)
                             val new_y = it.y - (size.height / 2)
                             val ind = viewModel.gettingClickedStar(new_y, new_x, starSight)
-                            Log.d("stars", "${new_y}, ${new_x}")
                             if(ind == null) clicked = false
                             else{
                                 clicked = true
                                 clickedIndex = ind
                             }
-                            Log.d("stars", "${clicked}, ${clickedIndex}")
-
                         }
                     )
                 }
@@ -137,12 +134,11 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                     val ind2 = starInfo[constellationLine.end[i]]
                     val star1 = viewModel.starSight.value[ind1?:0]
                     val star2 = viewModel.starSight.value[ind2?:0]
-                    Log.d("star1", "${star1[0]}, ${star1[1]}, ${star1[2]}, ${star1[3]}, ${star1[4]}")
                     val x1 = star1[0].toFloat()
                     val y1 = star1[1].toFloat()
                     val x2 = star2[0].toFloat()
                     val y2 = star2[1].toFloat()
-                    if((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) > 160000.0) continue
+                    if((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) > (size.width * size.width + size.height * size.height)) continue
                     val center1 = Offset( (size.width / 2) + y1,(size.height / 2) + x1)
                     val center2 = Offset((size.width / 2) + y2, (size.height / 2) + x2)
                     drawLine(
@@ -160,7 +156,6 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                     val radius = pow(10.0, 0.20 * (5.5 - star[3] + 0.2 * Random.nextFloat())).toFloat()
                     val center = Offset((size.width / 2) + y, (size.height / 2) + x)
                     val name = nameMap[star[4].toInt()]?:""
-                    Log.d("stars", "${x}, ${y} ${name}")
                     //TODO: gradient 작동 안 함.
 
 //                drawCircle(center = center, radius = 3.0f * radius,
@@ -174,7 +169,7 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                     val x2 = constSight[2 * i + 1][0]
                     val y2 = constSight[2 * i + 1][1]
 
-                    if((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1) > 160000.0) continue
+                    if((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1) > 160000) continue
                     drawLine(
                         color = Color.White,
                         start = Offset((size.width / 2) + y1.toFloat(),(size.height / 2) + x1.toFloat() ),
@@ -196,10 +191,12 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
         ){
+            //TODO: 이건 위에 따로 박스로 빼주세요.
             if(clicked) Text("${nameMap[clickedIndex]}",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 color = Color.White)
+            //TODO: 이건 스크롤로.
             Slider(
                 value = phi.toFloat(),
                 onValueChange = {
