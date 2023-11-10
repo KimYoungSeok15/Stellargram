@@ -1,16 +1,9 @@
 package com.ssafy.stellargram.data.db.database
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import androidx.room.Database
-import androidx.room.ProvidedTypeConverter
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.ssafy.stellargram.data.db.dao.StarDAO
 import com.ssafy.stellargram.data.db.entity.Star
 import dagger.Module
@@ -57,7 +50,7 @@ abstract class StarDatabase: RoomDatabase() {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModule {
+object StarDatabaseModule {
 
     @Singleton
     @Provides

@@ -32,3 +32,5 @@ val Typography = Typography(
     )
     */
 )
+
+val profileSize = 30
