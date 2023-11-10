@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8a46b2a5115fc2be48e14cecc41834fd",
+    "identityHash": "e0a9ec25a63f05c6d6b08d70ca729a81",
     "entities": [
       {
         "tableName": "stars",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `hip` INTEGER, `hd` INTEGER, `hr` INTEGER, `gl` TEXT, `bf` TEXT, `proper` TEXT, `ra` REAL, `dec` REAL, `dist` REAL, `pmra` REAL, `pmdec` REAL, `rv` REAL, `mag` REAL, `absmag` REAL, `spect` TEXT, `ci` REAL, `x` REAL, `y` REAL, `z` REAL, `vx` REAL, `vy` REAL, `vz` REAL, `rarad` REAL, `decrad` REAL, `pmrarad` REAL, `pmdecrad` REAL, `bayer` TEXT, `flam` INTEGER, `con` TEXT, `comp` INTEGER, `comp_primary` INTEGER, `base` TEXT, `lum` REAL, `var` TEXT, `var_min` REAL, `var_max` REAL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `hip` INTEGER, `hd` INTEGER, `hr` INTEGER, `gl` TEXT, `bf` TEXT, `proper` TEXT, `ra` REAL, `dec` REAL, `dist` REAL, `pmra` REAL, `pmdec` REAL, `rv` REAL, `mag` REAL, `absmag` REAL, `spect` TEXT, `ci` REAL, `x` REAL, `y` REAL, `z` REAL, `vx` REAL, `vy` REAL, `vz` REAL, `rarad` REAL, `decrad` REAL, `pmrarad` REAL, `pmdecrad` REAL, `bayer` TEXT, `flam` INTEGER, `con` TEXT, `comp` INTEGER, `comp_primary` INTEGER, `base` TEXT, `lum` REAL, `variable` TEXT, `var_min` REAL, `var_max` REAL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -214,7 +214,7 @@
           },
           {
             "fieldPath": "variable",
-            "columnName": "var",
+            "columnName": "variable",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -244,7 +244,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a46b2a5115fc2be48e14cecc41834fd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e0a9ec25a63f05c6d6b08d70ca729a81')"
     ]
   }
 }
