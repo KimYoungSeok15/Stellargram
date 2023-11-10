@@ -1,9 +1,7 @@
 package com.ssafy.stellargram.ui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavArgument
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,6 +10,7 @@ import androidx.navigation.navArgument
 import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
+import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
@@ -55,13 +54,13 @@ fun NavGraph(
             val starName = arguments.getString("name") ?: ""
 
             BaseFrame(navController, screen = Screen.StarDetail) {
-                StarDetailScreen(navController = navController, name = starName)
+                StarDetailScreen(navController = navController, id = 1)
             }
         }
 
         composable(route = Screen.SkyMap.route){
             BaseFrame(navController, screen = Screen.SkyMap) {
-                SkyMapScreen(navController = navController, modifier = modifier)
+                SkyMapScreen(navController = navController)
             }
         }
         composable(route = Screen.Camera.route){
