@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun StarDetailScreen(navController: NavController, name: String) {
+fun StarDetailScreen(navController: NavController, id: Int) {
     val starViewModel: StarDetailViewModel = viewModel()
     var starDetails by remember { mutableStateOf<Star?>(null) }
 
