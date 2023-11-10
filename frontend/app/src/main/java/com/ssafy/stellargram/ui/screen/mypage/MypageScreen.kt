@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,13 +44,13 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoViewModel
+import com.ssafy.stellargram.ui.screen.search.MainViewModel
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MypageScreen(navController: NavController) {
     val viewModel: MypageViewModel = viewModel()
-    var activeTab by rememberSaveable { mutableIntStateOf(0) }
 
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
@@ -94,27 +95,27 @@ fun MypageScreen(navController: NavController) {
                         ) {
                             Text(
                                 text = it.cardCount.toString(),
-                                fontWeight= FontWeight.Bold,
+                                fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             )
                             Text(text = "게시물")
                         }
-                        Column (
+                        Column(
                             horizontalAlignment = Alignment.CenterHorizontally
-                        ){
+                        ) {
                             Text(
                                 text = it.followCount.toString(),
-                                fontWeight= FontWeight.Bold,
+                                fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             )
                             Text(text = "팔로우")
                         }
-                        Column (
+                        Column(
                             horizontalAlignment = Alignment.CenterHorizontally
-                        ){
+                        ) {
                             Text(
                                 text = it.followingCount.toString(),
-                                fontWeight= FontWeight.Bold,
+                                fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             )
                             Text(text = "팔로잉")
@@ -123,18 +124,11 @@ fun MypageScreen(navController: NavController) {
                 }
             }
             // TabLayout 함수를 호출하여 탭을 렌더링
-            TabLayout(tabTitles = listOf("게시물", "팔로우", "팔로잉"), activeTab = activeTab) {
-                // 각 탭에 따른 UI를 렌더링
-                when (it) {
-                    0 -> {
-                        // 게시물 탭에 대한 내용 렌더링
-                    }
-                    1 -> {
-                        // 팔로우 탭에 대한 내용 렌더링
-                    }
-                    2 -> {
-                        // 팔로잉 탭에 대한 내용 렌더링
-                    }
+            TabLayout(viewModel = viewModel, dragState = remember { mutableStateOf(DraggableState { }) }) { tabIndex, dragState ->
+                when (tabIndex) {
+                    0 -> ArticleScreen(viewModel, dragState, navController)
+                    1 -> AccountScreen(viewModel, dragState, navController)
+                    2 -> StarScreen(viewModel, dragState, navController)
                 }
             }
         }
