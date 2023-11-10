@@ -2,6 +2,7 @@ package com.ssafy.stellargram
 
 import android.app.Application
 import android.content.Context
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 import java.io.FileOutputStream
@@ -22,6 +23,8 @@ class StellargramApplication : Application() {
         instance = this
         KakaoSdk.init(this, "36c2ac2060a5b0da3ece614fcae40854")
 //        copyDatabaseFromAssets(this,"StarData.db")
+        AndroidThreeTen.init(this);
+
     }
 }
 

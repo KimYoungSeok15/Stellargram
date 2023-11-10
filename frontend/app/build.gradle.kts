@@ -165,6 +165,9 @@ dependencies {
 
     // STOMP 파싱을 위한 코틀린용 JSON 파싱 라이브러리
     implementation("com.beust:klaxon:5.5")
+
+    // unixTimestamp 포매팅 라이브러리
+    implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
 }
 
 // Dependency injection with Hilt
