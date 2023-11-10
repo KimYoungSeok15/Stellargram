@@ -38,13 +38,13 @@ interface ApiServiceForChat {
     // 내 채팅방 목록 가져오기
     @GET("chat/rooms")
     suspend fun getRoomList(
-        @Header("myId") myId: Int
+        @Header("myId") myId: Long
     ): RoomListResponse
 
     // 특정 채팅방의 이전 메세지 가져오기
     @GET("chat/open/{chatRoomId}/{cursor}")
     suspend fun getPrevChats(
-        @Header("myId") myId: Int,
+        @Header("myId") myId: Long,
         @Path("chatRoomId")  chatRoomId:Int,
         @Path("cursor")  cursor:Int,
         ): MessageListResponse
