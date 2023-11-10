@@ -72,7 +72,7 @@ class SkyMapViewModel @Inject constructor(
         return starArray
     }
 
-    fun getSight(_theta: Double, _phi: Double, starData1: Array<DoubleArray>, flag: Int){
+    fun getSight(_theta: Double, _phi: Double, starData1: Array<DoubleArray>, _zoom: Float,  flag: Int){
         val theta = _theta * PI / 180.0
         val phi = _phi * PI / 180.0
         val cosTheta = cos(theta)
@@ -108,8 +108,8 @@ class SkyMapViewModel @Inject constructor(
             val _cos = temp[0] / cosa
 
             val new_theta = if(_cos > 0) asin(_sin) else PI - asin(_sin)
-            resultMatrix[i][0] = -800.0 * new_theta
-            resultMatrix[i][1] = -800.0 * ln(abs((1 + sin(a)) / cosa))
+            resultMatrix[i][0] = -1500.0 * new_theta * (Math.pow(10.0, _zoom.toDouble()))
+            resultMatrix[i][1] = -1500.0 * ln(abs((1 + sin(a)) / cosa)) * (Math.pow(10.0, _zoom.toDouble()))
         }
         if(flag == 0){
             starSight.value = resultMatrix
@@ -123,11 +123,13 @@ class SkyMapViewModel @Inject constructor(
     }
 
     //TODO: 해당 좌표 범위에서 뽑아내기. (확대 구현 이후)
-    fun getVisibleStars(_limit: Double, _xrange: Double, _yrange: Double): List<DoubleArray> {
+    fun getVisibleStars(_limit: Double): List<DoubleArray> {
         var visible: MutableList<DoubleArray> = mutableListOf()
 
         for(i in 0 until starSight.value.size){
-            if(starSight.value[i][3] > _limit){
+            if(starSight.value[i][3] > _limit ||
+                abs(starSight.value[i][0]) > screenHeight / 2.0 ||
+                abs(starSight.value[i][1]) > screenWidth / 2.0){
                 continue
             }
             visible.add(starSight.value[i])
@@ -135,7 +137,35 @@ class SkyMapViewModel @Inject constructor(
         return visible
     }
 
+    fun getlines(): List<DoubleArray> {
+        var visible: MutableList<DoubleArray> = mutableListOf()
+
+        for(i in 0 until constellationSight.value.size){
+            if(
+                abs(constellationSight.value[i][0]) > screenHeight / 2.0 ||
+                abs(constellationSight.value[i][1]) > screenWidth / 2.0){
+                continue
+            }
+            visible.add(constellationSight.value[i])
+        }
+        return visible
+    }
+
     fun settingConstellation(_constellation: Array<DoubleArray>){
         constellation.value = _constellation
+    }
+
+    fun gettingClickedStar(_x: Float, _y: Float, _arr: List<DoubleArray>): Int?{
+        var res: Int? = null
+        var dist: Float = 400.0f
+        _arr.forEach{element ->
+            val x1 = element[0]
+            val y1 = element[1]
+            if((_x - x1) * (_x - x1) + (_y - y1) * (_y - y1) < dist){
+                res = element[4].toInt()
+                dist = ((_x - x1) * (_x - x1) + (_y - y1) * (_y - y1)).toFloat()
+            }
+        }
+        return res
     }
 }

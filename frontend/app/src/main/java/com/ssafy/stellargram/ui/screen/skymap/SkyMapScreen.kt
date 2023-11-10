@@ -3,11 +3,15 @@ package com.ssafy.stellargram.ui.screen.skymap
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -28,9 +34,12 @@ import com.ssafy.stellargram.util.Temperature
 import kotlinx.coroutines.delay
 import java.lang.Math.PI
 import java.lang.Math.cos
+import java.lang.Math.log
 import java.lang.Math.min
 import java.lang.Math.pow
 import java.lang.Math.sin
+import kotlin.random.Random
+
 
 @Composable
 fun SkyMapScreen(navController : NavController, modifier: Modifier){
@@ -56,9 +65,12 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
     var nameMap: HashMap<Int, String> by remember{ mutableStateOf(hashMapOf()) }
     var starSight: List<DoubleArray> by remember{ mutableStateOf(listOf())}
     var starInfo: HashMap<Int, Int> by remember{ mutableStateOf(hashMapOf())}
-    var constSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
+    var constSight: List<DoubleArray> by remember{ mutableStateOf(listOf())}
     var horizon: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
     var horizonSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
+    var zoom: Float by remember{ mutableStateOf(1.0f)}
+    var clicked: Boolean by remember{ mutableStateOf(false)}
+    var clickedIndex: Int by remember{ mutableStateOf(1)}
 
     LaunchedEffect(Unit) {
         // star array가 늦게 계산되기도 하기 때문에 바로 홈화면에서 화면을 키게 될 경우 아무것도 불러오지 못함.
@@ -83,14 +95,14 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
         while (true) {
             i = System.currentTimeMillis()
             LST = viewModel.getMeanSiderealTime(longitude)
-            viewModel.getSight(theta, phi, viewModel.getAllStars(longitude, latitude, LST, viewModel.starData.value), 0)
-            viewModel.getSight(theta, phi, viewModel.getAllStars(latitude, latitude, LST, viewModel.constellation.value), 1)
-            viewModel.getSight(theta, phi, horizon, 2)
+            viewModel.getSight(theta, phi, viewModel.getAllStars(longitude, latitude, LST, viewModel.starData.value), zoom, 0)
+            viewModel.getSight(theta, phi, viewModel.getAllStars(latitude, latitude, LST, viewModel.constellation.value), zoom,1)
+            viewModel.getSight(theta, phi, horizon, zoom,2)
             starArray = viewModel.starSight.value
-            starSight = viewModel.getVisibleStars(4.5, 0.0, 0.0)
-            constSight = viewModel.constellationSight.value
+            starSight = viewModel.getVisibleStars(5.0)
+            constSight = viewModel.getlines()
             horizonSight = viewModel.horizonSight.value
-            delay(1000L) // 1초마다 함수 호출
+            delay(400L) // 0.4초마다 함수 호출
             Log.d("create", "${System.currentTimeMillis() - i}")
         }
     }
@@ -100,7 +112,25 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                 .fillMaxSize()
                 .background(
                     color = Color.Black
-                ),
+                )
+                .pointerInput(true){
+                    detectTapGestures(
+                        onTap = {
+                            val new_x = it.x - (size.width / 2)
+                            val new_y = it.y - (size.height / 2)
+                            val ind = viewModel.gettingClickedStar(new_y, new_x, starSight)
+                            Log.d("stars", "${new_y}, ${new_x}")
+                            if(ind == null) clicked = false
+                            else{
+                                clicked = true
+                                clickedIndex = ind
+                            }
+                            Log.d("stars", "${clicked}, ${clickedIndex}")
+
+                        }
+                    )
+                }
+            ,
             onDraw = {
                 for(i in 0 until min(constellationLine.start.size, viewModel.starSight.value.size)){
                     val ind1 = starInfo[constellationLine.start[i]]
@@ -122,13 +152,15 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                         strokeWidth = 0.7f
                     )
                 }
+                Log.d("drawing", "${starSight.size}")
                 starSight.forEach {star ->
                     val x = star[0].toFloat()
                     val y = star[1].toFloat()
-                    val starColor = temperature.colorMap[temperature.getTemperature(star[2])]?:0
-                    val radius = pow(10.0, 0.25 * (5.5 - star[3])).toFloat()
+                    val starColor = (temperature.colorMap[temperature.getTemperature(star[2])]?:0) % (256 * 256 * 256) + Random.nextInt(200, 255) * (256 * 256 * 256)
+                    val radius = pow(10.0, 0.20 * (5.5 - star[3] + 0.2 * Random.nextFloat())).toFloat()
                     val center = Offset((size.width / 2) + y, (size.height / 2) + x)
                     val name = nameMap[star[4].toInt()]?:""
+                    Log.d("stars", "${x}, ${y} ${name}")
                     //TODO: gradient 작동 안 함.
 
 //                drawCircle(center = center, radius = 3.0f * radius,
@@ -154,24 +186,58 @@ fun SkyMapScreen(navController : NavController, modifier: Modifier){
                 horizonSight.forEach {star ->
                     val x = star[0].toFloat()
                     val y = star[1].toFloat()
-                    Log.d("coor", "${x} ${y}")
                     val center = Offset((size.width / 2) + y,(size.height / 2) + x )
                     drawCircle(center = center, radius = 5.0f, color = Color(0xFF4CAF50))
                 }
             }
         )
-        Slider(
-            value = theta.toFloat(),
-            onValueChange = {
-                theta = it.toDouble()
-            },
-            valueRange = 0.0f..360.0f,
-            steps = 1000,
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .height(200.dp)
-                .fillMaxWidth()
-        )
+                .padding(16.dp)
+        ){
+            if(clicked) Text("${nameMap[clickedIndex]}",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                color = Color.White)
+            Slider(
+                value = phi.toFloat(),
+                onValueChange = {
+                    phi = it.toDouble()
+                },
+                valueRange = -90.0f..90.0f,
+                steps = 1000,
+                modifier = Modifier
+                    .height(100.dp)
+                    .fillMaxWidth()
+            )
+            Text("Phi : ${phi}", color = Color.White)
+            Slider(
+                value = theta.toFloat(),
+                onValueChange = {
+                    theta = it.toDouble()
+                },
+                valueRange = 0.0f..360.0f,
+                steps = 1000,
+                modifier = Modifier
+                    .height(100.dp)
+                    .fillMaxWidth()
+            )
+            Text("Theta : ${theta}", color = Color.White)
+            Slider(
+                value = zoom,
+                onValueChange = {
+                    zoom = it
+                },
+                valueRange = log(0.5).toFloat()..2.0f,
+                steps = 1000,
+                modifier = Modifier
+                    .height(100.dp)
+                    .fillMaxWidth()
+            )
+            Text("Theta : ${theta}", color = Color.White)
+        }
+
     }
 
 }
