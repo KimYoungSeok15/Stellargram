@@ -1,7 +1,6 @@
-package com.instargram101.starcard.dto.response;
+package com.instargram101.starcard.dto.query;
 
 import com.instargram101.starcard.entity.Starcard;
-import com.instargram101.starcard.entity.StarcardLike;
 import com.instargram101.starcard.entity.enums.StarcardCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StarcardElement {
+public class StarcardWithAmILikeQueryDto {
 
     private Long cardId;
     private Long memberId;
@@ -27,9 +26,9 @@ public class StarcardElement {
     private int likeCount;
     private boolean amILikeThis;
 
-    public static StarcardElement of(Starcard starcard){
+    public static StarcardWithAmILikeQueryDto from(Starcard starcard){
 
-        return StarcardElement.builder()
+        return StarcardWithAmILikeQueryDto.builder()
                 .cardId(starcard.getCardId())
                 .memberId(starcard.getMemberId())
                 .observeSiteId(starcard.getObserveSiteId())
