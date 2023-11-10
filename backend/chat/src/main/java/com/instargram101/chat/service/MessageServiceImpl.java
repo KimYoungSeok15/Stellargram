@@ -62,8 +62,28 @@ public class MessageServiceImpl implements MessageService {
         // 증가된 seq 저장
         autoSequenceRepository.save(messageSeq);
 
+        // 멤버 정보 openfeign으로 가져오기
+        List<Long> memberIdList = new ArrayList<>();
+        memberIdList.add(message.getMemberId());
+        ResponseEntity<CommonApiResponse> response = memberFeignClient.getMemberListsById(MemberListFeignRequest.of(memberIdList));
+
+        LinkedHashMap data = (LinkedHashMap) response.getBody().getData();
+        List<LinkedHashMap> memberResponse = (ArrayList) data.get("members");
+        LinkedHashMap member = memberResponse.get(0);
+
+
+        // 가져온 정보로 발행할 메세지 형식 맞추기
+        MessageResponse newMessage = MessageResponse.of(
+                message.getSeq(),
+                message.getUnixTimestamp(),
+                message.getMemberId(),
+                (String) member.get("nickname"),
+                (String) member.get("profileImageUrl"),
+                message.getContent()
+                , message.getRoomId());
+
         // 메세지 redis에 발행
-        redisPublisher.publishMessage(roomId, message);
+        redisPublisher.publishMessage(roomId, newMessage);
 
         return false;
     }
@@ -77,8 +97,10 @@ public class MessageServiceImpl implements MessageService {
         }
 
         Long count = messageRepository.countByRoomId(roomId);
+        Long cursor = count / chattingConfig.getPageSize();
+        if (count % chattingConfig.getPageSize() == 0) cursor--;
 
-        return count / chattingConfig.getPageSize();
+        return cursor;
     }
 
 
@@ -99,8 +121,11 @@ public class MessageServiceImpl implements MessageService {
         List<ChatMessage> searchResult = messageRepository.findByRoomIdOrderByUnixTimestampAsc(roomId, pageable).getContent();
 //        List<ChatMessage> searchResult = messageRepository.findByRoomId(roomId,pageable).getContent();
 
-        // 마지막 페이지라면 다음커서 -1
-        if (searchResult.size() < chattingConfig.getPageSize()) nextCursor = -1;
+//        // 마지막 페이지라면 다음커서 -1
+//        if (searchResult.size() < chattingConfig.getPageSize()) nextCursor = -1;
+
+        // 다음 커서는 이전페이지
+        nextCursor = cursor - 1;
 
         // 검색된 메세지의 멤버Id 리스트 만들기
         List<Long> memberIdList = new ArrayList<>();
@@ -114,14 +139,12 @@ public class MessageServiceImpl implements MessageService {
         }
         System.out.println(memberIdList);
 
-        // TODO: 중복 제거하고 오니까 매치 코드 추가하기
         // openfiegn으로 가져오기
         ResponseEntity<CommonApiResponse> response = memberFeignClient.getMemberListsById(MemberListFeignRequest.of(memberIdList));
 
         LinkedHashMap data = (LinkedHashMap) response.getBody().getData();
 
         List<LinkedHashMap> memberResponse = (ArrayList) data.get("members");
-        System.out.println(memberResponse.get(0).get("memberId").getClass());
 
         // 가져온 정보를 memberId를 키로가지는 Map으로 변환
         Map<Long, MemberInfo> memberMap = new HashMap<>();
@@ -147,15 +170,9 @@ public class MessageServiceImpl implements MessageService {
                             .memberImagePath(thisMember.getProfileImageUrl())
                             .memberNickName(thisMember.getNickname())
                             .content(thisChat.getContent())
+                            .roomId(thisChat.getRoomId())
                             .build());
         }
-
-//        for (ChatMessage chat : searchResult) {
-//            Long thisMemberId = chat.getMemberId();
-//            if (memberResponse.thisMemberId) {
-//
-//            }
-//        }
 
         // 가져온 정보 가공해서 response에 담아 반환하기
         return MessageListResponse.of(nextCursor, messageResponseList);
