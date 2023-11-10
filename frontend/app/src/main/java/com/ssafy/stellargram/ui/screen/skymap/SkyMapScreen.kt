@@ -42,7 +42,7 @@ import kotlin.random.Random
 
 
 @Composable
-fun SkyMapScreen(navController : NavController, modifier: Modifier){
+fun SkyMapScreen(navController : NavController){
     val viewModel : SkyMapViewModel = viewModel()
     val temperature: Temperature = Temperature()
     val constellationLine: ConstellationLine = ConstellationLine()
