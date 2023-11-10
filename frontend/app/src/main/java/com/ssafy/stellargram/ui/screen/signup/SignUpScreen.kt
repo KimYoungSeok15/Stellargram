@@ -1,6 +1,5 @@
 package com.ssafy.stellargram.ui.screen.signup
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,18 +24,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ssafy.stellargram.R
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SignUpScreen(navController: NavHostController) {
     val viewModel : SignUpViewModel = viewModel()
@@ -74,10 +72,7 @@ fun SignUpScreen(navController: NavHostController) {
                     .clip(RoundedCornerShape(150.dp))
                     .background(Color.LightGray)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.sunandcloud),
-                    contentDescription = "UserImage",
-                )
+                GlideImage(model = viewModel.profileImageUrl, contentDescription ="DefaultProfileImg" )
             }
             Column() {
                 OutlinedTextField(
