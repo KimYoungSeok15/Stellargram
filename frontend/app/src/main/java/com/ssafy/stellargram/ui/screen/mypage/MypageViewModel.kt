@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -19,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -38,13 +41,11 @@ import javax.inject.Inject
 @HiltViewModel
 class MypageViewModel @Inject constructor() : ViewModel() {
     private val _memberResults = mutableStateOf<List<Member>>(emptyList())
+    val tabs = listOf("게시물", "즐겨찾기", "좋아요")
     val memberResults: State<List<Member>> get() = _memberResults
 
     // Add these properties for managing tabs
     private val _tabIndex = mutableStateOf(0)
-    val tabIndex: State<Int> get() = _tabIndex
-
-    val tabs = listOf("Tab 1", "Tab 2", "Tab 3")
 
     // API 호출을 트리거하고 결과를 업데이트하는 함수
     fun getMemberInfo(text: String) {
@@ -58,9 +59,14 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         _tabIndex.value = index
     }
 
-    fun updateTabIndexBasedOnSwipe(velocity: Float) {
-        // Implement the logic for updating tab index based on swipe velocity
-        // You can use this method if needed
+    fun updateTabIndexBasedOnSwipe(delta: Float) {
+        if (delta > 0 && _tabIndex.value!! > 0) {
+            // Swipe to the right
+            _tabIndex.value = _tabIndex.value!! - 1
+        } else if (delta < 0 && _tabIndex.value!! < tabs.size - 1) {
+            // Swipe to the left
+            _tabIndex.value = _tabIndex.value!! + 1
+        }
     }
 
     // 실제 API 호출이 이루어지는 함수
@@ -90,11 +96,11 @@ class MypageViewModel @Inject constructor() : ViewModel() {
 
 @Composable
 fun TabLayout(viewModel: MypageViewModel, dragState: MutableState<DraggableState>, content: @Composable (Int, MutableState<DraggableState>) -> Unit) {
-    val tabIndex = remember { mutableIntStateOf(0) }
+    val tabIndex = remember { mutableStateOf(0) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = tabIndex.value) {
-            listOf("게시물", "별", "좋아요").forEachIndexed { index, title ->
+            viewModel.tabs.forEachIndexed { index, title ->
                 Tab(
                     text = { Text(title) },
                     selected = tabIndex.value == index,
@@ -118,17 +124,16 @@ fun TabLayout(viewModel: MypageViewModel, dragState: MutableState<DraggableState
 fun ArticleScreen(viewModel: MypageViewModel, dragState: MutableState<DraggableState>, navController: NavController) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .sizeIn(minHeight = 370.dp)
             .draggable(
                 state = dragState.value,
                 orientation = Orientation.Horizontal,
                 onDragStarted = {},
                 onDragStopped = { viewModel.updateTabIndexBasedOnSwipe(it) }
             ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        // ArticleScreen의 내용을 채우세요
+        Text(text = "1")
         Text(text = "1")
     }
 }
@@ -137,36 +142,35 @@ fun ArticleScreen(viewModel: MypageViewModel, dragState: MutableState<DraggableS
 fun AccountScreen(viewModel: MypageViewModel, dragState: MutableState<DraggableState>, navController: NavController) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .sizeIn(minHeight = 370.dp)
             .draggable(
                 state = dragState.value,
                 orientation = Orientation.Horizontal,
                 onDragStarted = {},
                 onDragStopped = { viewModel.updateTabIndexBasedOnSwipe(it) }
             ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        // AccountScreen의 내용을 채우세요
+        Text(text = "2")
         Text(text = "2")
     }
 }
+
 
 @Composable
 fun StarScreen(viewModel: MypageViewModel, dragState: MutableState<DraggableState>, navController: NavController) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .sizeIn(minHeight = 370.dp)
             .draggable(
                 state = dragState.value,
                 orientation = Orientation.Horizontal,
                 onDragStarted = {},
                 onDragStopped = { viewModel.updateTabIndexBasedOnSwipe(it) }
             ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        // StarScreen의 내용을 채우세요
+        Text(text = "3")
         Text(text = "3")
     }
 }
