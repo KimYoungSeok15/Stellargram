@@ -6,7 +6,7 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 object TimeUtil {
-    private val yearMonthDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("y.M.d")
+    private val yearMonthDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yy.MM.dd")
     private val updateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     private fun calZonedTime(unixTimestamp:Long): ZonedDateTime?{

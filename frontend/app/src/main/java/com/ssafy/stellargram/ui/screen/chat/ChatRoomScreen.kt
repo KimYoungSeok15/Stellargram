@@ -30,6 +30,7 @@ import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.model.MessageInfo
 import com.ssafy.stellargram.ui.theme.PurpleGrey40
+import com.ssafy.stellargram.util.StompUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatRoomScreen(
     navController: NavController = rememberNavController(),
-    roomId: Int? = 2,
+    roomId: Int = 1,
     personnel: Int? = 0,
     observeSiteId: String? = ""
 ) {
@@ -46,19 +47,28 @@ fun ChatRoomScreen(
     // 채팅 뷰모델 생성
     val viewModel: ChatViewModel = hiltViewModel()
 
+    // 스톰프 저장용
+//    val stomp = StompUtil.getStompConnection()
     // 다음 커서
     var nextCursor: Int = 0
+
     // TODO: 메세지 리스트 업데이트 방법 찾을 것
     var messageList: List<MessageInfo> by remember { mutableStateOf<List<MessageInfo>>(viewModel.messages) }
 
-    // 뷰모델에 채팅방 정보 세팅
-    viewModel.setRoomInfo(
-        newInfo = ChatRoom(
-            roomId = roomId ?: -1, personnel = personnel ?: 0, observeSiteId = observeSiteId ?: ""
-        )
-    )
-    // 뷰모델을 통해 메세지 가져오기
+
+    // 채팅방 열 때 실행
     LaunchedEffect(key1 = true) {
+        // 뷰모델에 채팅방 정보 세팅
+        viewModel.setRoomInfo(
+            newInfo = ChatRoom(
+                roomId = roomId ?: -1,
+                personnel = personnel ?: 0,
+                observeSiteId = observeSiteId ?: ""
+            )
+        )
+
+        // 스톰프로 웹소켓 연결
+        viewModel.makeConnect()
         // 최초 실행시 메세지 가져오기
         nextCursor = viewModel.getMessages(nextCursor) ?: -1
     }
@@ -115,7 +125,12 @@ fun ChatRoomScreen(
             )
             // 전송 버튼
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.publishToChannel(
+                        roomId = roomId,
+                        messageContent = messageContent
+                    )
+                },
             ) {
 //                Text(text = "전송")
                 Image(
