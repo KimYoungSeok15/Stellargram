@@ -2,7 +2,6 @@ package com.ssafy.stellargram.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,6 +16,7 @@ import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
+import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
 import com.ssafy.stellargram.ui.screen.search.SearchScreen
 import com.ssafy.stellargram.ui.screen.search.StarScreen
@@ -72,9 +72,13 @@ fun  NavGraph(
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route){            BaseFrame(navController, screen = Screen.GoogleMap) {
+        composable(route = Screen.GoogleMap.route){            
+            BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
+        }
+        composable(Screen.SignUp.route){
+            SignUpScreen(navController = navController)
         }
         composable(route = Screen.MyPage.route){
             BaseFrame(navController, screen = Screen.MyPage) {
