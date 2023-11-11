@@ -46,16 +46,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.data.db.entity.Star
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.Member
-import com.ssafy.stellargram.model.Star
+import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.ui.Screen
-import com.ssafy.stellargram.ui.rememberAppNavigationController
+import com.ssafy.stellargram.util.SearchStarByName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -156,6 +155,9 @@ fun StarScreen(viewModel: MainViewModel, starCardsState: MutableState<List<Star>
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
+    // name으로 star를 찾기위한 함수를 쓰기 위해 선언.
+    val searchStars: SearchStarByName = SearchStarByName()
+
     private val _tabIndex: MutableLiveData<Int> = MutableLiveData(0)
     var text by mutableStateOf("")
     val tabIndex: LiveData<Int> = _tabIndex
@@ -253,31 +255,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun getStarResults(text: String): List<Star> {
         // 별 검색 로직
-        // 현재는 더미데이터
-        val results : List<Star>
-        results = listOf<Star>(
-            Star(
-            name = "Vega",
-            constellation = "Lyra",
-            rightAscension = "18h 36m 56.19s",
-            declination = "+38° 46′ 58.8″",
-            apparentMagnitude = "0.03",
-            absoluteMagnitude = "0.58",
-            distanceLightYear = "25",
-            spectralClass = "A0Vvar"
-            ),
-            Star(
-                name = "Vega",
-                constellation = "Lyra",
-                rightAscension = "18h 36m 56.19s",
-                declination = "+38° 46′ 58.8″",
-                apparentMagnitude = "0.03",
-                absoluteMagnitude = "0.58",
-                distanceLightYear = "25",
-                spectralClass = "A0Vvar"
-            )
-        )
-        return results
+        // text를 포함하고 있는 모든 별들을 반환.
+        val results = searchStars.searchByName(text)
+        return results.toList()
     }
 //    init {
 //        // 초기화 시 API 요청을 통해 검색 결과를 가져와서 캐싱
@@ -485,19 +465,20 @@ fun StarUI(starCardsState: MutableState<List<Star>>, navController: NavControlle
         modifier = Modifier.fillMaxSize()
     ) {
         items(starCardsState.value.size) { index ->
-            val starCard = starCardsState.value[index]
+            val star = starCardsState.value[index]
             // Row를 클릭 가능하게 변경
+            Log.d("search", "ID: ${star.id}")
             Row (
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        navController.navigate("${Screen.StarDetail.route}/${starCard.name}")
+                        navController.navigate("${Screen.StarDetail.route}/${star.id}")
                     }
                     .padding(0.dp, 10.dp)
             ) {
-                // 별자리 정보 표시
+                // 별 정보 표시
                 Text(
-                    text = starCard.name,
+                    text = DBModule.nameMap[star.id]?:"Invalid Star",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(0.dp, 8.dp)
                 )
