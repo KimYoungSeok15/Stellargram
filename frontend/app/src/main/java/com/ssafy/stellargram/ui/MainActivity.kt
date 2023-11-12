@@ -20,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import com.kakao.sdk.common.util.Utility
 import com.ssafy.stellargram.data.db.database.ConstellationDatabaseModule
 import com.ssafy.stellargram.data.db.database.StarDatabaseModule
-import com.ssafy.stellargram.data.db.entity.Constellation
 import com.ssafy.stellargram.data.db.entity.Star
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.module.ScreenModule
@@ -75,6 +74,7 @@ class MainActivity : ComponentActivity() {
                     starMap.put(star.id, star)
                     stars.add(star)
                 }
+                setStarList(starArray)
                 DBModule.settingData(starArray, nameMap, starInfo, starMap, stars)
                 Log.d("Create", "Done")
             }
@@ -83,16 +83,13 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             constellationdb.constellationDAO().readAll().collect{
                 val _length = it.size
-                val constellationArray = Array(it.size){DoubleArray(5)}
-                it.forEachIndexed {
-                        index: Int, constellation: Constellation ->
-                    constellationArray[index][0] = constellation.ra * PI / 180.0
-                    constellationArray[index][1] = constellation.dec * PI / 180.0
-                    constellationArray[index][2] = 0.0
-                    constellationArray[index][3] = 0.0
-                    constellationArray[index][4] = 0.0
+                val constellationArray = Array(it.size){DoubleArray(2)}
+                for(i in 0 until it.size){
+                    val st = it[i]
+                    constellationArray[i][0] = st.ra * PI / 180
+                    constellationArray[i][1] = st.dec * PI / 180
                 }
-                DBModule.settingConstellation(constellationArray)
+                setLineList(constellationArray)
                 Log.d("constellation", "${constellationArray.size}")
             }
         }
@@ -129,6 +126,15 @@ class MainActivity : ComponentActivity() {
         }
         ScreenModule.settingData(getScreenWidth(this), getScreenHeight(this))
 
+    }
+
+    external fun setStarList(stars: Array<DoubleArray>)
+
+    external fun setLineList(constellationLineList: Array<DoubleArray>)
+    companion object{
+        init{
+            System.loadLibrary("coord_convert")
+        }
     }
 
 }
