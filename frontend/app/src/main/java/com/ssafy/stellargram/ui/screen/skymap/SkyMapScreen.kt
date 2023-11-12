@@ -94,8 +94,8 @@ fun SkyMapScreen(navController : NavController){
             starSight = viewModel.getAllStars(longitude, latitude, zoom.toDouble(), theta, phi, 5.0, screenHeight.toDouble(), screenWidth.toDouble())
             constSight = viewModel.getAllConstellationLines(longitude, latitude, zoom.toDouble(), theta, phi, screenHeight.toDouble(), screenWidth.toDouble())
 //            horizonSight = viewModel.horizonSight.value
-            delay(400L) // 0.4초마다 함수 호출
-            Log.d("create", "Elapsed Time: ${System.currentTimeMillis() - i - 400L} ms")
+            delay(1L) // 0.4초마다 함수 호출
+            Log.d("create", "Elapsed Time: ${System.currentTimeMillis() - i - 1L} ms")
         }
     }
     Box(){

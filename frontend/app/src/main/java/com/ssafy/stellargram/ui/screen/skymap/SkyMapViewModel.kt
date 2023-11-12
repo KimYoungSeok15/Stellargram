@@ -31,7 +31,7 @@ class SkyMapViewModel @Inject constructor(
 
     fun gettingClickedStar(_x: Float, _y: Float, _arr: Array<DoubleArray>): Int?{
         var res: Int? = null
-        var dist: Float = 400.0f
+        var dist: Float = 900.0f
         _arr.forEach{element ->
             val x1 = element[0]
             val y1 = element[1]
