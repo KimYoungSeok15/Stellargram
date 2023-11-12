@@ -4,14 +4,18 @@
 #include <thread>
 #include <android/log.h>
 
-std::vector<std::vector<double>> starList = {};
-std::vector<std::vector<double>> constellationLineList = {};
+double starList1[120000][5];
+double constList1[20000][2];
 
-std::vector<std::vector<double>> starTrans = {};
-std::vector<std::vector<double>> constTrans = {};
+int starList_size = 0;
+int constList_size = 0;
 
-std::vector<std::vector<double>> starResult = {};
-std::vector<std::vector<double>> constResult = {};
+double starTrans1[120000][6];
+double constTrans1[20000][3];
+
+
+double starResult1[120000][5];
+double constResult1[20000][2];
 
 std::vector<double> temp(3, 0.0);
 //---------------------------------------------------------------
@@ -27,6 +31,7 @@ extern "C"{
             jobjectArray array
     ){
         jsize rowSize = env -> GetArrayLength(array);
+        starList_size = rowSize;
 
         for(jsize i = 0; i < rowSize; i++) {
             jdoubleArray oneRow = (jdoubleArray)env ->GetObjectArrayElement(array, i);
@@ -35,11 +40,11 @@ extern "C"{
             env ->GetDoubleArrayRegion(oneRow, 0, colSize, &row[0]);
             env ->DeleteLocalRef(oneRow);
 
-            starList.push_back(row);
-        }
-        starTrans.resize(starList.size(), std::vector<double>(6, 0.0));
-        starResult.resize(starList.size(), std::vector<double>(5, 0.0));
+            for(int j = 0; j < 5; j++){
+                starList1[i][j] = row[j];
+            }
 
+        }
         std::vector<std::thread> threads;
         int threadCount = std::thread::hardware_concurrency();
 
@@ -53,6 +58,7 @@ extern "C"{
             jobjectArray array
     ){
         jsize rowSize = env -> GetArrayLength(array);
+        constList_size = rowSize;
 
         for(jsize i = 0; i < rowSize; i++) {
             jdoubleArray oneRow = (jdoubleArray)env ->GetObjectArrayElement(array, i);
@@ -61,12 +67,11 @@ extern "C"{
             env ->GetDoubleArrayRegion(oneRow, 0, colSize, &row[0]);
             env ->DeleteLocalRef(oneRow);
 
-            constellationLineList.push_back(row);
+            for(int j = 0; j < 2; j++){
+                constList1[i][j] = row[j];
+            }
         }
-        constTrans.resize(constellationLineList.size(), std::vector<double>(3, 0.0));
-        constResult.resize(constellationLineList.size(), std::vector<double>(2, 0.0));
-
-        __android_log_print(ANDROID_LOG_DEBUG, "test", "const Length: %d", constellationLineList.size());
+        __android_log_print(ANDROID_LOG_DEBUG, "test", "const Length: %d", constList_size);
     };
 
 }
@@ -87,54 +92,52 @@ double getLocalSiderealTime(double longitude) {
     return theta * M_PI / 180.0;
 }
 
-//모든 별들의 적경 적위를 방위각, 고도에 대한 좌표로 표현한 함수.
-void transCoordinate(double longitude, double latitude, bool flag) {
-
+void starTransCoor(double longitude, double latitude){
     double sidereal = getLocalSiderealTime(longitude);
-
     double newLatitude = latitude * M_PI / 180.0;
-
     double sinPhi = sin(newLatitude);
     double cosPhi = cos(newLatitude);
 
-    int colSize = flag ? 5 : 2;
-    if(flag){
-        for (size_t i = 0; i < starList.size(); ++i) {
-            double hourAngle = sidereal - starList[i][0];
-            double sinDec = sin(starList[i][1]);
-            double cosDec = cos(starList[i][1]);
-            double sina = sinDec * sinPhi + cosDec * cosPhi * cos(hourAngle);
-            double cosa = sqrt(1.0 - (sina * sina));
-            double sinA = -sin(hourAngle) * cosDec / cosa;
-            double cosA = (sinDec - (sinPhi * sina)) / (cosPhi * cosa);
+    for(size_t i = 0; i < starList_size; i++){
+        double hourAngle = sidereal - starList1[i][0];
+        double sinDec = sin(starList1[i][1]);
+        double cosDec = cos(starList1[i][1]);
+        double sina = sinDec * sinPhi + cosDec * cosPhi * cos(hourAngle);
+        double cosa = sqrt(1.0 - (sina * sina));
+        double sinA = -sin(hourAngle) * cosDec / cosa;
+        double cosA = (sinDec - (sinPhi * sina)) / (cosPhi * cosa);
 
-            starTrans[i][0] = cosa * cosA;
-            starTrans[i][1] = cosa * sinA;
-            starTrans[i][2] = sina;
-            for(int j = 2; j < colSize; j++){
-                starTrans[i][j + 1] = starList[i][j];
-            }
-        }
-    }
-    else{
-        for (size_t i = 0; i < constellationLineList.size(); ++i) {
-            double hourAngle = sidereal - constellationLineList[i][0];
-            double sinDec = sin(constellationLineList[i][1]);
-            double cosDec = cos(constellationLineList[i][1]);
-            double sina = sinDec * sinPhi + cosDec * cosPhi * cos(hourAngle);
-            double cosa = sqrt(1.0 - (sina * sina));
-            double sinA = -sin(hourAngle) * cosDec / cosa;
-            double cosA = (sinDec - (sinPhi * sina)) / (cosPhi * cosa);
-
-            constTrans[i][0] = cosa * cosA;
-            constTrans[i][1] = cosa * sinA;
-            constTrans[i][2] = sina;
-        }
+        starTrans1[i][0] = cosa * cosA;
+        starTrans1[i][1] = cosa * sinA;
+        starTrans1[i][2] = sina;
+        starTrans1[i][3] = starList1[i][2];
+        starTrans1[i][4] = starList1[i][3];
+        starTrans1[i][5] = starList1[i][4];
     }
 }
 
-//시선 방향이 theta, phi일 때 방위각, 고도로 변환한 data, zoom에 대한 x, y 좌표 변환
-void getSight(double _theta, double _phi, const std::vector<std::vector<double>>& data, std::vector<std::vector<double>>& resultMatrix, float _zoom) {
+void constTransCoor(double longitude, double latitude){
+    double sidereal = getLocalSiderealTime(longitude);
+    double newLatitude = latitude * M_PI / 180.0;
+    double sinPhi = sin(newLatitude);
+    double cosPhi = cos(newLatitude);
+
+    for(size_t i = 0; i < constList_size; i++){
+        double hourAngle = sidereal - constList1[i][0];
+        double sinDec = sin(constList1[i][1]);
+        double cosDec = cos(constList1[i][1]);
+        double sina = sinDec * sinPhi + cosDec * cosPhi * cos(hourAngle);
+        double cosa = sqrt(1.0 - (sina * sina));
+        double sinA = -sin(hourAngle) * cosDec / cosa;
+        double cosA = (sinDec - (sinPhi * sina)) / (cosPhi * cosa);
+
+        constTrans1[i][0] = cosa * cosA;
+        constTrans1[i][1] = cosa * sinA;
+        constTrans1[i][2] = sina;
+    }
+}
+
+void starSight(double _theta, double _phi, float _zoom){
     double theta = _theta * M_PI / 180.0;
     double phi = _phi * M_PI / 180.0;
     double cosTheta = cos(theta);
@@ -142,42 +145,77 @@ void getSight(double _theta, double _phi, const std::vector<std::vector<double>>
     double cosPhi = cos(phi);
     double sinPhi = sin(phi);
 
-    std::vector<std::vector<double>> transMatrix = {
-            {cosTheta * cosPhi, -cosTheta * sinPhi, sinTheta},
-            {sinTheta * cosPhi, -sinTheta * sinPhi, -cosTheta},
-            {sinPhi, cosPhi, 0.0}
+    double transMatrix[3][3] = {
+    {cosTheta * cosPhi, -cosTheta * sinPhi, sinTheta},
+    {sinTheta * cosPhi, -sinTheta * sinPhi, -cosTheta},
+    {sinPhi, cosPhi, 0.0}
     };
 
-    int colSize = data[0].size();
-    for(size_t i = 0; i < data.size(); ++i) {
-
-        for(int j = 3; j < colSize; j++){
-            resultMatrix[i][j - 1] = data[i][j];
-        }
+    for(size_t i = 0; i < starList_size; i++){
+        starResult1[i][2] = starTrans1[i][3];
+        starResult1[i][3] = starTrans1[i][4];
+        starResult1[i][4] = starTrans1[i][5];
 
         for(size_t j = 0; j < 3; ++j) {
             for(size_t k = 0; k < 3; ++k) {
-                temp[j] += data[i][k] * transMatrix[k][j];
+                temp[j] += starTrans1[i][k] * transMatrix[k][j];
             }
         }
 
         double a = asin(temp[2]);
         double cosa = cos(a);
         if(std::abs(cosa) < 1.0E-6) {
-            resultMatrix[i][0] = 0.0;
-            resultMatrix[i][1] = 1000000.0;
+            starResult1[i][0] = 0.0;
+            starResult1[i][1] = 1000000.0;
             continue;
         }
         double _sin = temp[1] / cosa;
         double _cos = temp[0] / cosa;
 
         double new_theta = _cos > 0 ? asin(_sin) : M_PI - asin(_sin);
-        resultMatrix[i][0] = -1500.0 * new_theta * pow(10.0, _zoom);
-        resultMatrix[i][1] = -1500.0 * log(std::abs((1 + sin(a)) / cosa)) * pow(10.0, _zoom);
+        starResult1[i][0] = -1500.0 * new_theta * pow(10.0, _zoom);
+        starResult1[i][1] = -1500.0 * log(std::abs((1 + sin(a)) / cosa)) * pow(10.0, _zoom);
         temp[0] = 0.0; temp[1] = 0.0; temp[2] = 0.0;
     }
 }
 
+void constSight(double _theta, double _phi, float _zoom){
+    double theta = _theta * M_PI / 180.0;
+    double phi = _phi * M_PI / 180.0;
+    double cosTheta = cos(theta);
+    double sinTheta = sin(theta);
+    double cosPhi = cos(phi);
+    double sinPhi = sin(phi);
+
+    double transMatrix[3][3] = {
+            {cosTheta * cosPhi, -cosTheta * sinPhi, sinTheta},
+            {sinTheta * cosPhi, -sinTheta * sinPhi, -cosTheta},
+            {sinPhi, cosPhi, 0.0}
+    };
+
+    for(size_t i = 0; i < constList_size; i++){
+        for(size_t j = 0; j < 3; ++j) {
+            for(size_t k = 0; k < 3; ++k) {
+                temp[j] += constTrans1[i][k] * transMatrix[k][j];
+            }
+        }
+
+        double a = asin(temp[2]);
+        double cosa = cos(a);
+        if(std::abs(cosa) < 1.0E-6) {
+            constResult1[i][0] = 0.0;
+            constResult1[i][1] = 1000000.0;
+            continue;
+        }
+        double _sin = temp[1] / cosa;
+        double _cos = temp[0] / cosa;
+
+        double new_theta = _cos > 0 ? asin(_sin) : M_PI - asin(_sin);
+        constResult1[i][0] = -1500.0 * new_theta * pow(10.0, _zoom);
+        constResult1[i][1] = -1500.0 * log(std::abs((1 + sin(a)) / cosa)) * pow(10.0, _zoom);
+        temp[0] = 0.0; temp[1] = 0.0; temp[2] = 0.0;
+    }
+}
 
 //---------------------------------------------------------------
 /*
@@ -185,32 +223,31 @@ void getSight(double _theta, double _phi, const std::vector<std::vector<double>>
 */
 
 void getAllStars(double longitude, double latitude){
-    transCoordinate(longitude, latitude, true);
+    starTransCoor(longitude, latitude);
 }
 
 void getAllConstellationLines(double longitude, double latitude){
-    transCoordinate(longitude, latitude, false);
+    constTransCoor(longitude, latitude);
 }
 
-std::vector<std::vector<double>> getVisibleStars(double _limit, double screenHeight, double screenWidth, const std::vector<std::vector<double>>& starSight) {
+std::vector<std::vector<double>> getVisibleStars(double _limit, double screenHeight, double screenWidth) {
     std::vector<std::vector<double>> visible;
-    for (const auto& star : starSight) {
+    for (auto star : starResult1) {
         if (star[3] > _limit ||
             std::abs(star[0]) > screenHeight / 2.0 ||
             std::abs(star[1]) > screenWidth / 2.0) {
             continue;
         }
-        visible.push_back(star);
+        visible.push_back(std::vector<double>{star[0], star[1], star[2], star[3], star[4]});
     }
     return visible;
 }
 
-std::vector<std::vector<double>> getVisibleConstellationLines(double screenHeight, double screenWidth, const std::vector<std::vector<double>>& lines){
+std::vector<std::vector<double>> getVisibleConstellationLines(double screenHeight, double screenWidth){
     std::vector<std::vector<double>> visible;
-    int totSize = lines.size();
-    for (int i = 0; i < (totSize >> 1); i++){
-        auto st = lines[i << 1];
-        auto fi = lines[i << 1 | 1];
+    for (int i = 0; i < (constList_size >> 1); i++){
+        auto st = constList1[i << 1];
+        auto fi = constList1[i << 1 | 1];
         if(std::abs(st[0]) > screenHeight / 2.0 ||
             std::abs(st[1]) > screenWidth / 2.0 ||
             std::abs(fi[0]) > screenHeight / 2.0 ||
@@ -221,6 +258,20 @@ std::vector<std::vector<double>> getVisibleConstellationLines(double screenHeigh
         visible.push_back(std::vector<double>{st[0], st[1], fi[0], fi[1]});
     }
     return visible;
+}
+//---------------------------------------------------------------
+/*
+ * 쓰레드 관련 함수
+*/
+
+void starThread(double longitude, double latitude, double _theta, double _phi, float _zoom){
+    getAllStars(longitude, latitude);
+    starSight(_theta, _phi, _zoom);
+}
+
+void constThread(double longitude, double latitude, double _theta, double _phi, float _zoom){
+    getAllConstellationLines(longitude, latitude);
+    constSight(_theta, _phi, _zoom);
 }
 
 //---------------------------------------------------------------
@@ -250,9 +301,9 @@ extern "C"{
 
         jclass doubleArrayClass = env->FindClass("[D");
 
-        getAllStars(longitude, latitude);
-        getSight(theta, phi, starTrans, starResult, zoom);
-        auto visibleStars = getVisibleStars(limit, screenHeight, screenWidth, starResult);
+        starThread(longitude, latitude, theta, phi, zoom);
+
+        auto visibleStars = getVisibleStars(limit, screenHeight, screenWidth);
 
         now = std::chrono::system_clock::now();
         duration = now.time_since_epoch();
@@ -285,9 +336,8 @@ extern "C"{
             jdouble screenWidth
     ){
         jclass doubleArrayClass = env->FindClass("[D");
-        getAllConstellationLines(longitude, latitude);
-        getSight(theta, phi, constTrans, constResult, zoom);
-        auto visibleLines = getVisibleConstellationLines(screenHeight, screenWidth, constResult);
+        constThread(longitude, latitude, theta, phi, zoom);
+        auto visibleLines = getVisibleConstellationLines(screenHeight, screenWidth);
 
         __android_log_print(ANDROID_LOG_DEBUG, "calc", "check");
 
