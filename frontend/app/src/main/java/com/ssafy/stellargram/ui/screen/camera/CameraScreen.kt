@@ -1,4 +1,11 @@
 package com.ssafy.stellargram.ui.screen.camera
+
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,13 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
-import com.ssafy.stellargram.ui.Screen
+import com.ssafy.stellargram.ui.screen.camera.CameraActivity
 
 @Composable
 fun CameraScreen(navController: NavController) {
@@ -39,6 +47,11 @@ fun CameraScreen(navController: NavController) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GifImage(navController: NavController) {
+    val context = LocalContext.current
+    val galleryLauncher = rememberLauncherForGallery {
+        Log.d("SelectedImage", it.toString())
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,8 +63,11 @@ fun GifImage(navController: NavController) {
                 .background(Color.White)
                 .width(400.dp)
                 .height(300.dp)
-                .border(width=1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
-                .clickable { navController.navigate(Screen.Home.route) }
+                .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
+                .clickable {
+                    val intent = Intent(context, CameraActivity::class.java)
+                    context.startActivity(intent)
+                }
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -60,7 +76,7 @@ fun GifImage(navController: NavController) {
             ) {
                 GlideImage(
                     model = R.drawable.icon_camera,
-                    contentDescription = "<a href=\"https://www.flaticon.com/kr/free-animated-icons/\" title=\"카메라 애니메이션 아이콘\">카메라 애니메이션 아이콘 제작자: Freepik - Flaticon</a>",
+                    contentDescription = "카메라 애니메이션 아이콘",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(200.dp)
                 )
@@ -77,8 +93,10 @@ fun GifImage(navController: NavController) {
                 .background(Color.White)
                 .width(400.dp)
                 .height(300.dp)
-                .border(width=1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
-                .clickable { navController.navigate(Screen.Home.route) }
+                .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
+                .clickable {
+                    galleryLauncher.launch(null)
+                }
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -87,7 +105,7 @@ fun GifImage(navController: NavController) {
             ) {
                 GlideImage(
                     model = R.drawable.icon_gallery,
-                    contentDescription = "<a href=\"https://www.flaticon.com/kr/free-animated-icons/\" title=\"그림 애니메이션 아이콘\">그림 애니메이션 아이콘 제작자: Freepik - Flaticon</a>",
+                    contentDescription = "그림 애니메이션 아이콘",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(200.dp)
                 )
@@ -99,4 +117,13 @@ fun GifImage(navController: NavController) {
             }
         }
     }
+
 }
+
+@Composable
+fun rememberLauncherForGallery(onResult: (Uri) -> Unit): ManagedActivityResultLauncher<String, Uri?> {
+    return rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { onResult(it) }
+    }
+}
+
