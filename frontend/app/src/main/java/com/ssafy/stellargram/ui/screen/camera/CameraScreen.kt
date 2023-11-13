@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.camera
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -27,11 +28,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
-import com.ssafy.stellargram.ui.screen.camera.CameraActivity
 
 @Composable
 fun CameraScreen(navController: NavController) {
@@ -95,7 +97,23 @@ fun GifImage(navController: NavController) {
                 .height(300.dp)
                 .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
                 .clickable {
-                    galleryLauncher.launch(null)
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                        != androidx.core.content.ContextCompat.checkSelfPermission(
+                            context,
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                    ) {
+                        ActivityCompat.requestPermissions(
+                            context as Activity,
+                            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
+                        )
+                    } else {
+                        galleryLauncher.launch("image/*")
+                    }
                 }
         ) {
             Column(
@@ -117,7 +135,6 @@ fun GifImage(navController: NavController) {
             }
         }
     }
-
 }
 
 @Composable
@@ -127,3 +144,4 @@ fun rememberLauncherForGallery(onResult: (Uri) -> Unit): ManagedActivityResultLa
     }
 }
 
+const val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1
