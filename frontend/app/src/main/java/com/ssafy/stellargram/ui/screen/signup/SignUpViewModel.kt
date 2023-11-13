@@ -63,7 +63,7 @@ class SignUpViewModel @Inject constructor(
             SignInSubmit(memberSignUpRequest, navController)
         } else {
             dialogMessage = "입력이 올바르지 않습니다."
-            TODO()// dialog 기능 추가후 구현 예정
+            //TO DO - dialog 기능 추가 구현 예정
         }
 
     }
