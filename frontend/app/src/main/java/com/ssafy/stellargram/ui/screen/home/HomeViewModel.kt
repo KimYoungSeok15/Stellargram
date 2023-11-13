@@ -1,4 +1,8 @@
 package com.ssafy.stellargram.ui.screen.home
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import android.util.Log
 import androidx.compose.foundation.DefaultMarqueeSpacing
 import androidx.compose.foundation.DefaultMarqueeVelocity
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -66,7 +70,102 @@ import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardsData
 import kotlinx.coroutines.delay
+import java.io.IOException
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.ln
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.math.tan
 
+// 기상청에 맞게 위도 경도를 수정하기 위한 상수들
+const val COEFFICIENT_TO_RADIAN = Math.PI / 180.0
+const val GRID_UNIT_COUNT = 6371.00877 / 5.0
+const val REF_X = 43.0
+const val REF_Y = 136.0
+const val REF_LON_RAD = 126.0 * COEFFICIENT_TO_RADIAN
+const val REF_LAT_RAD = 38.0 * COEFFICIENT_TO_RADIAN
+const val PROJ_LAT_1_RAD = 30.0 * COEFFICIENT_TO_RADIAN
+const val PROJ_LAT_2_RAD = 60.0 * COEFFICIENT_TO_RADIAN
+
+
+// api에 담을 nx, ny가 담긴 변수
+data class CoordinatesXy(val nx: Int, val ny: Int)
+data class CoordinatesLatLon(val lat: Double, val lon: Double)
+
+// 경도 위도 -> nx, ny 변환 or 반대도 가능한 함수
+class CoordinateConverter {
+    private val sn = ln(cos(PROJ_LAT_1_RAD) / cos(PROJ_LAT_2_RAD)) / ln(tan(Math.PI * 0.25 + PROJ_LAT_2_RAD * 0.5) / tan(Math.PI * 0.25 + PROJ_LAT_1_RAD * 0.5))
+    private val sf = tan(Math.PI * 0.25 + PROJ_LAT_1_RAD * 0.5).pow(sn) * cos(PROJ_LAT_1_RAD) / sn
+    private val ro = GRID_UNIT_COUNT * sf / tan(Math.PI * 0.25 + REF_LAT_RAD * 0.5).pow(sn)
+
+    // 위경도 -> xy
+    internal fun convertToXy(lat: Double, lon: Double): CoordinatesXy {
+        val ra = GRID_UNIT_COUNT * sf / tan(Math.PI * 0.25 + lat * COEFFICIENT_TO_RADIAN * 0.5).pow(sn)
+        val theta: Double = lon * COEFFICIENT_TO_RADIAN - REF_LON_RAD
+        val niceTheta = if (theta < -Math.PI) {
+            theta + 2 * Math.PI
+        } else if (theta > Math.PI) {
+            theta - 2 * Math.PI
+        } else theta
+
+        return CoordinatesXy(
+            nx = floor(ra * sin(niceTheta * sn) + REF_X + 0.5).toInt(),
+            ny = floor(ro - ra * cos(niceTheta * sn) + REF_Y + 0.5).toInt()
+        )
+    }
+
+    //xy -> 위경도
+    internal fun convertToLatLon(nx: Double, ny: Double): CoordinatesLatLon {
+        val diffX: Double = nx - REF_X
+        val diffY: Double = ro - ny + REF_Y
+        val distance = sqrt(diffX * diffX + diffY * diffY)
+        val latSign: Int = if (sn < 0) -1 else 1
+        val latRad = 2 * atan((GRID_UNIT_COUNT * sf / distance).pow(1.0 / sn)) - Math.PI * 0.5
+
+        val theta: Double = if (abs(diffX) <= 0) 0.0 else {
+            if (abs(diffY) <= 0) {
+                if (diffX < 0) -Math.PI * 0.5 else Math.PI * 0.5
+            } else atan2(diffX, diffY)
+        }
+
+        val lonRad = theta / sn + REF_LON_RAD
+
+        return CoordinatesLatLon(
+            lat = (latRad * latSign) / COEFFICIENT_TO_RADIAN,
+            lon = lonRad / COEFFICIENT_TO_RADIAN
+        )
+    }
+}
+
+// 현재 주소를 위경도를 통해 받아오는 함수
+fun getAddressFromLocation(context: Context, latitude: Double, longitude: Double): String {
+    val geocoder = Geocoder(context, Locale.getDefault())
+    var addressText = ""
+    try {
+        val addresses: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
+        if (addresses != null && addresses.isNotEmpty()) {
+            val address = addresses[0]
+            // 주소를 원하는 형식으로 조합하거나 필요한 부분만 추출할 수 있습니다.
+            addressText = address.thoroughfare ?: "주소 정보 없음"
+        } else {
+            addressText = "주소 정보 없음"
+        }
+    } catch (e: IOException) {
+        Log.d("Location1", "위치정보 받아오기 실패")
+        e.printStackTrace()
+        addressText = "주소 정보 없음"
+    }
+    Log.d("Location1", "getAddressFromLocation: $addressText")
+    return addressText
+}
+
+// 천문현상 가로 자동스크롤링 UI
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AutoScrollingText(text:String) {
@@ -88,6 +187,7 @@ fun AutoScrollingText(text:String) {
     }
 }
 
+// 오늘의 추천 사진 가져오기
 suspend fun GetTodaysPicture(): CardsData? {
     return try {
         val response = NetworkModule.provideRetrofitInstanceCards().getCards()
@@ -101,6 +201,8 @@ suspend fun GetTodaysPicture(): CardsData? {
         null
     }
 }
+
+// 오늘의 추천 사진 UI
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun TodaysPicture() {
