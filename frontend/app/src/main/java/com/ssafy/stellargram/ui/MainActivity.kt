@@ -24,6 +24,7 @@ import com.ssafy.stellargram.data.db.entity.Star
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.module.ScreenModule
 import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
+import com.ssafy.stellargram.util.ConstellationLine
 import com.ssafy.stellargram.util.CreateStarName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -125,12 +126,16 @@ class MainActivity : ComponentActivity() {
             }
         }
         ScreenModule.settingData(getScreenWidth(this), getScreenHeight(this))
-
+        val constellationLine = ConstellationLine()
+        setConstLineList(constellationLine.lines)
     }
 
     external fun setStarList(stars: Array<DoubleArray>)
 
     external fun setLineList(constellationLineList: Array<DoubleArray>)
+
+    external fun setConstLineList(lines: Array<DoubleArray>)
+
     companion object{
         init{
             System.loadLibrary("coord_convert")
