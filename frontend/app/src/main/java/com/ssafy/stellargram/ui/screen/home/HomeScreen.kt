@@ -58,6 +58,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.data.remote.ApiServiceForAstronomicalEvents
+import com.ssafy.stellargram.model.AstronomicalEventResponse
+import com.ssafy.stellargram.model.Response
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.Calendar
 import java.util.Date
@@ -254,13 +258,41 @@ fun HomeScreen(navController: NavController) {
                     Log.d("Location1", weatherData[1].toString())
                     Log.d("Location1", weatherData[2].toString())
                 }
+                Log.d("디버그","시작")
+                val apiService = NetworkModule.RetrofitClient.getInstance().create(ApiServiceForAstronomicalEvents::class.java)
+                val astronomicalEventsResponse: AstronomicalEventResponse? = try {
+                    val response = apiService.getAstronomicalEvents(
+                        solYear = "2023",
+                        solMonth = "11",
+                        serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
+                        numOfRows = 100
+                    )
+                    val responseBody = response.body()
+                    Log.d("디버그", "Response Body: $response")
+                    Log.d("디버그", "Response Body: $responseBody")
+                    responseBody
+                } catch (e: Exception) {
+                    Log.d("디버그","실패")
+                    Log.d("디버그","$e")
+                    null
+                }
+
+                astronomicalEventsResponse?.let {
+                    Log.d("디버그", "Header: ${it.header}")
+                    Log.d("디버그", "Body: ${it.body}")
+                    it.body?.items?.item?.forEach { item ->
+                        Log.d("디버그", "astroEvent: ${item.astroEvent}")
+                    }
+                }
             }
         }
     }
 
     // Composable에서 받은 날씨 데이터 표시
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(30.dp, 0.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp, 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {

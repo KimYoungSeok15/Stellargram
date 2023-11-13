@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.util.Log
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoViewModel
@@ -63,6 +65,7 @@ fun MypageScreen(navController: NavController) {
         viewModel.getMemberInfo("someText")
         getResults(viewModel = viewModel)
     }
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
