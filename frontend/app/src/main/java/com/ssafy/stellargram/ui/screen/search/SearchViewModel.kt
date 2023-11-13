@@ -310,14 +310,6 @@ suspend fun getSearchResults(text: String, mainViewModel: MainViewModel): List<A
     results
 }
 
-
-
-
-
-
-
-
-
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController) {
