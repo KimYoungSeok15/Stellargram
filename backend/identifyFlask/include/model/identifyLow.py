@@ -7,7 +7,10 @@ import tetra3
 
 from service.starsSearchSearvice import findByRaDec, findAllStarsByRaDec
 
-tetraModule = tetra3.Tetra3(load_database='default_database')
+t3 = tetra3.Tetra3()
+# t3.generate_database(max_fov=30, min_fov=0.1, star_max_magnitude=7, save_as='default_database_custom')
+tetraModule = tetra3.Tetra3(load_database='default_database_custom')
+# tetraModule = tetra3.Tetra3(load_database='default_database')
 
 
 def identify_with_tetra(imageIn):
