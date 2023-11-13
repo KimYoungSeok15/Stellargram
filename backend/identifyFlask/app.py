@@ -1,10 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-from include.model.identifyLow import identify_with_tetra, identify_test_noshow
+from include.model.identifyLow import identify_with_tetra
 from service.makeTetraDB import make_database
 
-from service.saveCSV import  create_star_table, input_csv_data
+from service.saveCSVService import  create_star_table, input_csv_data
+from service.preprocessImageService import preprocess_image
 
 # 플라스크 객체 인스턴스 생성
 app = Flask(__name__)
@@ -52,11 +53,14 @@ def tetra_identify():
     # POST로 들어왔다면
     if request.method == 'POST':
 
-        # 파일 추출
+        # 요청에서 파일 추출
         file = request.files['file']
 
+        # 파일 전처리
+        pre_image=preprocess_image(file)
+
         # 파일 인식 후 결과 반환
-        result = identify_with_tetra(file)
+        result = identify_with_tetra(pre_image)
         
     return result
 
