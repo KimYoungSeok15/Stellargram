@@ -3,8 +3,14 @@ package com.ssafy.stellargram.ui.screen.skymap
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -110,19 +116,22 @@ fun SkyMapScreen(navController : NavController){
 //    }
 
     Box(){
-        if(clicked) Text("${nameMap[clickedIndex]}",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            color = Color.White)
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     color = Color.Black
                 )
-                .pointerInput(true) {
+                .transformable(rememberTransformableState { zoomChange: Float, panChange: Offset, rotationChange: Float ->
+                    zoom = (zoom * zoomChange)
+                    theta -= (panChange.x * zoom) / 10
+                    phi += (panChange.y * zoom) / 10
+
+                })
+                .clickable {  }
+                .pointerInput(Unit) {
                     detectTapGestures(
-                        onTap = {
+                        onPress = {
                             val new_x = it.x - (size.width / 2)
                             val new_y = it.y - (size.height / 2)
                             val ind = viewModel.gettingClickedStar(new_y, new_x, starSight)
@@ -135,18 +144,20 @@ fun SkyMapScreen(navController : NavController){
                         }
                     )
                 }
-                .pointerInput(true){
-                    detectDragGestures {change, dragAmount ->
-                        theta -= (dragAmount.x * zoom) / 10
-                        phi += (dragAmount.y * zoom) / 10
-                        change.consume()
-                    }
-                }
-//                .pointerInput(Unit) {
-//                detectTransformGestures { _, pan, _zoom, rotate ->
-//                    zoom = (zoom * _zoom)
+//                .pointerInput(Unit){
+//                    detectDragGestures(
+//                        onDrag = {_, dragAmount ->
+//                            theta -= (dragAmount.x * zoom) / 10
+//                            phi += (dragAmount.y * zoom) / 10
+////                            change.consume()
+//                        }
+//                    )
 //                }
-//            },
+//                .pointerInput(Unit) {
+//                   detectTransformGestures { _, pan, _zoom, rotate ->
+//                        zoom = (zoom * _zoom)
+//                   }
+//                }
             ,onDraw = {
                 constLineSight.forEach{line ->
                     val x1 = line[0]
@@ -219,23 +230,29 @@ fun SkyMapScreen(navController : NavController){
 //                    drawCircle(center = center, radius = 5.0f, color = Color(0xFF4CAF50))
 //                }
             }
+
         )
+
         Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
+                .align(Alignment.TopStart)
                 .padding(16.dp)
         ){
-            Slider(
-                value = zoom,
-                onValueChange = {
-                    zoom = it
-                },
-                valueRange = 1.0f..10.0f,
-                steps = 1000,
-                modifier = Modifier
-                    .height(100.dp)
-                    .fillMaxWidth()
-            )
+            if(clicked) Text("${nameMap[clickedIndex]}",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                color = Color.White)
+//            Slider(
+//                value = zoom,
+//                onValueChange = {
+//                    zoom = it
+//                },
+//                valueRange = 1.0f..10.0f,
+//                steps = 1000,
+//                modifier = Modifier
+//                    .height(100.dp)
+//                    .fillMaxWidth()
+//            )
         }
 
     }
