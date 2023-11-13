@@ -58,25 +58,25 @@ fun NavGraph(
             }
         }
 
-        composable(route = Screen.SkyMap.route){
+        composable(route = Screen.SkyMap.route) {
             BaseFrame(navController, screen = Screen.SkyMap) {
                 SkyMapScreen(navController = navController)
             }
         }
-        composable(route = Screen.Camera.route){
+        composable(route = Screen.Camera.route) {
             BaseFrame(navController, screen = Screen.Camera) {
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route){
+        composable(route = Screen.GoogleMap.route) {
             BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
         }
-        composable(Screen.SignUp.route){
+        composable(Screen.SignUp.route) {
             SignUpScreen(navController = navController)
         }
-        composable(route = Screen.MyPage.route){
+        composable(route = Screen.MyPage.route) {
             BaseFrame(navController, screen = Screen.MyPage) {
                 MypageScreen(navController = navController)
             }
@@ -89,12 +89,14 @@ fun NavGraph(
                 navArgument("observeSiteId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.let {
-                ChatRoomScreen(
-                    navController = navController,
-                    roomId = it.getInt("roomId"),
-                    personnel = backStackEntry.arguments?.getInt("personnel"),
-                    observeSiteId = backStackEntry.arguments?.getString("observeSiteId"),
-                )
+                BaseFrame(navController, screen = Screen.ChatRoom) {
+                    ChatRoomScreen(
+                        navController = navController,
+                        roomId = it.getInt("roomId"),
+                        personnel = backStackEntry.arguments?.getInt("personnel"),
+                        observeSiteId = backStackEntry.arguments?.getString("observeSiteId"),
+                    )
+                }
             }
         }
         composable(route = Screen.ChatRoomList.route) {
