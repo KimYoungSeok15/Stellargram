@@ -10,9 +10,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://devrepo.kakao.com/nexus/content/groups/public/")
+        maven(url = "https://jitpack.io")
     }
 }
 
-rootProject.name = "INSTARGRAM"
+rootProject.name = "STELLARGRAM"
 include(":app")
  
