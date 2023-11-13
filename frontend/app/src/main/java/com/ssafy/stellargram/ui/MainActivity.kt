@@ -18,7 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.kakao.sdk.common.util.Utility
-import com.ssafy.stellargram.data.db.database.DatabaseModule
+import com.ssafy.stellargram.data.db.database.ConstellationDatabaseModule
+import com.ssafy.stellargram.data.db.database.StarDatabaseModule
+import com.ssafy.stellargram.data.db.entity.Constellation
 import com.ssafy.stellargram.data.db.entity.Star
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.module.ScreenModule
@@ -26,6 +28,7 @@ import com.ssafy.stellargram.ui.theme.INSTARGRAMTheme
 import com.ssafy.stellargram.util.CreateStarName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.lang.Math.PI
 
 
 @AndroidEntryPoint
@@ -50,12 +53,15 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        val db = DatabaseModule.provideDatabase(this)
+        val stardb = StarDatabaseModule.provideDatabase(this)
         lifecycleScope.launch {
-            db.starDAO().readAll().collect{
+            stardb.starDAO().readAll().collect{
                 val _length = it.size
                 val starArray = Array(it.size){DoubleArray(5)}
                 val nameMap = hashMapOf<Int, String>()
+                val starMap = hashMapOf<Int, Star>()
+                val starInfo = hashMapOf<Int, Int>()
+                val stars : MutableList<Star> = mutableListOf()
                 it.forEachIndexed {
                     index: Int, star: Star ->
                     starArray[index][0] = star.rarad?:999.0
@@ -64,9 +70,30 @@ class MainActivity : ComponentActivity() {
                     starArray[index][3] = star.mag?:999.0
                     starArray[index][4] = star.id.toDouble()
                     val name = CreateStarName.getStarName(star)
+                    starInfo.put(star.hip?:-1, index)
                     nameMap.put(star.id, name)
+                    starMap.put(star.id, star)
+                    stars.add(star)
                 }
-                DBModule.settingData(starArray, nameMap)
+                DBModule.settingData(starArray, nameMap, starInfo, starMap, stars)
+                Log.d("Create", "Done")
+            }
+        }
+        val constellationdb = ConstellationDatabaseModule.provideDatabase(this)
+        lifecycleScope.launch {
+            constellationdb.constellationDAO().readAll().collect{
+                val _length = it.size
+                val constellationArray = Array(it.size){DoubleArray(5)}
+                it.forEachIndexed {
+                        index: Int, constellation: Constellation ->
+                    constellationArray[index][0] = constellation.ra * PI / 180.0
+                    constellationArray[index][1] = constellation.dec * PI / 180.0
+                    constellationArray[index][2] = 0.0
+                    constellationArray[index][3] = 0.0
+                    constellationArray[index][4] = 0.0
+                }
+                DBModule.settingConstellation(constellationArray)
+                Log.d("constellation", "${constellationArray.size}")
             }
         }
 

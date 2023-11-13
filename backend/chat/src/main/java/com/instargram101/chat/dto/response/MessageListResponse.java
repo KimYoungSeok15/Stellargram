@@ -13,9 +13,9 @@ import java.util.List;
 public class MessageListResponse {
     int nextCursor;
 
-    List<ChatMessage> messageList;
+    List<MessageResponse> messageList;
 
-    public static MessageListResponse of(int nextCursor, List<ChatMessage> messageList){
+    public static MessageListResponse of(int nextCursor, List<MessageResponse> messageList){
         return MessageListResponse.builder()
                 .nextCursor(nextCursor)
                 .messageList(messageList)
