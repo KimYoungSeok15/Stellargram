@@ -113,7 +113,7 @@ fun SkyMapScreen(navController : NavController){
 //            Log.d("create", "Elapsed Time: ${System.currentTimeMillis() - i - 1L} ms")
         }
     }
-    // TODO: launched effect 안 먹음
+//    launched effect 안 먹음
 //    LaunchedEffect(theta, phi, zoom){
 //        starSight = viewModel.getAllStars(longitude, latitude, zoom.toDouble(), theta, phi, 5.0, screenHeight.toDouble(), screenWidth.toDouble())
 //        constSight = viewModel.getAllConstellations(longitude, latitude, zoom.toDouble(), theta, phi, screenHeight.toDouble(), screenWidth.toDouble())
@@ -127,12 +127,13 @@ fun SkyMapScreen(navController : NavController){
                     color = Color.Black
                 )
                 .transformable(rememberTransformableState { zoomChange: Float, panChange: Offset, rotationChange: Float ->
-                    zoom = (zoom * zoomChange)
+                    if(zoom*zoomChange in  0.7f .. 10f){
+                        zoom = (zoom * zoomChange)
+                    }
                     theta -= (panChange.x * zoom) / 10
                     phi += (panChange.y * zoom) / 10
 
                 })
-                .clickable { }
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
