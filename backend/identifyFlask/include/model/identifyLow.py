@@ -8,8 +8,8 @@ import tetra3
 from service.starsSearchSearvice import findByRaDec, findAllStarsByRaDec
 
 t3 = tetra3.Tetra3()
-# t3.generate_database(max_fov=30, min_fov=0.1, star_max_magnitude=7, save_as='default_database_custom')
-tetraModule = tetra3.Tetra3(load_database='default_database_custom')
+# t3.generate_database(max_fov=50, min_fov=0.1, star_max_magnitude=5, save_as='default_database_custom_5_max50')
+tetraModule = tetra3.Tetra3(load_database='default_database_custom_5_max50')
 # tetraModule = tetra3.Tetra3(load_database='default_database')
 
 
@@ -45,11 +45,11 @@ def identify_with_tetra(imageIn):
 
     # print(result)
 
-    if identified_star is not None and len(identified_star) != 0:
-        result['matched'] = identified_star
-        result.pop("matched_stars")
-        result.pop("matched_centroids")
-    else:
+    # if identified_star is not None and len(identified_star) != 0:
+    #     result['matched'] = identified_star
+    #     result.pop("matched_stars")
+    #     result.pop("matched_centroids")
+    # else:
         result['matched'] = None
 
     return result
