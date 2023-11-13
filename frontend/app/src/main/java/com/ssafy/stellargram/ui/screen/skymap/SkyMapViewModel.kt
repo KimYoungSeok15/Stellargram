@@ -45,5 +45,7 @@ class SkyMapViewModel @Inject constructor(
 
     external fun getAllStars(longitude: Double, latitude: Double, zoom: Double, theta: Double, phi: Double, limit: Double, screenHeight: Double, screenWidth: Double) : Array<DoubleArray>
 
-    external fun getAllConstellationLines(longitude: Double, latitude: Double, zoom: Double, theta: Double, phi: Double, screenHeight: Double, screenWidth: Double) : Array<DoubleArray>
+    external fun getAllConstellations(longitude: Double, latitude: Double, zoom: Double, theta: Double, phi: Double, screenHeight: Double, screenWidth: Double) : Array<DoubleArray>
+
+    external fun getAllConstellationLines(latitude: Double, longitude: Double,zoom: Double, theta: Double, phi: Double, screenHeight: Double, screenWidth: Double) : Array<DoubleArray>
 }
