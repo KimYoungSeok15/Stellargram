@@ -21,8 +21,8 @@ android {
         applicationId = "com.ssafy.stellargram"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 2_6
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         kapt {
