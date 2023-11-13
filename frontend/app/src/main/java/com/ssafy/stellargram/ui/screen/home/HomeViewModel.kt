@@ -69,8 +69,8 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AutoScrollingText() {
-    var text = "231022-02:37금환일식 / 231029-08:48오리온자리유성우극대(ZHR=20)"
+fun AutoScrollingText(text:String) {
+    var text : String = text
     Box(Modifier.fillMaxWidth()) {
         Row (
 

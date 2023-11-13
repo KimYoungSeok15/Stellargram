@@ -151,11 +151,12 @@ fun getAddressFromLocation(context: Context, latitude: Double, longitude: Double
 // 메인함수
 @Composable
 fun HomeScreen(navController: NavController) {
-    var weatherData by remember { mutableStateOf<List<WeatherItem>>(emptyList()) }
-    var address by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
+    var weatherData by remember { mutableStateOf<List<WeatherItem>>(emptyList()) } // 날씨 정보
+    var address by remember { mutableStateOf("") } // 현재 주소
+    val coroutineScope = rememberCoroutineScope()  // 비동기 영역 선언
     val context = LocalContext.current
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    var combinedEvents by remember { mutableStateOf("") }  // 이벤트 띄워주는 문구
 
     // 현재 시간을 가져옴
     val currentTime = Date()
@@ -163,7 +164,9 @@ fun HomeScreen(navController: NavController) {
     calendar.time = currentTime
     val minute = calendar.get(Calendar.MINUTE)
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
-    Log.d("Location1", "$hour")
+    val currentYear = SimpleDateFormat("yyyy", Locale.getDefault()).format(currentTime)
+    val currentMonth = SimpleDateFormat("MM", Locale.getDefault()).format(currentTime)
+
     val timeString = if (hour < 12) {
         "오전 $hour:${String.format("%02d", minute)}"
     } else if (hour == 12) {
@@ -172,18 +175,19 @@ fun HomeScreen(navController: NavController) {
         "오후 ${hour - 12}:${String.format("%02d", minute)}"
     }
 
-// 현재 '분'이 30 이하인 경우에는 31분을 뺀다 ( 전시간 예보를 받는다 )
+    // 현재 '분'이 30 이하인 경우에는 31분을 뺀다 ( 전시간 예보를 받는다 )
     if (minute <= 30) {
         calendar.add(Calendar.MINUTE, -31)
     }
 
 
-// baseDate를 yyyyMMdd 형식으로 설정
+    // baseDate를 yyyyMMdd 형식으로 설정
     val baseDate = SimpleDateFormat("yyyyMMdd").format(calendar.time)
 
-// baseTime을 hhmm 형식으로 설정
+    // baseTime을 hhmm 형식으로 설정
     val baseTime = SimpleDateFormat("HHmm").format(calendar.time)
     var coordinatesXy: CoordinatesXy? by remember { mutableStateOf(null) }
+
     // 현재 위경도를 받아오고, 변환 함수에 넣어 nx, ny를 coordinatesXy에 저장
     val locationListener = LocationListener { location ->
         val latitude = location.latitude
@@ -258,31 +262,42 @@ fun HomeScreen(navController: NavController) {
                     Log.d("Location1", weatherData[1].toString())
                     Log.d("Location1", weatherData[2].toString())
                 }
-                Log.d("디버그","시작")
+                Log.d("이벤트","시작")
                 val apiService = NetworkModule.RetrofitClient.getInstance().create(ApiServiceForAstronomicalEvents::class.java)
                 val astronomicalEventsResponse: AstronomicalEventResponse? = try {
                     val response = apiService.getAstronomicalEvents(
-                        solYear = "2023",
-                        solMonth = "11",
+                        solYear = currentYear,
+                        solMonth = currentMonth,
                         serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
                         numOfRows = 100
                     )
                     val responseBody = response.body()
-                    Log.d("디버그", "Response Body: $response")
-                    Log.d("디버그", "Response Body: $responseBody")
                     responseBody
                 } catch (e: Exception) {
-                    Log.d("디버그","실패")
-                    Log.d("디버그","$e")
+                    Log.d("이벤트","$e")
+                    combinedEvents = "천문 이벤트 없음" // 정보 받아오기 실패시
                     null
                 }
 
                 astronomicalEventsResponse?.let {
-                    Log.d("디버그", "Header: ${it.header}")
-                    Log.d("디버그", "Body: ${it.body}")
-                    it.body?.items?.item?.forEach { item ->
-                        Log.d("디버그", "astroEvent: ${item.astroEvent}")
+                    combinedEvents = buildString {
+                        it.body?.items?.item?.forEachIndexed { index, item ->
+                            // 각 아이템에서 원하는 정보를 추출합니다
+                            val locdateSubstring = item.locdate?.substring(2) // 3번째 글자부터 시작
+                            val astroTime = item.astroTime
+                            val astroEvent =
+                                if (item.astroTitle!!.isNotBlank()) item.astroTitle else item.astroEvent
+
+                            // 정보를 하나의 문자열로 결합합니다
+                            append("$locdateSubstring $astroTime $astroEvent")
+
+                            // 이벤트 사이에 구분자를 추가합니다 (마지막 이벤트 제외)
+                            if (index < it.body.items.item.size - 1) {
+                                append(" / ")
+                            }
+                        }
                     }
+                    Log.d("이벤트", "조합된 이벤트: $combinedEvents")
                 }
             }
         }
@@ -392,7 +407,7 @@ fun HomeScreen(navController: NavController) {
                     .padding(16.dp, 16.dp, 16.dp, 0.dp)
                     .background(Color.Transparent)
             ) {
-                AutoScrollingText()
+                AutoScrollingText(combinedEvents)
                 // eventText를 텍스트뷰로 추가하고 가로로 너비를 부모의 너비로 설정
             }
             Box(
