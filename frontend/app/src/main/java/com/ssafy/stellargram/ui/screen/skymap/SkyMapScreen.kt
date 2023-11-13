@@ -99,8 +99,8 @@ fun SkyMapScreen(navController : NavController){
             constLineSight = viewModel.getAllConstellationLines(longitude, latitude, zoom.toDouble(), theta, phi, screenHeight.toDouble() * 2.0, screenWidth.toDouble() * 2.0)
 //            horizonSight = viewModel.horizonSight.value
             delay(1L) // 0.4초마다 함수 호출
-            Log.d("test", "${starSight.size} ${constSight.size} ${constLineSight.size}")
-            Log.d("create", "Elapsed Time: ${System.currentTimeMillis() - i - 1L} ms")
+//            Log.d("test", "${starSight.size} ${constSight.size} ${constLineSight.size}")
+//            Log.d("create", "Elapsed Time: ${System.currentTimeMillis() - i - 1L} ms")
         }
     }
     // TODO: launched effect 안 먹음
@@ -110,6 +110,10 @@ fun SkyMapScreen(navController : NavController){
 //    }
 
     Box(){
+        if(clicked) Text("${nameMap[clickedIndex]}",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = Color.White)
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -124,7 +128,6 @@ fun SkyMapScreen(navController : NavController){
                             val ind = viewModel.gettingClickedStar(new_y, new_x, starSight)
                             if (ind == null) {
                                 clicked = false
-                                //TODO: 밑에 navbar 추가. + 위에 햄버거 + 검색
                             } else {
                                 clicked = true
                                 clickedIndex = ind
@@ -161,24 +164,37 @@ fun SkyMapScreen(navController : NavController){
                     }
                 }
                 starSight.forEach {star ->
-                    val x = star[0].toFloat()
-                    val y = star[1].toFloat()
-                    val starColor = (temperature.colorMap[temperature.getTemperature(star[2])]?:0) % (256 * 256 * 256) + Random.nextInt(210, 255) * (256 * 256 * 256)
-                    val radius = sqrt(zoom.toDouble()).toFloat() * pow(10.0, 0.13 * (9.0 - star[3] + 0.2 * Random.nextFloat())).toFloat()
-                    val center = Offset((size.width / 2) + y, (size.height / 2) + x)
-                    val name = nameMap[star[4].toInt()]?:""
+                    if(star[4].toInt() != 0 ) {
+                        val x = star[0].toFloat()
+                        val y = star[1].toFloat()
+                        val starColor = (temperature.colorMap[temperature.getTemperature(star[2])]
+                            ?: 0) % (256 * 256 * 256) + Random.nextInt(210, 255) * (256 * 256 * 256)
+                        val radius = sqrt(zoom.toDouble()).toFloat() * pow(
+                            10.0,
+                            0.13 * (9.0 - star[3] + 0.2 * Random.nextFloat())
+                        ).toFloat()
+                        val center = Offset((size.width / 2) + y, (size.height / 2) + x)
+                        val name = nameMap[star[4].toInt()] ?: ""
 
-                    drawCircle(center = center, radius = radius,
-                        brush = Brush.radialGradient(colors = listOf(
-                            Color(starColor),
-                            Color(starColor - 30 * (256 * 256 * 256)),
-                            Color(starColor - 50 * (256 * 256 * 256)),
-                            Color(starColor - 70 * (256 * 256 * 256)),
-                            Color(starColor - 90 * (256 * 256 * 256)),
-                            Color(starColor - 110 * (256 * 256 * 256)),
-                            Color(starColor - 130 * (256 * 256 * 256)),
-                            Color.Black
-                        ), center = center, radius =  radius*1.1f, tileMode = TileMode.Repeated))
+                        drawCircle(
+                            center = center, radius = radius,
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    Color(starColor),
+                                    Color(starColor - 30 * (256 * 256 * 256)),
+                                    Color(starColor - 50 * (256 * 256 * 256)),
+                                    Color(starColor - 70 * (256 * 256 * 256)),
+                                    Color(starColor - 90 * (256 * 256 * 256)),
+                                    Color(starColor - 110 * (256 * 256 * 256)),
+                                    Color(starColor - 130 * (256 * 256 * 256)),
+                                    Color.Black
+                                ),
+                                center = center,
+                                radius = radius * 1.1f,
+                                tileMode = TileMode.Repeated
+                            )
+                        )
+                    }
                 }
                 constSight.forEach{line ->
                     val x1 = line[0]
@@ -209,11 +225,6 @@ fun SkyMapScreen(navController : NavController){
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
         ){
-            //TODO: 이건 위에 따로 박스로 빼주세요.
-            if(clicked) Text("${nameMap[clickedIndex]}",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = Color.White)
             Slider(
                 value = zoom,
                 onValueChange = {
