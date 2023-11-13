@@ -79,10 +79,14 @@ class SignUpViewModel @Inject constructor(
                     StellargramApplication.prefs.setString("followCount",memberSignUpResponse.data.followCount.toString())
                     StellargramApplication.prefs.setString("followingCount",memberSignUpResponse.data.followingCount.toString())
                     StellargramApplication.prefs.setString("cardCount",memberSignUpResponse.data.cardCount.toString())
-                    navController.navigate(Screen.Home.route)
+                    afterSignIn(navController)
                 }
             }
         }
+    }
+
+    private fun afterSignIn(navController: NavController){
+        navController.navigate(Screen.Home.route)
     }
 
 }
