@@ -21,8 +21,8 @@ android {
         applicationId = "com.ssafy.stellargram"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2_6
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         kapt {
@@ -32,6 +32,11 @@ android {
         }
         vectorDrawables {
             useSupportLibrary = true
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags += "-std=c++17"
+            }
         }
         buildConfigField("String", "MAPS_API_KEY", getApiKey("MAPS_API_KEY"))
     }
@@ -51,6 +56,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
     buildFeatures {
         compose = true
