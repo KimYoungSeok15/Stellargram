@@ -242,7 +242,10 @@ fun HomeScreen(navController: NavController) {
                     val targetCategories = setOf("T1H", "SKY", "PTY")
 
                     // targetCategories에 속하는 카테고리만 필터링
-                    val filteredItems = items.filter { it.category in targetCategories }
+                    var filteredItems = emptyList<WeatherItem>()
+                    if (items != null){
+                        filteredItems = items.filter { it.category in targetCategories }
+                    }
 
                     // 각 카테고리별 첫 번째 아이템 가져오기
                     val firstItems =
