@@ -83,7 +83,8 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
         Button(
             onClick = {
-                navController.navigate(Screen.ChatRoom.route)
+//                navController.navigate(Screen.ChatRoom.route)
+                navController.navigate(route = Screen.ChatRoom.route + "/1/2/testsite")
             },
             modifier = Modifier
                 .padding(16.dp)
