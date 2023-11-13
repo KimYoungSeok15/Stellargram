@@ -31,6 +31,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ import kotlinx.coroutines.delay
 import java.lang.Math.log
 import java.lang.Math.pow
 import java.lang.Math.sqrt
+import kotlin.math.pow
 import kotlin.random.Random
 
 
@@ -79,7 +82,8 @@ fun SkyMapScreen(navController : NavController){
     var zoom: Float by remember{ mutableStateOf(1.0f)}
     var clicked: Boolean by remember{ mutableStateOf(false)}
     var clickedIndex: Int by remember{ mutableStateOf(1)}
-
+    var clickedX by remember { mutableStateOf(1.0f)  }
+    var clickedY by remember { mutableStateOf(1.0f)  }
     LaunchedEffect(Unit) {
         // star array가 늦게 계산되기도 하기 때문에 바로 홈화면에서 화면을 키게 될 경우 아무것도 불러오지 못함.
         while(starArray.isEmpty() || starInfo.isEmpty() || screenHeight == 0 || screenWidth == 0){
@@ -128,13 +132,15 @@ fun SkyMapScreen(navController : NavController){
                     phi += (panChange.y * zoom) / 10
 
                 })
-                .clickable {  }
+                .clickable { }
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
-                            val new_x = it.x - (size.width / 2)
-                            val new_y = it.y - (size.height / 2)
-                            val ind = viewModel.gettingClickedStar(new_y, new_x, starSight)
+                            clickedX = it.x
+                            clickedY = it.y
+                            val newX = it.x - (size.width / 2)
+                            val newY = it.y - (size.height / 2)
+                            val ind = viewModel.gettingClickedStar(newY, newX, starSight)
                             if (ind == null) {
                                 clicked = false
                             } else {
@@ -179,13 +185,10 @@ fun SkyMapScreen(navController : NavController){
                         val x = star[0].toFloat()
                         val y = star[1].toFloat()
                         val starColor = (temperature.colorMap[temperature.getTemperature(star[2])]
-                            ?: 0) % (256 * 256 * 256) + Random.nextInt(210, 255) * (256 * 256 * 256)
-                        val radius = sqrt(zoom.toDouble()).toFloat() * pow(
-                            10.0,
-                            0.13 * (9.0 - star[3] + 0.2 * Random.nextFloat())
-                        ).toFloat()
+                            ?: 0) % (256 * 256 * 256) + Random.nextInt(240, 255) * (256 * 256 * 256)
+                        val radius = sqrt(zoom.toDouble()).toFloat() * 10.0.pow(0.13 * (9.0 - star[3] + 0.2 * Random.nextFloat())).toFloat()
                         val center = Offset((size.width / 2) + y, (size.height / 2) + x)
-                        val name = nameMap[star[4].toInt()] ?: ""
+//                        val name = nameMap[star[4].toInt()] ?: ""
 
                         drawCircle(
                             center = center, radius = radius,
@@ -221,6 +224,14 @@ fun SkyMapScreen(navController : NavController){
                             strokeWidth = 0.5f
                         )
                     }
+                }
+                if(clicked){
+                    drawCircle(
+                        color = Color.Cyan,
+                        center = Offset(clickedX,clickedY),
+                        radius = 30f,
+                        style = Stroke()
+                    )
                 }
 
 //                horizonSight.forEach {star ->
