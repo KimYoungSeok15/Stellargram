@@ -36,7 +36,6 @@ class KakaoViewModel @Inject constructor(
         if (error != null) {
             // Handle login failure here
             Log.e(TAG, "카카오 서버 로그인 실패", error)
-            navController.navigate(Screen.Landing.route)
         } else if (token != null) {
             Log.i(TAG, "카카오 서버 로그인 성공 ${token.accessToken}")
             // After successful login, request user information
