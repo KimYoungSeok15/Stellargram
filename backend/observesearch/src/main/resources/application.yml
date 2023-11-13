@@ -23,6 +23,9 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URL}
+  instance:
+    prefer-ip-address: true
+
 value:
   chunk_size: 1000
   minimum_review_count: 5
