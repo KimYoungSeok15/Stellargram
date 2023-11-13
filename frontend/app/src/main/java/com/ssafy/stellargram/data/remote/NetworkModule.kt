@@ -117,5 +117,18 @@ object NetworkModule {
             .create(ApiServiceForChat::class.java)
     }
 
+    // 관측소 관련 API
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceSite(): ApiServiceForSite {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClient())
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForSite::class.java)
+    }
+
+
 }
 

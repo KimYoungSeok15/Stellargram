@@ -9,6 +9,7 @@ import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
+import com.ssafy.stellargram.model.SiteInfoResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import retrofit2.Call
 import retrofit2.Response
@@ -72,3 +73,16 @@ interface ApiServiceForChat {
     ): CursorResponse
 }
 
+
+// 관측포인트 관련
+interface ApiServiceForSite {
+
+    // 관측포인트 상세 조회
+    @GET("observe-site/latitude/{latitude}/longitude/{longitude}")
+    suspend fun getSiteInfo(
+//        @Header("myId") myId: Long,
+        @Path("latitude") latitude: Double,
+        @Path("longitude") longitude: Double,
+    ): SiteInfoResponse
+
+}
