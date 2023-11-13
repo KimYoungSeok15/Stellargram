@@ -5,8 +5,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,7 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -33,7 +45,9 @@ import androidx.navigation.compose.rememberNavController
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.model.MessageInfo
+import com.ssafy.stellargram.ui.screen.search.getSearchResults
 import com.ssafy.stellargram.ui.theme.PurpleGrey40
+import kotlinx.coroutines.launch
 
 // 상수
 const val inputBoxCornerSize = 10
@@ -70,34 +84,51 @@ fun ChatRoomScreen(
         // 최초 실행시 메세지 가져오고 다음커서 세팅하기
         viewModel.getMessages()
     }
-    // TODO: 메세지 리스트 업데이트 방법 찾을 것
+
+    // 메세지 viewModel에서 가져오는 곳
     var messageList: List<MessageInfo> by remember { mutableStateOf<List<MessageInfo>>(viewModel.messages) }
 
+    // css. 스크린 컨테이너 modifier
+    val screenModifier: Modifier = Modifier.fillMaxSize()
 
     // 스크린 전체
-    Column(modifier = Modifier, verticalArrangement = Arrangement.SpaceAround) {
+    Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceAround) {
+
+
         // 스크롤 상태 기억
         val scrollState = rememberScrollState()
 
-        // 메세지들 컨테이너
-        LazyColumn(modifier = Modifier.height(700.dp)) {
-            items(messageList) { message ->
-                ChatBox(
-                    isMine = (message.memberId == TestValue.myId),
-                    imgUrl = message.memberImagePath,
-                    nickname = message.memberNickName,
-                    content = message.content,
-                    unixTimestamp = message.time
-                )
+
+        // 채팅 전체 컨테이너
+        Column {
+            // 메세지들 컨테이너
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(messageList) { message ->
+                    ChatBox(
+                        isMine = (message.memberId == TestValue.myId),
+                        imgUrl = message.memberImagePath,
+                        nickname = message.memberNickName,
+                        content = message.content,
+                        unixTimestamp = message.time
+                    )
+                }
             }
+            MessageInput(viewModel = viewModel, roomId = roomId)
         }
-        MessageInput(viewModel = viewModel, roomId = roomId)
+
 
         // TODO: 테스트용. 나중에 지울 것
-        Text(text = "방 번호: " + roomId.toString())
+//        Text(text = "방 번호: " + roomId.toString())
+//        Text(text = "관측소아이디: " + observeSiteId)
+
     }
 
 }
+
+//@Composable
+//fun SiteInfo(viewModel: SiteViewModel, roomId: Int) {
+//}
+
 
 @Composable
 fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
@@ -105,27 +136,49 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
     // 입력박스 내 메세지 내용
     var messageContent by remember { mutableStateOf("") }
 
+    // css. 입력 컨테이너 modifier
+    var containerModifier: Modifier = Modifier
+        .fillMaxWidth()
+//        .height(300.dp)
+        .defaultMinSize(minHeight = 150.dp)
+
+
     // css. 메세지 입력박스 modifier
     var inputModifier: Modifier = Modifier
-        .fillMaxWidth(0.8f)
-        .clip(
-            RoundedCornerShape(
-                inputBoxCornerSize.dp
-//        topStart = if (isMine) inputBoxCornerSize.dp else 0.dp,
-//        topEnd = if (isMine) 0.dp else inputBoxCornerSize.dp,
-//        bottomStart = inputBoxCornerSize.dp,
-//        bottomEnd = inputBoxCornerSize.dp
-            )
-        )
-        .border(width = 5.dp, color = PurpleGrey40)
+
+        .fillMaxWidth(0.9f)
+//        .clip(
+//            RoundedCornerShape(
+//                inputBoxCornerSize.dp
+////        topStart = if (isMine) inputBoxCornerSize.dp else 0.dp,
+////        topEnd = if (isMine) 0.dp else inputBoxCornerSize.dp,
+////        bottomStart = inputBoxCornerSize.dp,
+////        bottomEnd = inputBoxCornerSize.dp
+//            )
+//        )
+//        .border(width = 5.dp, color = PurpleGrey40)
 
     // 메세지 입력 필드
-    Row {
+    Column(
+        modifier = containerModifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // 입력 필드
-        BasicTextField(
+        OutlinedTextField(
             value = messageContent,
             onValueChange = { messageContent = it },
-            modifier = inputModifier
+            modifier = inputModifier,
+            trailingIcon = {
+                IconButton(
+                    onClick = { messageContent = "" },
+                    modifier = Modifier.padding(13.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                }
+            },
+            singleLine = false,
+            maxLines = 4
         )
         // 전송 버튼
         Button(
@@ -136,7 +189,7 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
                 )
                 messageContent = ""
             },
-            modifier = Modifier.width(200.dp)
+            modifier = Modifier.width(100.dp)
         ) {
 //                Text(text = "전송")
             Image(
@@ -145,5 +198,7 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
                 modifier = Modifier.size(36.dp)
             )
         }
+
+
     }
 }

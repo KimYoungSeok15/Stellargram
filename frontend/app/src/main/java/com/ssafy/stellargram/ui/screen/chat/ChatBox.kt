@@ -139,11 +139,12 @@ fun MessageBox(imgUrl: String, nickname: String, content: String, isMine: Boolea
 fun TimeBox(yearMonth: String, hourMinute: String) {
     // css .시간 Modifier
     val timeModifier: Modifier = Modifier
-        .padding(vertical = 10.dp)
+        .padding(horizontal = 10.dp)
+
 
     //시간 렌더링
-    Column (modifier = timeModifier){
-        Text(text = yearMonth, style = TextStyle(fontSize = (textSize -5).sp))
-        Text(text = hourMinute, style = TextStyle(fontSize = (textSize -5).sp))
+    Column(modifier = timeModifier) {
+        Text(text = yearMonth, style = TextStyle(fontSize = (textSize - 5).sp))
+        Text(text = hourMinute, style = TextStyle(fontSize = (textSize - 5).sp))
     }
 }
