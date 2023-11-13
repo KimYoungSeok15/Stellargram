@@ -42,7 +42,7 @@ data class MemberSignUpResponse(
     val data: Data
 ) {
     data class Data(
-        val memberId : Int,
+        val memberId : Long,
         val nickname : String,
         val profileImageUrl : String,
         val followCount : Int,
@@ -63,7 +63,7 @@ data class MembersData(
 )
 
 data class Member(
-    val memberId: Int,
+    val memberId: Long,
     val nickname: String,
     val profileImageUrl: String,
     val isFollow: Boolean,
