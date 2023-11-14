@@ -8,6 +8,7 @@ import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
 import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.WeatherResponse
@@ -29,6 +30,10 @@ interface ApiService {
 
      @POST("member/signup")
      suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
+
+     @GET("member/me")
+     suspend fun getMemberMe() : Response<MemberMeResponse>
+
 }
 
 interface ApiServiceForWeather{
