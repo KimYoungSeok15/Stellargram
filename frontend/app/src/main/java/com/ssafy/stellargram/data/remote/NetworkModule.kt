@@ -194,7 +194,7 @@ object NetworkModule {
             .build()
             .create(ApiServiceForObserveSearch::class.java)
     }
-}
+
     // 관측소 관련 API
     @Singleton
     @Provides
@@ -206,6 +206,4 @@ object NetworkModule {
             .build()
             .create(ApiServiceForSite::class.java)
     }
-
-
 }
