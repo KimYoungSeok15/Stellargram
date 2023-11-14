@@ -41,9 +41,9 @@ object NetworkModule {
     @Singleton
     fun provideHttpClientHeader(interceptor: MyIdInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
-            .readTimeout(10, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(interceptor)
             .addInterceptor(getLoggingInterceptor())
             .build()
@@ -90,7 +90,7 @@ object NetworkModule {
         HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 
     class MyIdInterceptor : Interceptor {
-        @Throws(IOException::class)
+//        @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain)
                 : Response = with(chain) {
             val myId = StellargramApplication.prefs.getString("myId","")
