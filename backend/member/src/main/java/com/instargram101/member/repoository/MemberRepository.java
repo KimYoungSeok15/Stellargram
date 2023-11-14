@@ -12,7 +12,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Boolean existsByNicknameAndActivated(String nickname, Boolean activated);
     Optional<Member> findByNicknameAndActivated(String nickname, Boolean activated);
     List<Member> findByNicknameContainingAndActivated(String searchNickname, Boolean activated);
-    List<Member> findMembersByMemberIdInAndActivated(List<Long> memberIds, Boolean activated);
+    List<Member> findMembersByMemberIdInAndActivated(List<?> memberIds, Boolean activated);
 
 
 }
