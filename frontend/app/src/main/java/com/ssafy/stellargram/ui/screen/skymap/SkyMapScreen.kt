@@ -3,27 +3,16 @@ package com.ssafy.stellargram.ui.screen.skymap
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorManager
-import android.location.LocationManager
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,60 +20,47 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.rotationMatrix
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.maps.model.LatLng
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.module.ScreenModule
-import com.ssafy.stellargram.ui.MainActivity
-import com.ssafy.stellargram.ui.screen.googlemap.LocationState
-import com.ssafy.stellargram.util.ConstellationLine
 import com.ssafy.stellargram.util.Temperature
-import dev.ricknout.composesensors.getSensor
-import dev.ricknout.composesensors.getSensorManager
-import dev.ricknout.composesensors.gyroscope.rememberGyroscopeSensorValueAsState
-import dev.ricknout.composesensors.rememberSensorValueAsState
 import kotlinx.coroutines.delay
-import java.lang.Math.log
-import java.lang.Math.pow
-import java.lang.Math.sqrt
-import java.text.DecimalFormat
+import kotlin.math.ln
 import kotlin.math.pow
-import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlin.math.sqrt
 
 
-@SuppressLint("MissingPermission")
+@SuppressLint("MissingPermission", "MutableCollectionMutableState")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SkyMapScreen(navController : NavController){
 
 
     val viewModel : SkyMapViewModel = viewModel()
-    val temperature: Temperature = Temperature()
-    val constellationLine: ConstellationLine = ConstellationLine()
+    val temperature = Temperature()
+//    val constellationLine: ConstellationLine = ConstellationLine()
     val context = LocalContext.current
 
 
@@ -98,7 +74,7 @@ fun SkyMapScreen(navController : NavController){
     val locationPermissionState = rememberMultiplePermissionsState(
         listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
     )
-    var fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     LaunchedEffect(locationPermissionState.allPermissionsGranted) {
         // 위치 권한이 허용되지 않은 경우
         if (!locationPermissionState.allPermissionsGranted) {
@@ -113,27 +89,27 @@ fun SkyMapScreen(navController : NavController){
         }
     }
 
-    var offsetX: Double by remember { mutableStateOf(0.0) }
-    var offsetY: Double by remember { mutableStateOf(0.0) }
-    var theta: Double by remember { mutableStateOf(180.0)}
-    var phi: Double by remember { mutableStateOf(0.0) }
-    var isDragging: Boolean by remember { mutableStateOf(false) }
-    var i: Long by remember{mutableStateOf(0L)}
-    var screenWidth: Int by remember{mutableStateOf(0)}
-    var screenHeight: Int by remember{mutableStateOf(0)}
+//    var offsetX: Double by remember { mutableStateOf(0.0) }
+//    var offsetY: Double by remember { mutableStateOf(0.0) }
+    var theta by remember { mutableDoubleStateOf(180.0)}
+    var phi by remember { mutableDoubleStateOf(0.0) }
+//    var isDragging: Boolean by remember { mutableStateOf(false) }
+    var i by remember{ mutableLongStateOf(0L) }
+    var screenWidth by remember{ mutableIntStateOf(0) }
+    var screenHeight by remember{mutableIntStateOf(0)}
     var starArray: Array<DoubleArray> by remember{ mutableStateOf(arrayOf()) }
     var nameMap: HashMap<Int, String> by remember{ mutableStateOf(hashMapOf()) }
     var starSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
     var starInfo: HashMap<Int, Int> by remember{ mutableStateOf(hashMapOf())}
     var constSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
     var constLineSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
-    var horizon: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
-    var horizonSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
-    var zoom: Float by remember{ mutableStateOf(1.0f)}
+//    var horizon: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
+//    var horizonSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
+    var zoom by remember{ mutableFloatStateOf(1.0f) }
     var clicked: Boolean by remember{ mutableStateOf(false)}
-    var clickedIndex: Int by remember{ mutableStateOf(1)}
-    var clickedX by remember { mutableStateOf(1.0f)  }
-    var clickedY by remember { mutableStateOf(1.0f)  }
+    var clickedIndex by remember{ mutableIntStateOf(1) }
+    var clickedX by remember { mutableFloatStateOf(1.0f)  }
+    var clickedY by remember { mutableFloatStateOf(1.0f)  }
     LaunchedEffect(Unit) {
         // star array가 늦게 계산되기도 하기 때문에 바로 홈화면에서 화면을 키게 될 경우 아무것도 불러오지 못함.
         while(starArray.isEmpty() || starInfo.isEmpty() || screenHeight == 0 || screenWidth == 0){
@@ -154,7 +130,7 @@ fun SkyMapScreen(navController : NavController){
 
         while (true) {
             i = System.currentTimeMillis()
-            starSight = viewModel.getAllStars(longitude, latitude, zoom.toDouble(), theta, phi, 5.0 + 2.5 * log(zoom.toDouble()), screenHeight.toDouble(), screenWidth.toDouble())
+            starSight = viewModel.getAllStars(longitude, latitude, zoom.toDouble(), theta, phi, 5.0 + 2.5 * ln(zoom.toDouble()), screenHeight.toDouble(), screenWidth.toDouble())
             constSight = viewModel.getAllConstellations(longitude, latitude, zoom.toDouble(), theta, phi, screenHeight.toDouble(), screenWidth.toDouble())
             constLineSight = viewModel.getAllConstellationLines(longitude, latitude, zoom.toDouble(), theta, phi, screenHeight.toDouble() * 2.0, screenWidth.toDouble() * 2.0)
 //            horizonSight = viewModel.horizonSight.value
@@ -163,12 +139,8 @@ fun SkyMapScreen(navController : NavController){
 //            Log.d("create", "Elapsed Time: ${System.currentTimeMillis() - i - 1L} ms")
         }
     }
-//    launched effect 안 먹음
-//    LaunchedEffect(theta, phi, zoom){
-//        starSight = viewModel.getAllStars(longitude, latitude, zoom.toDouble(), theta, phi, 5.0, screenHeight.toDouble(), screenWidth.toDouble())
-//        constSight = viewModel.getAllConstellations(longitude, latitude, zoom.toDouble(), theta, phi, screenHeight.toDouble(), screenWidth.toDouble())
-//    }
 
+    var canvasRotate by remember { mutableFloatStateOf(0.0f)}
     var orientationValues by remember { mutableStateOf(Triple(0f, 0f, 0f)) }
     val orientation = remember { Orientation(context as Activity) }
     DisposableEffect(context) {
@@ -177,6 +149,7 @@ fun SkyMapScreen(navController : NavController){
                 orientationValues = Triple(pitch, roll, yaw)
                 theta = -yaw.toDouble()
                 phi = pitch.toDouble()
+//                canvasRotate = roll
             }
         })
         onDispose {
@@ -184,7 +157,7 @@ fun SkyMapScreen(navController : NavController){
         }
     }
 
-    Box(){
+    Box{
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -197,6 +170,7 @@ fun SkyMapScreen(navController : NavController){
                     }
                     theta -= (panChange.x * zoom) / 10
                     phi += (panChange.y * zoom) / 10
+//                    canvasRotate += rotationChange
 
                 })
                 .pointerInput(Unit) {
@@ -216,20 +190,8 @@ fun SkyMapScreen(navController : NavController){
                         }
                     )
                 }
-//                .pointerInput(Unit){
-//                    detectDragGestures(
-//                        onDrag = {_, dragAmount ->
-//                            theta -= (dragAmount.x * zoom) / 10
-//                            phi += (dragAmount.y * zoom) / 10
-////                            change.consume()
-//                        }
-//                    )
-//                }
-//                .pointerInput(Unit) {
-//                   detectTransformGestures { _, pan, _zoom, rotate ->
-//                        zoom = (zoom * _zoom)
-//                   }
-//                }
+                .rotate(canvasRotate)
+
             ,onDraw = {
                 constLineSight.forEach{line ->
                     val x1 = line[0]
@@ -266,7 +228,7 @@ fun SkyMapScreen(navController : NavController){
                                     Color(starColor - 70 * (256 * 256 * 256)),
                                     Color(starColor - 90 * (256 * 256 * 256)),
                                     Color(starColor - 110 * (256 * 256 * 256)),
-                                    Color(starColor - 130 * (256 * 256 * 256)),
+                                    Color(starColor - 130 * (256 * 256 * 256).toLong()),
                                     Color.Black
                                 ),
                                 center = center,
