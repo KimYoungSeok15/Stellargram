@@ -64,7 +64,7 @@ fun MypageScreen(navController: NavController, id:Long) {
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
         viewModel.getMemberInfo(userId)
-        getResults(viewModel = viewModel)
+        getResults(viewModel = viewModel, id = userId)
     }
 
 

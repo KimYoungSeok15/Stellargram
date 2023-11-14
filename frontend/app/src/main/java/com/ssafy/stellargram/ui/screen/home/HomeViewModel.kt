@@ -48,6 +48,8 @@ import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardsData
+import com.ssafy.stellargram.model.CardsResponse
+import com.ssafy.stellargram.model.Response
 import java.io.IOException
 import java.util.Locale
 import kotlin.math.abs
@@ -166,11 +168,11 @@ fun AutoScrollingText(text:String) {
 }
 
 // 오늘의 추천 사진 가져오기
-suspend fun GetTodaysPicture(): CardsData? {
+suspend fun GetTodaysPicture(): retrofit2.Response<CardsResponse>? {
     return try {
-        val response = NetworkModule.provideRetrofitInstanceCards().getCards()
-        if (response.code == 200) {
-            response.data
+        val response = NetworkModule.provideRetrofitInstanceCards().getCards(3140000396)
+        if (response.isSuccessful) {
+            response
         } else {
             null
         }

@@ -48,6 +48,8 @@ object NetworkModule {
             .addInterceptor(getLoggingInterceptor())
             .build()
     }
+
+    // 멤버 retrofit
     @Singleton
     @Provides
     fun provideRetrofitInstance(
@@ -59,6 +61,21 @@ object NetworkModule {
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiService::class.java)
+
+    }
+
+    // 카드 retrofit
+    @Singleton
+    @Provides
+    fun ProvideRetrofitCards(
+    ): ApiServiceForCards {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            //json 변화기 Factory
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForCards::class.java)
 
     }
 
