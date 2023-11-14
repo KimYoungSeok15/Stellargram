@@ -68,6 +68,37 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
             modifier = Modifier
                 .clickable { navController.navigate("kakao") }
         )
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.Example.route)
+            },
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = "move to sphere")
+        }
+
+        // TODO: 채팅방 임시 연결버튼. 나중에 지우기
+        Button(
+            onClick = {
+                navController.navigate(Screen.ChatRoom.route)
+            },
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = "채팅방")
+        }
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.Camera.route)
+            },
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = "카메라")
+        }
     }
 }
 

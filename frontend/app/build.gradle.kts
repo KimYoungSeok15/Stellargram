@@ -183,6 +183,20 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
+
+        //카메라X 사용
+        val camerax_version = "1.1.0-beta01"
+        implementation ("androidx.camera:camera-core:${camerax_version}")
+        implementation ("androidx.camera:camera-camera2:${camerax_version}")
+        implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
+
+        implementation ("androidx.camera:camera-view:${camerax_version}")
+        implementation ("androidx.camera:camera-extensions:${camerax_version}")
+
+        implementation ("androidx.camera:camera-camera2:1.1.0-beta01")
+        implementation ("androidx.camera:camera-core:1.1.0-beta01")
+
+
     // STOMP 사용을 위한 라이브러리
     implementation("com.github.bishoybasily:stomp:2.0.5")
 
@@ -200,6 +214,7 @@ dependencies {
     implementation("com.squareup.retrofit2:adapter-rxjava2:2.3.0")
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+
 }
 
 // Dependency injection with Hilt
