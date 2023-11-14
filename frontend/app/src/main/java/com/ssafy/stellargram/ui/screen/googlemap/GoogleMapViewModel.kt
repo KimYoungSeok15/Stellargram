@@ -149,7 +149,7 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
 
     fun postObserveSite(latLng: LatLng){
         viewModelScope.launch {
-            val request = ObserveSiteRequest(latLng.latitude, latLng.latitude, "")
+            val request = ObserveSiteRequest(latLng.latitude, latLng.longitude, "")
             val response = NetworkModule.provideRetrofitInstanceObserveSite().postObserveSite(request)
         }
     }
