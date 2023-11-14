@@ -12,13 +12,13 @@ data class CardsData(
 
 data class Card(
     val cardId: Int,
-    val memberId: Int,
-    val memberNickName: String,
-    val memberImagePath: String,
+    val memberId: Long,
+    val memberNickname: String,
+    val memberProfileImageUrl: String,
     val observeSiteId: String,
     val imagePath: String,
     val content: String,
-    val photoAt: String,
+    val photoAt: String?,
     val category: String,
     val tools: String,
     val likeCount: Int,

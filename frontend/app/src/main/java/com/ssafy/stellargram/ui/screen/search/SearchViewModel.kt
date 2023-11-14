@@ -182,8 +182,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
             Card(
                 cardId = 5,
                 memberId = 99,
-                memberNickName = "Hyundolee199543413413431",
-                memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
+                memberNickname = "Hyundolee199543413413431",
+                memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
                 observeSiteId = "144",
                 imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
                 content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
@@ -196,8 +196,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
             Card(
                 cardId = 5,
                 memberId = 99,
-                memberNickName = "Hyundolee199543413413431",
-                memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
+                memberNickname = "Hyundolee199543413413431",
+                memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
                 observeSiteId = "144",
                 imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
                 content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
@@ -298,7 +298,7 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController)
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     GlideImage(
-                        model = card.memberImagePath,
+                        model = card.memberProfileImageUrl,
                         contentDescription = "123",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -306,7 +306,7 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController)
                             .clip(CircleShape) // 동그라미 모양으로 잘라주기
                     )
                     Text(
-                        text = card.memberNickName,
+                        text = card.memberNickname,
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier
                             .padding(start = 8.dp)

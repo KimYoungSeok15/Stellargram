@@ -58,14 +58,6 @@ data class MemberResponse(
     val data: Member
 )
 
-data class MemberData(
-    val memberId: Long,
-    val nickname: String,
-    val profileImageUrl: String,
-    val followCount: Int,
-    val followingCount: Int,
-    val cardCount: Int
-)
 data class Member(
     val memberId: Long,
     val nickname: String,

@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
+import com.ssafy.stellargram.model.FollowCancelResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
@@ -68,7 +69,7 @@ interface ApiService {
     @DELETE("follow/{followingId}")
     suspend fun unfollowUser(
         @Path("followingId") followingId: Long
-    ): Response<MemberCheckResponse>
+    ): Response<FollowCancelResponse>
 
 
 }

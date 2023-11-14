@@ -136,9 +136,10 @@ class MypageViewModel @Inject constructor() : ViewModel() {
     var likeCards = mutableStateOf<List<Card>>(emptyList())
 
     suspend fun fetchUserCards(id: Long): List<Card> {
+        Log.d("마이페이지", "시작")
         return try {
             val response = NetworkModule.ProvideRetrofitCards().getCards(memberId = id)
-
+            Log.d("마이페이지", "디버깅 : $response")
             if (response.isSuccessful) {
                 val cardsResponse = response.body()
                 Log.d("마이페이지", "내 카드들 : ${response.body()?.data?.starcards}")
@@ -148,8 +149,8 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                         Card(
                             cardId = starCardData.cardId,
                             memberId = starCardData.memberId,
-                            memberNickName = starCardData.memberNickName,
-                            memberImagePath = starCardData.memberImagePath,
+                            memberNickname = starCardData.memberNickname,
+                            memberProfileImageUrl = starCardData.memberProfileImageUrl,
                             observeSiteId = starCardData.observeSiteId,
                             imagePath = starCardData.imagePath,
                             content = starCardData.content,
@@ -162,13 +163,11 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                     }
                 } ?: emptyList()
             } else {
-                // API 에러 응답을 처리합니다.
-                // 에러를 로그에 남기거나 사용자에게 메시지를 표시합니다.
+                Log.d("마이페이지", "API 호출 실패: ${response.code()} - ${response.message()}")
                 emptyList()
             }
         } catch (e: Exception) {
-            // 예외를 처리합니다 (예: 네트워크 오류).
-            // 예외를 로그에 남기거나 사용자에게 메시지를 표시합니다.
+            Log.e("마이페이지", "API 호출 실패 $e")
             emptyList()
         }
     }
@@ -214,8 +213,8 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                         Card(
                             cardId = starCardData.cardId,
                             memberId = starCardData.memberId,
-                            memberNickName = starCardData.memberNickName,
-                            memberImagePath = starCardData.memberImagePath,
+                            memberNickname = starCardData.memberNickname,
+                            memberProfileImageUrl = starCardData.memberProfileImageUrl,
                             observeSiteId = starCardData.observeSiteId,
                             imagePath = starCardData.imagePath,
                             content = starCardData.content,
@@ -344,12 +343,12 @@ suspend fun getResults(viewModel: MypageViewModel, id:Long): List<Any> = corouti
     viewModel.myCards.value = myCards
     viewModel.favStars.value = favStars
     viewModel.likeCards.value = likeCards
-
     val results = mutableListOf<Any>()
     results.addAll(myCards)
     results.addAll(favStars)
     results.addAll(likeCards)
 
+    Log.d("마이페이지","$results")
     results
 }
 
@@ -376,7 +375,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     GlideImage(
-                        model = card.memberImagePath,
+                        model = card.memberProfileImageUrl,
                         contentDescription = "123",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -384,7 +383,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                             .clip(CircleShape) // 동그라미 모양으로 잘라주기
                     )
                     Text(
-                        text = card.memberNickName,
+                        text = card.memberNickname,
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier
                             .padding(start = 8.dp)
@@ -548,7 +547,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     GlideImage(
-                        model = card.memberImagePath,
+                        model = card.memberProfileImageUrl,
                         contentDescription = "123",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -556,7 +555,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                             .clip(CircleShape) // 동그라미 모양으로 잘라주기
                     )
                     Text(
-                        text = card.memberNickName,
+                        text = card.memberNickname,
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier
                             .padding(start = 8.dp)
