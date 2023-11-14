@@ -1,8 +1,12 @@
 package com.ssafy.stellargram.ui.screen.skymap
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.location.LocationManager
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -25,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,9 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.rotationMatrix
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationListener
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.LatLng
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.module.ScreenModule
 import com.ssafy.stellargram.ui.MainActivity
+import com.ssafy.stellargram.ui.screen.googlemap.LocationState
 import com.ssafy.stellargram.util.ConstellationLine
 import com.ssafy.stellargram.util.Temperature
 import dev.ricknout.composesensors.getSensor
@@ -63,6 +76,8 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SkyMapScreen(navController : NavController){
 
@@ -70,16 +85,34 @@ fun SkyMapScreen(navController : NavController){
     val viewModel : SkyMapViewModel = viewModel()
     val temperature: Temperature = Temperature()
     val constellationLine: ConstellationLine = ConstellationLine()
+    val context = LocalContext.current
 
 
 
 
+    var longitude by remember { mutableDoubleStateOf(127.039611)}
+    var latitude by remember { mutableDoubleStateOf(37.501254) }
 
-    // TODO: 기기로부터 정보를 받는 거로 고쳐야 함.
-    val longitude: Double = 127.039611
-    val latitude: Double = 37.501254
 
-    // TODO: zoom 확대하였을 때
+
+    val locationPermissionState = rememberMultiplePermissionsState(
+        listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    )
+    var fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    LaunchedEffect(locationPermissionState.allPermissionsGranted) {
+        // 위치 권한이 허용되지 않은 경우
+        if (!locationPermissionState.allPermissionsGranted) {
+            locationPermissionState.launchMultiplePermissionRequest()
+        }
+        else {
+            // 허용된 경우
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                longitude = it.longitude
+                latitude = it.latitude
+            }
+        }
+    }
+
     var offsetX: Double by remember { mutableStateOf(0.0) }
     var offsetY: Double by remember { mutableStateOf(0.0) }
     var theta: Double by remember { mutableStateOf(180.0)}
@@ -137,7 +170,6 @@ fun SkyMapScreen(navController : NavController){
 //    }
 
     var orientationValues by remember { mutableStateOf(Triple(0f, 0f, 0f)) }
-    val context = LocalContext.current
     val orientation = remember { Orientation(context as Activity) }
     DisposableEffect(context) {
         orientation.startListening(object : Orientation.Listener {
@@ -283,9 +315,10 @@ fun SkyMapScreen(navController : NavController){
                 .align(Alignment.TopStart)
                 .padding(16.dp)
         ){
-            Text(text = "${orientationValues.first}")
-            Text(text = "${orientationValues.second}")
-            Text(text = "${orientationValues.third}")
+//            Text(text = "${orientationValues.first}")
+//            Text(text = "${orientationValues.second}")
+//            Text(text = "${orientationValues.third}")
+//            Text(text="$latitude , $longitude")
 
             if(clicked) Text("${nameMap[clickedIndex]}",
                 modifier = Modifier.fillMaxWidth(),
