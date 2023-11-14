@@ -55,7 +55,7 @@ import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardResponse
 import com.ssafy.stellargram.model.Member
-import com.ssafy.stellargram.model.MessageInfo
+import com.ssafy.stellargram.model.MemberSearchRequest
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.util.SearchStarByName
@@ -231,8 +231,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
                         result.add(newCardInfo)
                     }
                 }
-            }
-            else if(response.code==500){
+            } else if (response.code == 500) {
                 Log.e("SEARCH CARD", "500 error")
 
             }
@@ -241,67 +240,28 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
 
         return result
-
-//        // 현재는 더미데이터
-//        val results: List<Card>
-//        results = listOf<Card>(
-//            Card(
-//                cardId = 5,
-//                memberId = 99,
-//                memberNickname = "Hyundolee199543413413431",
-//                memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-//                observeSiteId = "144",
-//                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-//                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-//                photoAt = "2023-10-27T01:49:22",
-//                category = "GALAXY",
-//                tools = "엄청 좋은 카메라",
-//                likeCount = 156,
-//                amILikeThis = false
-//            ),
-//            Card(
-//                cardId = 5,
-//                memberId = 99,
-//                memberNickname = "Hyundolee199543413413431",
-//                memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-//                observeSiteId = "144",
-//                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-//                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-//                photoAt = "2023-10-27T01:49:22",
-//                category = "GALAXY",
-//                tools = "엄청 좋은 카메라",
-//                likeCount = 2,
-//                amILikeThis = true
-//            )
-//        )
-//        return results
     }
 
-    fun getMemberResults(text: String): List<Member> {
-        // 멤버 검색 로직
-        // 현재는 더미데이터
-        val results: List<Member>
-        results = listOf<Member>(
-            Member(
-                memberId = 2,
-                nickname = "닉네임2",
-                profileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                isFollow = true,
-                followCount = 0,
-                followingCount = 0,
-                cardCount = 0
-            ),
-            Member(
-                memberId = 1,
-                nickname = "닉네임",
-                profileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                isFollow = false,
-                followCount = 0,
-                followingCount = 0,
-                cardCount = 0
-            )
-        )
-        return results
+    suspend fun getMemberResults(text: String): List<Member> {
+
+        var result: List<Member> = emptyList()
+
+        try {
+            // 멤버 검색 로직
+            val response = NetworkModule.RetrofitGetMemberInfo()
+                .findMember(MemberSearchRequest(searchNickname = text))
+
+            if (response?.code == 200) {
+                result = response.data.members
+
+            } else if (response.code == 500) {
+                Log.e("SEARCH CARD", "500 error")
+
+            }
+        } catch (e: Exception) {
+            Log.e("SEARCH CARD", e.toString())
+        }
+        return result
     }
 
     fun getStarResults(text: String): List<Star> {

@@ -13,6 +13,8 @@ import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
+import com.ssafy.stellargram.model.MemberSearchRequest
+import com.ssafy.stellargram.model.MemberSearchResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.SiteInfoResponse
@@ -30,24 +32,24 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-     @GET("member/check")
-     suspend fun getMemberCheck(): Response<MemberCheckResponse>
+    @GET("member/check")
+    suspend fun getMemberCheck(): Response<MemberCheckResponse>
 
-     @POST("member/check-duplicate/")
-     suspend fun getMemberCheckDuplicate(@Body getMemberCheckDuplicateRequest: MemberCheckDuplicateRequest): Response<MemberCheckDuplicateResponse>
+    @POST("member/check-duplicate/")
+    suspend fun getMemberCheckDuplicate(@Body getMemberCheckDuplicateRequest: MemberCheckDuplicateRequest): Response<MemberCheckDuplicateResponse>
 
-     @POST("member/signup")
-     suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
+    @POST("member/signup")
+    suspend fun postMemberSignUP(@Body postMemberSignUpRequest: MemberSignUpRequest): Response<MemberSignUpResponse>
 
-     // 특정회원 정보조회 (본인도 대상으로 가능)
-     @GET("member/others/{userId}")
-     suspend fun getMember(
-         @Path("userId") userId: Long
-     ) : Response<MemberResponse>
+    // 특정회원 정보조회 (본인도 대상으로 가능)
+    @GET("member/others/{userId}")
+    suspend fun getMember(
+        @Path("userId") userId: Long
+    ): Response<MemberResponse>
 
     // 내 정보 조회
     @GET("member/me")
-    suspend fun getMemberMe() : Response<MemberMeResponse>
+    suspend fun getMemberMe(): Response<MemberMeResponse>
 
     // 닉네임 수정
     @PATCH("member/nickname")
@@ -73,8 +75,15 @@ interface ApiService {
         @Path("followingId") followingId: Long
     ): Response<FollowCancelResponse>
 
+    // 유저 닉네임 검색
+    @POST("member/nickname/search")
+    suspend fun findMember(
+        @Body postMemberSearchRequest:MemberSearchRequest
+    ): MemberSearchResponse
+
 
 }
+
 data class NickNameUpdateRequest(
     @SerializedName("nickname") val nickname: String
 )
@@ -101,7 +110,7 @@ interface ApiServiceForCards {
 
 }
 
-interface ApiServiceForWeather{
+interface ApiServiceForWeather {
     @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst")
     fun getWeatherData(
         @Query("ServiceKey") serviceKey: String,
@@ -114,6 +123,7 @@ interface ApiServiceForWeather{
         @Query("ny") ny: Int
     ): Call<WeatherResponse>
 }
+
 interface ApiServiceForAstronomicalEvents {
     @GET("B090041/openapi/service/AstroEventInfoService/getAstroEventInfo")
     suspend fun getAstronomicalEvents(
