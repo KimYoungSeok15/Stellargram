@@ -17,6 +17,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.ObserveSiteRequest
+import com.ssafy.stellargram.util.CalcZoom
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     lateinit var fusedLocationClient: FusedLocationProviderClient
     lateinit var placesClient: PlacesClient
     lateinit var geoCoder: Geocoder
+    val calcZoom = CalcZoom()
     var locationState by mutableStateOf<LocationState>(LocationState.NoPermission)
     /** Current geoLocation via LatLng, mutated by 'getCurrentLocation' */
     var currentLatLong by mutableStateOf(LatLng(0.0, 0.0))
@@ -149,5 +151,25 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
             val request = ObserveSiteRequest(latLng.latitude, latLng.latitude, "")
             val response = NetworkModule.provideRetrofitInstanceObserveSite().postObserveSite(request)
         }
+    }
+
+    fun getObserveSiteLists(latLng: LatLng, zoomLevel: Float): MutableList<Pair<LatLng, String>>{
+        var obsSiteList: MutableList<Pair<LatLng, String>> = mutableListOf()
+        viewModelScope.launch {
+            val lat = latLng.latitude
+            val lng = latLng.longitude
+
+            val radius = calcZoom.getScreenDiameter(zoomLevel)
+            val response = NetworkModule.provideRetrofitInstanceObserveSearch().getObserveSearch(
+                lat.toFloat() - 1.5f * radius,
+                lat.toFloat() + 1.5f * radius,
+                lng.toFloat() - 1.5f * radius,
+                lng.toFloat() + 1.5f * radius)
+            response.data.forEach{
+                val new_latLng = LatLng(it.latitude.toDouble(), it.longitude.toDouble())
+                obsSiteList.add(Pair(new_latLng, getFullAddress(new_latLng)))
+            }
+        }
+        return obsSiteList
     }
 }

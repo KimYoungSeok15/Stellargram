@@ -127,5 +127,16 @@ object NetworkModule {
             .build()
             .create(ApiServiceForObserveSite::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceObserveSearch(): ApiServiceForObserveSearch {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForObserveSearch::class.java)
+    }
 }
 
