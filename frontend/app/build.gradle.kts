@@ -191,6 +191,9 @@ dependencies {
 
     // unixTimestamp 포매팅 라이브러리
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
+
+    // Dependency implementation for sensor with compose
+    implementation("dev.ricknout.composesensors:composesensors:0.2.0")
 }
 
 // Dependency injection with Hilt
