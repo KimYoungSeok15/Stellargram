@@ -19,8 +19,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,26 +39,31 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.ui.Screen
+
 
 @Composable
 fun CameraScreen(navController: NavController) {
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        GifImage(navController)
+        GifImage(navController, selectedImageUri) {
+                updatedUri -> selectedImageUri = updatedUri
+        }
     }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun GifImage(navController: NavController) {
+fun GifImage(navController: NavController, selectedImageUri: Uri?, onImageSelected: (Uri) -> Unit) {
     val context = LocalContext.current
-    val galleryLauncher = rememberLauncherForGallery {
+    val galleryLauncher = rememberLauncherForGallery(selectedImageUri) {
         Log.d("SelectedImage", it.toString())
+        onImageSelected(it)
     }
-
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -101,7 +111,7 @@ fun GifImage(navController: NavController) {
                             context,
                             android.Manifest.permission.READ_EXTERNAL_STORAGE
                         )
-                        != androidx.core.content.ContextCompat.checkSelfPermission(
+                        != ContextCompat.checkSelfPermission(
                             context,
                             android.Manifest.permission.READ_EXTERNAL_STORAGE
                         )
@@ -121,26 +131,53 @@ fun GifImage(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                GlideImage(
-                    model = R.drawable.icon_gallery,
-                    contentDescription = "그림 애니메이션 아이콘",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(200.dp)
-                )
-                Text(
-                    text = "불러오기",
-                    fontSize = 24.sp,
-                    color = Color.Black,
-                )
+                if(selectedImageUri == null) {
+                    GlideImage(
+                        model = R.drawable.icon_gallery,
+                        contentDescription = "그림 애니메이션 아이콘",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(200.dp)
+                    )
+                    Text(
+                        text = "불러오기",
+                        fontSize = 24.sp,
+                        color = Color.Black,
+                    )
+                } else {
+                    DisplaySelectedimage(selectedImageUri!!)
+                    Button(
+                        onClick = {
+                            navController.navigate(Screen.Camera.route)
+                        }
+                    ) {
+                        Text(text = "저장하기")
+                    }
+                }
+
             }
         }
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun rememberLauncherForGallery(onResult: (Uri) -> Unit): ManagedActivityResultLauncher<String, Uri?> {
+fun DisplaySelectedimage(selectedImageUri: Uri) {
+    GlideImage(
+        model = selectedImageUri,
+        contentDescription = "Selected Image",
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color.Gray)
+    )
+}
+
+@Composable
+fun rememberLauncherForGallery(selectedImageUri: Uri?, onResult: (Uri) -> Unit): ManagedActivityResultLauncher<String, Uri?> {
     return rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { onResult(it) }
+        uri?.let {
+            onResult(it)
+        }
     }
 }
 
