@@ -117,5 +117,15 @@ object NetworkModule {
             .create(ApiServiceForChat::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceObserveSite(): ApiServiceForObserveSite {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForObserveSite::class.java)
+    }
 }
 

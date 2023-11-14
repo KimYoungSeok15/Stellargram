@@ -5,7 +5,6 @@ import android.location.Geocoder
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +15,8 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.ssafy.stellargram.data.remote.NetworkModule
+import com.ssafy.stellargram.model.ObserveSiteRequest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -141,5 +142,12 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
             ans = temp?.get(0)?.getAddressLine(0).toString()
         }
         return ans
+    }
+
+    fun postObserveSite(latLng: LatLng){
+        viewModelScope.launch {
+            val request = ObserveSiteRequest(latLng.latitude, latLng.latitude, "")
+            val response = NetworkModule.provideRetrofitInstanceObserveSite().postObserveSite(request)
+        }
     }
 }

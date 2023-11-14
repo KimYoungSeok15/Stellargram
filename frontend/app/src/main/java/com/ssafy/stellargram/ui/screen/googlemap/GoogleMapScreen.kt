@@ -65,8 +65,8 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
-import com.ssafy.stellargram.R
 import com.ssafy.stellargram.BuildConfig
+import com.ssafy.stellargram.R
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -206,7 +206,13 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             cameraPositionState = cameraPositionState,
             modifier = Modifier.fillMaxSize(),
             onMapLongClick = { latLng ->
-                markerList.add(Pair(latLng,viewModel.getFullAddress(latLng))) },
+                    try{
+                        viewModel.postObserveSite(latLng)
+                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
+                    } catch(e: Exception) {
+                        Log.d("error", e.message?:"")
+                    }
+                             },
             content = {
                 markerList.forEach {
                     CustomMarker(latlng = it.first, title = it.second, bitmap = bitmap)

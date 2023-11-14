@@ -2,21 +2,23 @@ package com.ssafy.stellargram.data.remote
 
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
-import com.ssafy.stellargram.model.MessageListResponse
-import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
 import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
+import com.ssafy.stellargram.model.MessageListResponse
+import com.ssafy.stellargram.model.ObserveSiteRequest
+import com.ssafy.stellargram.model.ObserveSiteResponse
+import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Path
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -72,3 +74,11 @@ interface ApiServiceForChat {
     ): CursorResponse
 }
 
+interface ApiServiceForObserveSite{
+
+    //관측지 post
+    @POST("observe-site/")
+    suspend fun postObserveSite(
+        @Body observeSiteRequest: ObserveSiteRequest
+    ): ObserveSiteResponse
+}
