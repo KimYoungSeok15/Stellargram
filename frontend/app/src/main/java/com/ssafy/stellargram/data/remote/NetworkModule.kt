@@ -85,7 +85,7 @@ object NetworkModule {
         }
     }
 
-    // 날씨 정보 불러오는 API 규정
+    // 날씨 정보 불러오는 retrofit
     @Singleton
     @Provides
     fun provideRetrofitInstanceWeather(
@@ -98,17 +98,8 @@ object NetworkModule {
             .build()
             .create(ApiServiceForWeather::class.java)
     }
-    @Singleton
-    @Provides
-    fun provideRetrofitInstanceAstronomicalEvents(): ApiServiceForAstronomicalEvents {
-        return Retrofit.Builder()
-            .baseUrl("http://apis.data.go.kr/")
-            .client(provideHttpClient())
-            .addConverterFactory(provideConverterFactory())
-            .build()
-            .create(ApiServiceForAstronomicalEvents::class.java)
-    }
 
+    // 천문현상 가져오는 retrofit
     object RetrofitClient {
         private var instance: Retrofit? = null
 
@@ -127,6 +118,19 @@ object NetworkModule {
             }
             return instance!!
         }
+    }
+
+    @Singleton
+    @Provides
+    fun RetrofitGetMemberInfo(
+    ): ApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            //json 변화기 Factory
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiService::class.java)
     }
 
     @Singleton

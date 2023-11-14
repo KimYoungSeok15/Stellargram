@@ -138,7 +138,7 @@ fun BaseFrame(
                             selected = navController.currentDestination?.route == it.route,
                             onClick = {
                                 if (it == Screen.MyPage) {
-                                    navController.navigate("${Screen.StarDetail.route}/$memberID")
+                                    navController.navigate("${Screen.MyPage.route}/$memberID")
                                 } else {
                                     navController.navigate(it.route)
                                 }

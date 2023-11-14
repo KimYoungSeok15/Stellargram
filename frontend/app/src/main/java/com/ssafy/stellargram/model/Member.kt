@@ -55,13 +55,17 @@ data class MemberSignUpResponse(
 data class MemberResponse(
     val code: String,
     val message: String,
-    val data: MembersData
+    val data: MemberData
 )
 
-data class MembersData(
-    val members: MutableList<Member>
+data class MemberData(
+    val memberId: Long,
+    val nickname: String,
+    val profileImageUrl: String,
+    val followCount: Int,
+    val followingCount: Int,
+    val cardCount: Int
 )
-
 data class Member(
     val memberId: Long,
     val nickname: String,

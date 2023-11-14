@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.DraggableState
@@ -48,15 +49,20 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.Member
+import com.ssafy.stellargram.model.MemberMeResponse
+import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.Star
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -85,7 +91,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
     }
 
     // API 호출을 트리거하고 결과를 업데이트하는 함수
-    fun getMemberInfo(text: String) {
+    fun getMemberInfo(text: Long) {
         viewModelScope.launch {
             _memberResults.value = fetchMemberInfoInternal(text)
         }
@@ -98,28 +104,51 @@ class MypageViewModel @Inject constructor() : ViewModel() {
 
 
     // 실제 API 호출이 이루어지는 함수
-    private suspend fun fetchMemberInfoInternal(text: String): List<Member> {
+    private suspend fun fetchMemberInfoInternal(id: Long): List<Member> {
         return withContext(Dispatchers.IO) {
-            // 여기에 실제 API 호출을 하고 결과를 반환하세요.
-            getMemberInfoFromApi(text)
+            getMemberInfoFromApi(id)
         }
     }
 
-    // 실제 API 호출을 대체하는 함수 (더미 데이터 형태로 구현)
-    private fun getMemberInfoFromApi(text: String): List<Member> {
-        // 실제 API 로직으로 대체
-        return listOf(
-            Member(
-                memberId = 2,
-                nickname = "Karina",
-                profileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                isFollow = true,
-                followCount = 123,
-                followingCount = 321,
-                cardCount = 2
-            )
-        )
+    private suspend fun getMemberInfoFromApi(id:Long): List<Member> {
+        return try {
+            // Retrofit을 사용하여 멤버 정보를 요청
+            val response = NetworkModule.provideRetrofitInstance().getMember(userId = id)
+
+            // API 응답 로그 출력
+            Log.d("마이페이지", response.toString())
+
+            if (response.isSuccessful) {
+                // 응답이 성공적으로 받아진 경우
+                val memberResponse = response.body()
+
+                memberResponse?.data?.let { data ->
+                    val member = Member(
+                        memberId = data.memberId,
+                        nickname = data.nickname,
+                        profileImageUrl = data.profileImageUrl,
+                        followCount = data.followCount,
+                        followingCount = data.followingCount,
+                        cardCount = data.cardCount,
+                        isFollow = true
+                    )
+                    // 위에서 생성한 Member 객체를 리스트에 추가
+                    return listOf(member)
+                } ?: emptyList() // data가 null인 경우 빈 리스트 반환
+            } else {
+                // 응답이 실패한 경우
+                Log.e("마이페이지", "API 호출 실패: ${response.code()} - ${response.message()}")
+                // TODO: 실패에 대한 적절한 처리를 수행해야 합니다. 예를 들어, 사용자에게 알림을 보여주거나 기본값을 반환할 수 있습니다.
+                emptyList()
+            }
+        } catch (e: Exception) {
+            // API 호출 중 예외 발생 시 로그 출력
+            Log.e("마이페이지", "API 호출 중 예외 발생: ${e.message}")
+            // TODO: 예외에 대한 적절한 처리를 수행해야 합니다. 예를 들어, 네트워크 에러인 경우 사용자에게 알림을 보여주거나 기본값을 반환할 수 있습니다.
+            emptyList()
+        }
     }
+
     var myCards = mutableStateOf<List<Card>>(emptyList())
     var favStars = mutableStateOf<List<Star>>(emptyList())
     var likeCards = mutableStateOf<List<Card>>(emptyList())
