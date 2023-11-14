@@ -171,9 +171,6 @@ fun HomeScreen(navController: NavController) {
                         filteredItems = items.filter { it.category in targetCategories }
                     }
 
-                        // targetCategories에 속하는 카테고리만 필터링
-                        val filteredItems = items.filter { it.category in targetCategories }
-
                         // 각 카테고리별 첫 번째 아이템 가져오기
                         val firstItems =
                             filteredItems.groupBy { it.category }.mapValues { it.value.first() }
