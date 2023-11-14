@@ -3,8 +3,6 @@ package com.ssafy.stellargram.ui.screen.home
 import android.content.Context
 import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
-import android.location.Address
-import android.location.Geocoder
 import android.location.LocationManager
 import android.location.LocationListener
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,16 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import kotlin.math.floor
-import kotlin.math.ln
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.cos
-import kotlin.math.tan
-import kotlin.math.sqrt
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.atan
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ssafy.stellargram.data.remote.NetworkModule
@@ -37,6 +25,7 @@ import com.ssafy.stellargram.model.WeatherResponse
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,13 +49,9 @@ import kotlinx.coroutines.launch
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.data.remote.ApiServiceForAstronomicalEvents
 import com.ssafy.stellargram.model.AstronomicalEventResponse
-import com.ssafy.stellargram.model.Response
-import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -76,6 +61,8 @@ fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     var combinedEvents by remember { mutableStateOf("") }  // 이벤트 띄워주는 문구
+    var isLocationUpdateComplete by remember { mutableStateOf(false) } // 위치정보를 불러왔을때만 API요청을 보내도록
+    var refreshClickCount by remember { mutableStateOf(0) }  // 기상청 api 새로고침 할 때 쓰는 변수
 
     // 현재 시간을 가져옴
     val currentTime = Date()
@@ -85,7 +72,6 @@ fun HomeScreen(navController: NavController) {
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
     val currentYear = SimpleDateFormat("yyyy", Locale.getDefault()).format(currentTime)
     val currentMonth = SimpleDateFormat("MM", Locale.getDefault()).format(currentTime)
-
     val timeString = if (hour < 12) {
         "오전 $hour:${String.format("%02d", minute)}"
     } else if (hour == 12) {
@@ -99,21 +85,21 @@ fun HomeScreen(navController: NavController) {
         calendar.add(Calendar.MINUTE, -31)
     }
 
-
     // baseDate를 yyyyMMdd 형식으로 설정
     val baseDate = SimpleDateFormat("yyyyMMdd").format(calendar.time)
 
     // baseTime을 hhmm 형식으로 설정
     val baseTime = SimpleDateFormat("HHmm").format(calendar.time)
     var coordinatesXy: CoordinatesXy? by remember { mutableStateOf(null) }
-
+    Log.d("Location1","날짜가져옴, 위치 가져오기전")
     // 현재 위경도를 받아오고, 변환 함수에 넣어 nx, ny를 coordinatesXy에 저장
     val locationListener = LocationListener { location ->
+        Log.d("Location1","위치정보 받아오기 시도시작")
         val latitude = location.latitude
         val longitude = location.longitude
         val currentAddress = getAddressFromLocation(context, latitude, longitude)
         address = currentAddress // address 변수 업데이트
-        Log.d("Location1", "Latitude: $latitude, Longitude: $longitude")
+        Log.d("Location1", "위치정보 받기완료 Latitude: $latitude, Longitude: $longitude")
 
         val converter = CoordinateConverter()
         val coordinates = converter.convertToXy(latitude, longitude)
@@ -137,86 +123,98 @@ fun HomeScreen(navController: NavController) {
         // 위치 권한이 허용되지 않은 경우
         // 사용자에게 위치 권한을 요청할 수 있음 ( 추후 구현 )
     }
-    // API 호출 및 데이터 가져오기
+
+    // 현재 위치 업데이트가 완료되면 isLocationUpdateComplete 값을 true로 설정
+    // -> 이렇게하면 위치정보를 받아온 최초 1회만 API 요청을 보낸다. (refresh 버튼 클릭할 경우에는 제외)
     LaunchedEffect(key1 = coordinatesXy) {
-        coordinatesXy?.let { coordinates ->
-            Log.d("Location1", "날짜: $baseDate 시간: $baseTime")
-            Log.d("weather response", "기상청API 요청 시작 전")
-            CoroutineScope(Dispatchers.IO).launch {
-                val response = NetworkModule.provideRetrofitInstanceWeather().getWeatherData(
-                    serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
-                    pageNo = 1,
-                    numOfRows = 1000,
-                    dataType = "JSON",
-                    baseDate = baseDate,
-                    baseTime = baseTime,
-                    nx = coordinates.nx, // 사용자의 위치에 따라서 coordinatesXy의 값 사용
-                    ny = coordinates.ny
-                ).execute()
-                Log.d("weather response", response.toString())
-                if (response.isSuccessful) {
-                    val weatherResponse: WeatherResponse? = response.body()
-                    // 파싱
-                    val gson = Gson()
-                    val itemType = object : TypeToken<List<WeatherItem>>() {}.type
-                    Log.d("weather response", "Gson 시작전")
-                    val items = gson.fromJson<List<WeatherItem>>(
-                        gson.toJson(weatherResponse?.response?.body?.items?.item),
-                        itemType
-                    )
-                    Log.d("weather response", "Gson 시작후")
-                    // 필터링할 카테고리 목록
-                    val targetCategories = setOf("T1H", "SKY", "PTY")
+        coordinatesXy?.let {
+            isLocationUpdateComplete = true
+        }
+    }
 
-                    // targetCategories에 속하는 카테고리만 필터링
-                    val filteredItems = items.filter { it.category in targetCategories }
-
-                    // 각 카테고리별 첫 번째 아이템 가져오기
-                    val firstItems =
-                        filteredItems.groupBy { it.category }.mapValues { it.value.first() }
-
-                    // firstItems에는 각 카테고리별 첫 번째 아이템이 들어가게 됩니다.
-                    weatherData = firstItems.values.toList()
-                    Log.d("Location1", weatherData[0].toString())
-                    Log.d("Location1", weatherData[1].toString())
-                    Log.d("Location1", weatherData[2].toString())
-                }
-                Log.d("이벤트","시작")
-                val apiService = NetworkModule.RetrofitClient.getInstance().create(ApiServiceForAstronomicalEvents::class.java)
-                val astronomicalEventsResponse: AstronomicalEventResponse? = try {
-                    val response = apiService.getAstronomicalEvents(
-                        solYear = currentYear,
-                        solMonth = currentMonth,
+    // API 호출 및 데이터 가져오기
+    LaunchedEffect(key1 = refreshClickCount, key2 = isLocationUpdateComplete) {
+        if (isLocationUpdateComplete) {
+            coordinatesXy?.let { coordinates ->
+                Log.d("Location1", "날짜: $baseDate 시간: $baseTime")
+                Log.d("weather response", "기상청API 요청 시작 전")
+                CoroutineScope(Dispatchers.IO).launch {
+                    val response = NetworkModule.provideRetrofitInstanceWeather().getWeatherData(
                         serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
-                        numOfRows = 100
-                    )
-                    val responseBody = response.body()
-                    responseBody
-                } catch (e: Exception) {
-                    Log.d("이벤트","$e")
-                    combinedEvents = "천문 이벤트 없음" // 정보 받아오기 실패시
-                    null
-                }
+                        pageNo = 1,
+                        numOfRows = 1000,
+                        dataType = "JSON",
+                        baseDate = baseDate,
+                        baseTime = baseTime,
+                        nx = coordinates.nx, // 사용자의 위치에 따라서 coordinatesXy의 값 사용
+                        ny = coordinates.ny
+                    ).execute()
+                    Log.d("weather response", response.toString())
+                    if (response.isSuccessful) {
+                        val weatherResponse: WeatherResponse? = response.body()
+                        // 파싱
+                        val gson = Gson()
+                        val itemType = object : TypeToken<List<WeatherItem>>() {}.type
+                        Log.d("weather response", "Gson 시작전")
+                        val items = gson.fromJson<List<WeatherItem>>(
+                            gson.toJson(weatherResponse?.response?.body?.items?.item),
+                            itemType
+                        )
+                        Log.d("weather response", "Gson 시작후")
+                        // 필터링할 카테고리 목록
+                        val targetCategories = setOf("T1H", "SKY", "PTY")
 
-                astronomicalEventsResponse?.let {
-                    combinedEvents = buildString {
-                        it.body?.items?.item?.forEachIndexed { index, item ->
-                            // 각 아이템에서 원하는 정보를 추출합니다
-                            val locdateSubstring = item.locdate?.substring(2) // 3번째 글자부터 시작
-                            val astroTime = item.astroTime
-                            val astroEvent =
-                                if (item.astroTitle!!.isNotBlank()) item.astroTitle else item.astroEvent
+                        // targetCategories에 속하는 카테고리만 필터링
+                        val filteredItems = items.filter { it.category in targetCategories }
 
-                            // 정보를 하나의 문자열로 결합합니다
-                            append("$locdateSubstring $astroTime $astroEvent")
+                        // 각 카테고리별 첫 번째 아이템 가져오기
+                        val firstItems =
+                            filteredItems.groupBy { it.category }.mapValues { it.value.first() }
 
-                            // 이벤트 사이에 구분자를 추가합니다 (마지막 이벤트 제외)
-                            if (index < it.body.items.item.size - 1) {
-                                append(" / ")
+                        // firstItems에는 각 카테고리별 첫 번째 아이템이 들어가게 됩니다.
+                        weatherData = firstItems.values.toList()
+                        Log.d("Location1", weatherData[0].toString())
+                        Log.d("Location1", weatherData[1].toString())
+                        Log.d("Location1", weatherData[2].toString())
+                    }
+                    Log.d("이벤트", "시작")
+                    val apiService = NetworkModule.RetrofitClient.getInstance()
+                        .create(ApiServiceForAstronomicalEvents::class.java)
+                    val astronomicalEventsResponse: AstronomicalEventResponse? = try {
+                        val response = apiService.getAstronomicalEvents(
+                            solYear = currentYear,
+                            solMonth = currentMonth,
+                            serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
+                            numOfRows = 100
+                        )
+                        val responseBody = response.body()
+                        responseBody
+                    } catch (e: Exception) {
+                        Log.d("이벤트", "$e")
+                        combinedEvents = "천문 이벤트 없음" // 정보 받아오기 실패시
+                        null
+                    }
+
+                    astronomicalEventsResponse?.let {
+                        combinedEvents = buildString {
+                            it.body?.items?.item?.forEachIndexed { index, item ->
+                                // 각 아이템에서 원하는 정보를 추출합니다
+                                val locdateSubstring = item.locdate?.substring(2) // 3번째 글자부터 시작
+                                val astroTime = item.astroTime
+                                val astroEvent =
+                                    if (item.astroTitle!!.isNotBlank()) item.astroTitle else item.astroEvent
+
+                                // 정보를 하나의 문자열로 결합합니다
+                                append("$locdateSubstring $astroTime $astroEvent")
+
+                                // 이벤트 사이에 구분자를 추가합니다 (마지막 이벤트 제외)
+                                if (index < it.body.items.item.size - 1) {
+                                    append(" / ")
+                                }
                             }
                         }
+                        Log.d("이벤트", "조합된 이벤트: $combinedEvents")
                     }
-                    Log.d("이벤트", "조합된 이벤트: $combinedEvents")
                 }
             }
         }
@@ -315,6 +313,9 @@ fun HomeScreen(navController: NavController) {
                                 modifier = Modifier
                                     .padding(4.dp, 7.dp, 0.dp, 0.dp)
                                     .size(16.dp)
+                                    .clickable {
+                                        refreshClickCount++
+                                    }
                             )
                         }
                     }
