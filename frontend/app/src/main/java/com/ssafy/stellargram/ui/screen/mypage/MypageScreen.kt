@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.util.Log
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoViewModel
@@ -51,11 +54,18 @@ import java.io.File
 @Composable
 fun MypageScreen(navController: NavController) {
     val viewModel: MypageViewModel = viewModel()
+    val tabIndex by viewModel.tabIndex.observeAsState()
+
+    var cards by remember { mutableStateOf(viewModel.myCards) }
+    var favStars by remember { mutableStateOf(viewModel.favStars) }
+    var likeCards by remember { mutableStateOf(viewModel.likeCards) }
 
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
         viewModel.getMemberInfo("someText")
+        getResults(viewModel = viewModel)
     }
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -124,13 +134,12 @@ fun MypageScreen(navController: NavController) {
                 }
             }
             // TabLayout 함수를 호출하여 탭을 렌더링
-            TabLayout(viewModel = viewModel, dragState = remember { mutableStateOf(DraggableState { }) }) { tabIndex, dragState ->
+            TabLayout(viewModel = viewModel)
                 when (tabIndex) {
-                    0 -> ArticleScreen(viewModel, dragState, navController)
-                    1 -> AccountScreen(viewModel, dragState, navController)
-                    2 -> StarScreen(viewModel, dragState, navController)
+                    0 -> MyCardsScreen(viewModel, cards, navController)
+                    1 -> FavStarsScreen(viewModel, favStars, navController)
+                    2 -> LikeCardsScreen(viewModel, likeCards, navController)
                 }
-            }
         }
     }
 }

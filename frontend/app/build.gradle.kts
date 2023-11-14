@@ -21,8 +21,8 @@ android {
         applicationId = "com.ssafy.stellargram"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2_6
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         kapt {
@@ -32,6 +32,11 @@ android {
         }
         vectorDrawables {
             useSupportLibrary = true
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags += "-std=c++17"
+            }
         }
         buildConfigField("String", "MAPS_API_KEY", getApiKey("MAPS_API_KEY"))
     }
@@ -51,6 +56,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
     buildFeatures {
         compose = true
@@ -183,6 +194,15 @@ dependencies {
 
     // rating 컴포넌트 라이브러리
     implementation ("com.github.a914-gowtham:compose-ratingbar:1.3.4")
+
+    // XML Parser - https://bb-library.tistory.com/177
+    implementation("com.tickaroo.tikxml:annotation:0.8.13")
+    implementation("com.tickaroo.tikxml:core:0.8.13")
+    implementation("com.tickaroo.tikxml:retrofit-converter:0.8.13")
+    kapt("com.tickaroo.tikxml:processor:0.8.13")
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.3.0")
+
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 
 }
 

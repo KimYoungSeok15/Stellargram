@@ -11,7 +11,6 @@ import dagger.hilt.components.SingletonComponent
 object DBModule {
     var starArray: Array<DoubleArray> = arrayOf()
     var nameMap: HashMap<Int, String> = hashMapOf()
-    var constellation: Array<DoubleArray> = arrayOf()
     var starInfo: HashMap<Int, Int> = hashMapOf()
     var starMap: HashMap<Int, Star> = hashMapOf()
     var stars: MutableList<Star> = mutableListOf()
@@ -25,10 +24,6 @@ object DBModule {
         Log.d("check", "${starArray.size}")
     }
 
-    fun settingConstellation(_constellation: Array<DoubleArray>) {
-        constellation = _constellation
-    }
-
     fun gettingStarArray(): Array<DoubleArray> {
         return starArray
     }
@@ -39,10 +34,6 @@ object DBModule {
 
     fun gettingStarInfo(): HashMap<Int, Int> {
         return starInfo
-    }
-
-    fun gettingConstellation(): Array<DoubleArray> {
-        return constellation
     }
 
     fun gettingStarMap(): HashMap<Int, Star> {

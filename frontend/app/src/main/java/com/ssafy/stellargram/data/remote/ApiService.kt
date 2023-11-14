@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.data.remote
 
+import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.MessageListResponse
@@ -7,6 +8,7 @@ import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
 import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.SiteInfoResponse
@@ -29,6 +31,10 @@ interface ApiService {
 
      @POST("member/signup")
      suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
+
+     @GET("member/me")
+     suspend fun getMemberMe() : Response<MemberMeResponse>
+
 }
 
 interface ApiServiceForWeather{
@@ -43,6 +49,15 @@ interface ApiServiceForWeather{
         @Query("nx") nx: Int,
         @Query("ny") ny: Int
     ): Call<WeatherResponse>
+}
+interface ApiServiceForAstronomicalEvents {
+    @GET("B090041/openapi/service/AstroEventInfoService/getAstroEventInfo")
+    suspend fun getAstronomicalEvents(
+        @Query("solYear") solYear: String,
+        @Query("solMonth") solMonth: String,
+        @Query("ServiceKey") serviceKey: String,
+        @Query("numOfRows") numOfRows: Int
+    ): Response<AstronomicalEventResponse>
 }
 
 interface ApiServiceForCards {
