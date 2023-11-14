@@ -30,7 +30,7 @@ fun ScreenContainer(
     // css. 스크린 컨테이너 modifier
     val screenModifier: Modifier = Modifier
         .fillMaxSize()
-        .padding(horizontal = 30.dp)
+        .padding(horizontal = 20.dp)
 
     // css. 흰 박스 modifier
     val whiteRoundModifier: Modifier = Modifier

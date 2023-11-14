@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,20 +41,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.model.ChatRoom
+import com.ssafy.stellargram.model.Constant
 import com.ssafy.stellargram.model.MessageInfo
 import com.ssafy.stellargram.ui.screen.search.getSearchResults
 import com.ssafy.stellargram.ui.theme.PurpleGrey40
 import kotlinx.coroutines.launch
-
-// 상수
-const val inputBoxCornerSize = 10
 
 @Preview(showBackground = true)
 @Composable
@@ -90,7 +91,7 @@ fun ChatRoomScreen(
 
     // 메세지 viewModel에서 가져오는 곳
     var messageList: List<MessageInfo> by remember { mutableStateOf<List<MessageInfo>>(viewModel.messages) }
-    
+
 
     // 스크린 컨테이너
     ScreenContainer(customChild = {
@@ -160,8 +161,9 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
                 }
             },
             singleLine = false,
-            maxLines = 4
-        )
+            maxLines = 4,
+            textStyle = TextStyle(fontSize = Constant.middleText.sp, color = Color.Black),
+            )
         Spacer(modifier = Modifier.height(10.dp))
         // 전송 버튼
         Button(
