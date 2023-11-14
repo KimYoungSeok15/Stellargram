@@ -86,7 +86,7 @@ class Orientation(activity: Activity) : SensorEventListener {
         // Convert radians to degrees
         val pitch = orientation[1] * -57
         val roll = orientation[2] * -57 // landscape <-> portrait
-        val yaw = orientation[0] * -57 // 0=North, 90=East, 180=South, 270=West
+        val yaw = orientation[0] * -57 // 0=North, 90=West, 180=South, 270=East
 
         mListener?.onOrientationChanged(pitch, roll, yaw)
     }
