@@ -191,7 +191,8 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             val cameraPosition = cameraPositionState.position.target
             viewModel.getAddress(cameraPosition)
             try{
-                markerList = viewModel.getObserveSiteLists(viewModel.currentLatLong, cameraPositionState.position.zoom)
+                Log.d("content", "get inside")
+                markerList = viewModel.getObserveSiteLists(cameraPositionState.position.zoom)
             } catch(e: Exception){
                 Log.d("error", "Cannot get observe site lists.")
             }
