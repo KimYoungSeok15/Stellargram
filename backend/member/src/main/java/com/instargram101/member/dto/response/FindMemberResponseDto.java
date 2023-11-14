@@ -19,10 +19,15 @@ public class FindMemberResponseDto {
     private String profileImageUrl;
     @NotBlank
     private Boolean isFollow;
+    @Builder.Default
     @NotBlank
-    private Long followCount;
+    private Long followCount = 0L;
+    @Builder.Default
     @NotBlank
-    private Long followingCount;
+    private Long followingCount = 0L;
+    @Builder.Default
     @NotBlank
-    private Long cardCount;
+    private Long cardCount = 0L;
+
+
 }
