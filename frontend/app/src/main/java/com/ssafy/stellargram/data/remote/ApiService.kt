@@ -1,10 +1,17 @@
 package com.ssafy.stellargram.data.remote
 
+import com.google.gson.annotations.SerializedName
+import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
+import com.ssafy.stellargram.model.FollowCancelResponse
+import com.ssafy.stellargram.model.MessageListResponse
+import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
 import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.MemberMeResponse
+import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.MessageListResponse
@@ -12,17 +19,22 @@ import com.ssafy.stellargram.model.ObserveSiteListResponse
 import com.ssafy.stellargram.model.ObserveSiteRequest
 import com.ssafy.stellargram.model.ObserveSiteResponse
 import com.ssafy.stellargram.model.RoomListResponse
+import com.ssafy.stellargram.model.SiteInfoResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
+import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
+
      @GET("member/check")
      suspend fun getMemberCheck(): Response<MemberCheckResponse>
 
@@ -31,6 +43,67 @@ interface ApiService {
 
      @POST("member/signup")
      suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
+
+     // 특정회원 정보조회 (본인도 대상으로 가능)
+     @GET("member/others/{userId}")
+     suspend fun getMember(
+         @Path("userId") userId: Long
+     ) : Response<MemberResponse>
+
+    // 내 정보 조회
+    @GET("member/me")
+    suspend fun getMemberMe() : Response<MemberMeResponse>
+
+    // 닉네임 수정
+    @PATCH("member/nickname")
+    suspend fun patchNickName(@Body nickname: String): Response<MemberMeResponse>
+
+    // 프로필 이미지 수정 TODO: 파일 어떻게 넣는지 알아보기
+    @PATCH("member/profile-image")
+    suspend fun patchProfileImage(@Body profileImageFile: String): Response<MemberMeResponse>
+
+    // 회원 탈퇴 -> 추후 구현 예정
+    @PATCH("member/withdrawal")
+    suspend fun withdrawal(@Body nickname: String): Response<MemberMeResponse>
+
+    // 특정 사용자 팔로우 API
+    @GET("follow/{followingId}")
+    suspend fun followUser(
+        @Path("followingId") followingId: Long
+    ): Response<MemberCheckResponse>
+
+    // 특정 사용자 팔로우 취소 API
+    @DELETE("follow/{followingId}")
+    suspend fun unfollowUser(
+        @Path("followingId") followingId: Long
+    ): Response<FollowCancelResponse>
+
+
+}
+data class NickNameUpdateRequest(
+    @SerializedName("nickname") val nickname: String
+)
+
+interface ApiServiceForCards {
+    // 내 카드 전체 조회
+    @GET("/starcard/{memberId}")
+    suspend fun getCards(
+        @Path("memberId") memberId: Long
+    ): Response<CardsResponse>
+
+    // 내가 좋아하는 카드 전체 조회
+    @GET("/starcard/{memberId}")
+    suspend fun getLikeCards(
+        @Path("memberId") memberId: Long
+    ): Response<CardsResponse>
+
+    // 키워드로 카드 검색
+    @GET("starcard/search")
+    suspend fun searchStarCards(
+        @Query("keyword") keyword: String,
+        @Query("category") category: String = "galaxy"
+    ): Response<CardsResponse>
+
 }
 
 interface ApiServiceForWeather{
@@ -46,11 +119,16 @@ interface ApiServiceForWeather{
         @Query("ny") ny: Int
     ): Call<WeatherResponse>
 }
-
-interface ApiServiceForCards {
-    @GET("/starcard")
-    suspend fun getCards(): CardsResponse
+interface ApiServiceForAstronomicalEvents {
+    @GET("B090041/openapi/service/AstroEventInfoService/getAstroEventInfo")
+    suspend fun getAstronomicalEvents(
+        @Query("solYear") solYear: String,
+        @Query("solMonth") solMonth: String,
+        @Query("ServiceKey") serviceKey: String,
+        @Query("numOfRows") numOfRows: Int
+    ): Response<AstronomicalEventResponse>
 }
+
 
 // 채팅 관련
 interface ApiServiceForChat {
@@ -92,4 +170,17 @@ interface ApiServiceForObserveSearch{
         @Query("startY") startY: Float,
         @Query("endY") endY: Float
     ): ObserveSiteListResponse
+}
+
+// 관측포인트 관련
+interface ApiServiceForSite {
+
+    // 관측포인트 상세 조회
+    @GET("observe-site/latitude/{latitude}/longitude/{longitude}")
+    suspend fun getSiteInfo(
+//        @Header("myId") myId: Long,
+        @Path("latitude") latitude: Double,
+        @Path("longitude") longitude: Double,
+    ): SiteInfoResponse
+
 }

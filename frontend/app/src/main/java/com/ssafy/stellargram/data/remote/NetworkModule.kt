@@ -3,17 +3,22 @@ package com.ssafy.stellargram.data.remote
 import android.util.Log
 import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.StellargramApplication.Companion.INSTARGRAM_APP_URI
+import com.tickaroo.tikxml.TikXml
+import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.nio.Buffer
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -43,6 +48,8 @@ object NetworkModule {
             .addInterceptor(getLoggingInterceptor())
             .build()
     }
+
+    // 멤버 retrofit
     @Singleton
     @Provides
     fun provideRetrofitInstance(
@@ -54,6 +61,21 @@ object NetworkModule {
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiService::class.java)
+
+    }
+
+    // 카드 retrofit
+    @Singleton
+    @Provides
+    fun ProvideRetrofitCards(
+    ): ApiServiceForCards {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            //json 변화기 Factory
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForCards::class.java)
 
     }
 
@@ -80,7 +102,7 @@ object NetworkModule {
         }
     }
 
-    // 날씨 정보 불러오는 API 규정
+    // 날씨 정보 불러오는 retrofit
     @Singleton
     @Provides
     fun provideRetrofitInstanceWeather(
@@ -92,6 +114,40 @@ object NetworkModule {
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForWeather::class.java)
+    }
+
+    // 천문현상 가져오는 retrofit
+    object RetrofitClient {
+        private var instance: Retrofit? = null
+
+        fun getInstance(): Retrofit {
+            if (instance == null) {
+                instance = Retrofit.Builder()
+                    .baseUrl("http://apis.data.go.kr/")
+                    .client(provideHttpClient())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addConverterFactory(
+                        TikXmlConverterFactory.create(
+                            TikXml.Builder().exceptionOnUnreadXml(false).build()
+                        )
+                    )
+                    .build()
+            }
+            return instance!!
+        }
+    }
+
+    @Singleton
+    @Provides
+    fun RetrofitGetMemberInfo(
+    ): ApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            //json 변화기 Factory
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiService::class.java)
     }
 
     @Singleton
@@ -111,7 +167,7 @@ object NetworkModule {
     fun provideRetrofitInstanceChat(): ApiServiceForChat {
         return Retrofit.Builder()
             .baseUrl(BASE_URL) // 기본 URL을 여기에 설정해야 합니다.
-            .client(provideHttpClient())
+            .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForChat::class.java)
@@ -139,4 +195,17 @@ object NetworkModule {
             .create(ApiServiceForObserveSearch::class.java)
     }
 }
+    // 관측소 관련 API
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceSite(): ApiServiceForSite {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClient())
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForSite::class.java)
+    }
 
+
+}
