@@ -155,7 +155,7 @@ object NetworkModule {
     fun provideRetrofitInstanceCards(): ApiServiceForCards {
         return Retrofit.Builder()
             .baseUrl(BASE_URL) // 기본 URL을 여기에 설정해야 합니다.
-            .client(provideHttpClient())
+            .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForCards::class.java)

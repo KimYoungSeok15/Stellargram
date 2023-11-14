@@ -2,6 +2,7 @@ package com.ssafy.stellargram.data.remote
 
 import com.google.gson.annotations.SerializedName
 import com.ssafy.stellargram.model.AstronomicalEventResponse
+import com.ssafy.stellargram.model.CardListResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
@@ -96,7 +97,7 @@ interface ApiServiceForCards {
     suspend fun searchStarCards(
         @Query("keyword") keyword: String,
         @Query("category") category: String = "galaxy"
-    ): Response<CardsResponse>
+    ): CardListResponse
 
 }
 
