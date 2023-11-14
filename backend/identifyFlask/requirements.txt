@@ -8,6 +8,7 @@ itsdangerous==2.1.2
 Jinja2==3.1.2
 MarkupSafe==2.1.3
 numpy==1.26.1
+opencv-python==4.8.1.78
 Pillow==10.1.0
 scipy==1.11.3
 tetra3 @ git+https://github.com/esa/tetra3.git@f98bb4f769f6054cdc1fbc023a07934700ceb70e
