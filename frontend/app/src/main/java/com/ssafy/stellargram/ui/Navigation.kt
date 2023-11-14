@@ -24,6 +24,7 @@ sealed class Screen(
     object ChatRoom : Screen("chatroom","채팅")
     object ChatRoomList : Screen("chatroomlist","채팅방목록")
     object Identify : Screen("identify", "별 인식")
+    object MakeCard : Screen("makecard","천체카드 만들기")
 }
 
 @Composable

@@ -16,6 +16,7 @@ import com.ssafy.stellargram.ui.screen.home.HomeScreen
 import com.ssafy.stellargram.ui.screen.identify.IdentifyScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
+import com.ssafy.stellargram.ui.screen.makecard.MakeCardScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
 import com.ssafy.stellargram.ui.screen.search.SearchScreen
 import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
@@ -113,6 +114,9 @@ fun NavGraph(
 //            BaseFrame(navController, screen = Screen.Identify){
                 IdentifyScreen(navController = navController)
 //            }
+        }
+        composable(route = Screen.MakeCard.route){
+            MakeCardScreen(navController = navController)
         }
     }
 }
