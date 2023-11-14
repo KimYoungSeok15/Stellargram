@@ -13,28 +13,34 @@ class SiteViewModel @Inject constructor() : ViewModel() {
     // 관측포인트 정보 초기값
     private val initLatitude: Double = 1000.0
     private val initLongitude: Double = 1000.0
-    private val initName: String = ""
-    private val initRatingSum: Int = 0
-    private val initReviewCount: Int = -1
+    private val initName: String = "관측소 이름"
+    private val initRatingSum: Int = 5
+    private val initReviewCount: Int = 2
 
     // 관측포인트 정보
-    private var latitude: Double = initLatitude
-    private var longitude: Double = initLongitude
-    private var name: String = initName
-    private var ratingSum: Int = initRatingSum
-    private var reviewCount: Int = initReviewCount
+    private var latitudePrivate: Double = initLatitude
+    private var longitudePrivate: Double = initLongitude
+    private var namePrivate: String = initName
+    private var ratingSumPrivate: Int = initRatingSum
+    private var reviewCountPrivate: Int = initReviewCount
+
+    val latitude: Double = latitudePrivate
+    val longitude: Double = longitudePrivate
+    val name: String = namePrivate
+    val ratingSum: Int = ratingSumPrivate
+    val reviewCount: Int = reviewCountPrivate
 
     // 현재 뷰모델에 관측포인트 정보 설정
     fun setSiteInfo(newInfo: SiteInfo) {
-        latitude = newInfo.latitude
-        longitude = newInfo.longitude
-        name = newInfo.name
-        ratingSum = newInfo.ratingSum
-        reviewCount = newInfo.reviewCount
+        latitudePrivate = newInfo.latitude
+        longitudePrivate = newInfo.longitude
+        namePrivate = newInfo.name
+        ratingSumPrivate = newInfo.ratingSum
+        reviewCountPrivate = newInfo.reviewCount
     }
 
     // 관측포인트 정보 가져오기
-    suspend fun getSiteInfo() {
+    suspend fun getSiteInfo(latitude: Double, longitude: Double) {
         if (latitude != initLatitude && longitude != longitude) {
             val response =
                 NetworkModule.provideRetrofitInstanceSite().getSiteInfo(latitude, longitude)
@@ -43,4 +49,6 @@ class SiteViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
+
 }

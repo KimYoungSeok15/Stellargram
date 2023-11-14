@@ -1,10 +1,12 @@
 package com.ssafy.stellargram.ui.screen.chat
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -87,49 +90,39 @@ fun ChatRoomScreen(
 
     // 메세지 viewModel에서 가져오는 곳
     var messageList: List<MessageInfo> by remember { mutableStateOf<List<MessageInfo>>(viewModel.messages) }
+    
 
-    // css. 스크린 컨테이너 modifier
-    val screenModifier: Modifier = Modifier.fillMaxSize()
-
-    // 스크린 전체
-    Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceAround) {
-
-
-        // 스크롤 상태 기억
-        val scrollState = rememberScrollState()
-
-
-        // 채팅 전체 컨테이너
-        Column {
-            // 메세지들 컨테이너
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(messageList) { message ->
-                    ChatBox(
-                        isMine = (message.memberId == TestValue.myId),
-                        imgUrl = message.memberImagePath,
-                        nickname = message.memberNickName,
-                        content = message.content,
-                        unixTimestamp = message.time
-                    )
-                }
+    // 스크린 컨테이너
+    ScreenContainer(customChild = {
+        // 메세지들
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(messageList) { message ->
+                ChatBox(
+                    isMine = (message.memberId == TestValue.myId),
+                    imgUrl = message.memberImagePath,
+                    nickname = message.memberNickName,
+                    content = message.content,
+                    unixTimestamp = message.time
+                )
             }
-            MessageInput(viewModel = viewModel, roomId = roomId)
         }
 
+        // 입력 박스
+        MessageInput(viewModel = viewModel, roomId = roomId)
 
-        // TODO: 테스트용. 나중에 지울 것
+    })
+//        // 스크롤 상태 기억
+//        val scrollState = rememberScrollState()
+
+
+    // TODO: 테스트용. 나중에 지울 것
 //        Text(text = "방 번호: " + roomId.toString())
 //        Text(text = "관측소아이디: " + observeSiteId)
 
-    }
 
 }
 
-//@Composable
-//fun SiteInfo(viewModel: SiteViewModel, roomId: Int) {
-//}
-
-
+// 이미지 입력 박스
 @Composable
 fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
 
@@ -145,18 +138,7 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
 
     // css. 메세지 입력박스 modifier
     var inputModifier: Modifier = Modifier
-
         .fillMaxWidth(0.9f)
-//        .clip(
-//            RoundedCornerShape(
-//                inputBoxCornerSize.dp
-////        topStart = if (isMine) inputBoxCornerSize.dp else 0.dp,
-////        topEnd = if (isMine) 0.dp else inputBoxCornerSize.dp,
-////        bottomStart = inputBoxCornerSize.dp,
-////        bottomEnd = inputBoxCornerSize.dp
-//            )
-//        )
-//        .border(width = 5.dp, color = PurpleGrey40)
 
     // 메세지 입력 필드
     Column(
@@ -180,13 +162,15 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
             singleLine = false,
             maxLines = 4
         )
+        Spacer(modifier = Modifier.height(10.dp))
         // 전송 버튼
         Button(
             onClick = {
-                viewModel.publishToChannel(
-                    roomId = roomId,
-                    messageContent = messageContent
-                )
+                if (messageContent != "")
+                    viewModel.publishToChannel(
+                        roomId = roomId,
+                        messageContent = messageContent
+                    )
                 messageContent = ""
             },
             modifier = Modifier.width(100.dp)
