@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -183,7 +182,6 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
 //    var lat by remember { mutableStateOf("")}
 //    var lng by remember { mutableStateOf("")}
 
-    var markerList: MutableList<Pair<LatLng, String>> = remember { mutableStateListOf() }
 
     LaunchedEffect(key1 = cameraPositionState.isMoving){
         if (!cameraPositionState.isMoving) {
@@ -192,7 +190,7 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             viewModel.getAddress(cameraPosition)
             try{
                 Log.d("content", "get inside")
-                markerList = viewModel.getObserveSiteLists(cameraPositionState.position.zoom)
+                viewModel.getObserveSiteLists()
             } catch(e: Exception){
                 Log.d("error", "Cannot get observe site lists.")
             }
@@ -203,8 +201,8 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
 
 
     LaunchedEffect(key1 = viewModel.currentLatLong ){
-        val zoomLevel = cameraPositionState.position.zoom
-        val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, zoomLevel)
+        viewModel.zoomLevel = cameraPositionState.position.zoom
+        val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, viewModel.zoomLevel)
         cameraPositionState.move(update)
 
     }
@@ -221,14 +219,15 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             onMapLongClick = { latLng ->
                     try{
                         viewModel.postObserveSite(latLng)
-                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
+                        viewModel.getObserveSiteLists()
+//                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
                     } catch(e: Exception) {
                         Log.d("error", e.message?:"")
                     }
                              },
             content = {
-                markerList.forEach {
-                    CustomMarker(latlng = it.first, title = it.second, bitmap = bitmap)
+                viewModel.markerList.forEach {
+                    CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap)
                 }
             }
         )
