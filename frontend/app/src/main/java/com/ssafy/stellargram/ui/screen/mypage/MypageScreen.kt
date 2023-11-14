@@ -52,9 +52,10 @@ import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MypageScreen(navController: NavController) {
+fun MypageScreen(navController: NavController, id:Long) {
     val viewModel: MypageViewModel = viewModel()
     val tabIndex by viewModel.tabIndex.observeAsState()
+    val userId = id // 현재 유저의 id
 
     var cards by remember { mutableStateOf(viewModel.myCards) }
     var favStars by remember { mutableStateOf(viewModel.favStars) }

@@ -71,28 +71,14 @@ fun TabLayout(viewModel: MainViewModel) {
                 Tab(text = { Text(title) },
                     selected = tabIndex.value!! == index,
                     onClick = { viewModel.updateTabIndex(index) },
-//                    icon = {
-//                        when (index) {
-//                            0 -> Icon(imageVector = Icons.Default.Home, contentDescription = null)
-//                            1 -> Icon(imageVector = Icons.Default.Info, contentDescription = null)
-//                            2 -> Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-//                        }
-//                    }
                 )
             }
         }
-
-//        when (tabIndex.value) {
-//            0 -> ArticleScreen(viewModel = viewModel)
-//            1 -> AccountScreen(viewModel = viewModel)
-//            2 -> StarScreen(viewModel = viewModel)
-//        }
     }
 }
 // 게시물 탭
 @Composable
 fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<Card>>, navController: NavController) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -113,7 +99,6 @@ fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<
 // 계정 탭
 @Composable
 fun AccountScreen(viewModel: MainViewModel, accountCardsState: MutableState<List<Member>>, navController:NavController) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -459,7 +444,7 @@ fun StarUI(starCardsState: MutableState<List<Star>>, navController: NavControlle
         items(starCardsState.value.size) { index ->
             val star = starCardsState.value[index]
             // Row를 클릭 가능하게 변경
-            Log.d("search", "ID: ${star.id}")
+            Log.d("search", "ID: ${star}")
             Row (
                 modifier = Modifier
                     .fillMaxWidth()

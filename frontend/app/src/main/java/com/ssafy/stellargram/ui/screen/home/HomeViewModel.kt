@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardsData
@@ -184,7 +185,7 @@ suspend fun GetTodaysPicture(): CardsData? {
 @Composable
 fun TodaysPicture() {
     var dummyCardsData by remember { mutableStateOf<CardsData?>(null) }
-
+    Log.d("사진", StellargramApplication.prefs.getString("memberId","없음"))
     LaunchedEffect(Unit) {
         // API에서 카드 정보 가져오기 (실제 API 호출)
         // val data = GetTodaysPicture()
