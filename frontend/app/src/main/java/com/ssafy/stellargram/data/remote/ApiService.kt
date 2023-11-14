@@ -14,6 +14,9 @@ import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
+import com.ssafy.stellargram.model.ObserveSiteListResponse
+import com.ssafy.stellargram.model.ObserveSiteRequest
+import com.ssafy.stellargram.model.ObserveSiteResponse
 import com.ssafy.stellargram.model.SiteInfoResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import retrofit2.Call
@@ -147,6 +150,24 @@ interface ApiServiceForChat {
     ): CursorResponse
 }
 
+interface ApiServiceForObserveSite{
+
+    //관측지 post
+    @POST("observe-site/")
+    suspend fun postObserveSite(
+        @Body observeSiteRequest: ObserveSiteRequest
+    ): ObserveSiteResponse
+}
+
+interface ApiServiceForObserveSearch{
+    @GET("observe-search/")
+    suspend fun getObserveSearch(
+        @Query("startX") startX: Float,
+        @Query("endX") endX: Float,
+        @Query("startY") startY: Float,
+        @Query("endY") endY: Float
+    ): ObserveSiteListResponse
+}
 
 // 관측포인트 관련
 interface ApiServiceForSite {

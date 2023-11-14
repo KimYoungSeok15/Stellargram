@@ -173,6 +173,28 @@ object NetworkModule {
             .create(ApiServiceForChat::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceObserveSite(): ApiServiceForObserveSite {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForObserveSite::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceObserveSearch(): ApiServiceForObserveSearch {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForObserveSearch::class.java)
+    }
+}
     // 관측소 관련 API
     @Singleton
     @Provides

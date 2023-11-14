@@ -65,8 +65,8 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
-import com.ssafy.stellargram.R
 import com.ssafy.stellargram.BuildConfig
+import com.ssafy.stellargram.R
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -182,21 +182,34 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
 //    }
 //    var lat by remember { mutableStateOf("")}
 //    var lng by remember { mutableStateOf("")}
+
+    var markerList: MutableList<Pair<LatLng, String>> = remember { mutableStateListOf() }
+
     LaunchedEffect(key1 = cameraPositionState.isMoving){
         if (!cameraPositionState.isMoving) {
             // it will be done only when the map stops moving.
             val cameraPosition = cameraPositionState.position.target
             viewModel.getAddress(cameraPosition)
+            try{
+                Log.d("content", "get inside")
+                markerList = viewModel.getObserveSiteLists(cameraPositionState.position.zoom)
+            } catch(e: Exception){
+                Log.d("error", "Cannot get observe site lists.")
+            }
         }
     }
+
+
+
 
     LaunchedEffect(key1 = viewModel.currentLatLong ){
         val zoomLevel = cameraPositionState.position.zoom
         val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, zoomLevel)
         cameraPositionState.move(update)
+
     }
 
-    val markerList = remember { mutableStateListOf<Pair<LatLng, String>>() }
+
     val bitmap = AppCompatResources.getDrawable(context,R.drawable.telescope_svgrepo_com)!!.toBitmap(100,100)
     Box(Modifier.fillMaxWidth()) {
         GoogleMap(
@@ -206,7 +219,13 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             cameraPositionState = cameraPositionState,
             modifier = Modifier.fillMaxSize(),
             onMapLongClick = { latLng ->
-                markerList.add(Pair(latLng,viewModel.getFullAddress(latLng))) },
+                    try{
+                        viewModel.postObserveSite(latLng)
+                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
+                    } catch(e: Exception) {
+                        Log.d("error", e.message?:"")
+                    }
+                             },
             content = {
                 markerList.forEach {
                     CustomMarker(latlng = it.first, title = it.second, bitmap = bitmap)
