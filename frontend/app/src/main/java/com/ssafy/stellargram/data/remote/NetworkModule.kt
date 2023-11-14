@@ -3,17 +3,22 @@ package com.ssafy.stellargram.data.remote
 import android.util.Log
 import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.StellargramApplication.Companion.INSTARGRAM_APP_URI
+import com.tickaroo.tikxml.TikXml
+import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.nio.Buffer
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -93,6 +98,36 @@ object NetworkModule {
             .build()
             .create(ApiServiceForWeather::class.java)
     }
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceAstronomicalEvents(): ApiServiceForAstronomicalEvents {
+        return Retrofit.Builder()
+            .baseUrl("http://apis.data.go.kr/")
+            .client(provideHttpClient())
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForAstronomicalEvents::class.java)
+    }
+
+    object RetrofitClient {
+        private var instance: Retrofit? = null
+
+        fun getInstance(): Retrofit {
+            if (instance == null) {
+                instance = Retrofit.Builder()
+                    .baseUrl("http://apis.data.go.kr/")
+                    .client(provideHttpClient())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addConverterFactory(
+                        TikXmlConverterFactory.create(
+                            TikXml.Builder().exceptionOnUnreadXml(false).build()
+                        )
+                    )
+                    .build()
+            }
+            return instance!!
+        }
+    }
 
     @Singleton
     @Provides
@@ -118,4 +153,3 @@ object NetworkModule {
     }
 
 }
-

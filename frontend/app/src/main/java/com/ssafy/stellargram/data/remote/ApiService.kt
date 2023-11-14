@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.data.remote
 
+import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.MessageListResponse
@@ -42,6 +43,15 @@ interface ApiServiceForWeather{
         @Query("nx") nx: Int,
         @Query("ny") ny: Int
     ): Call<WeatherResponse>
+}
+interface ApiServiceForAstronomicalEvents {
+    @GET("B090041/openapi/service/AstroEventInfoService/getAstroEventInfo")
+    suspend fun getAstronomicalEvents(
+        @Query("solYear") solYear: String,
+        @Query("solMonth") solMonth: String,
+        @Query("ServiceKey") serviceKey: String,
+        @Query("numOfRows") numOfRows: Int
+    ): Response<AstronomicalEventResponse>
 }
 
 interface ApiServiceForCards {
