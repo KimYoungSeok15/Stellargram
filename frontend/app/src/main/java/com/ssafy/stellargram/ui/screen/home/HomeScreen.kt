@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +48,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.ApiServiceForAstronomicalEvents
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import java.util.Calendar
@@ -63,6 +65,7 @@ fun HomeScreen(navController: NavController) {
     var combinedEvents by remember { mutableStateOf("") }  // 이벤트 띄워주는 문구
     var isLocationUpdateComplete by remember { mutableStateOf(false) } // 위치정보를 불러왔을때만 API요청을 보내도록
     var refreshClickCount by remember { mutableStateOf(0) }  // 기상청 api 새로고침 할 때 쓰는 변수
+    var memberID by remember { mutableLongStateOf(0) }
 
     // 현재 시간을 가져옴
     val currentTime = Date()
@@ -122,6 +125,10 @@ fun HomeScreen(navController: NavController) {
     } else {
         // 위치 권한이 허용되지 않은 경우
         // 사용자에게 위치 권한을 요청할 수 있음 ( 추후 구현 )
+    }
+
+    LaunchedEffect(Unit,memberID){
+        memberID = StellargramApplication.prefs.getString("memberId","0").toLong()
     }
 
     // 현재 위치 업데이트가 완료되면 isLocationUpdateComplete 값을 true로 설정
@@ -218,6 +225,7 @@ fun HomeScreen(navController: NavController) {
                             }
                         }
                         Log.d("이벤트", "조합된 이벤트: $combinedEvents")
+                        Log.d("사진", StellargramApplication.prefs.getString("memberId","없음"))
                     }
                 }
             }

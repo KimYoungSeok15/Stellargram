@@ -59,7 +59,7 @@ fun NavGraph(
 
         composable(route = Screen.SkyMap.route) {
             BaseFrame(navController, screen = Screen.SkyMap) {
-                SkyMapScreen(navController = navController)
+                SkyMapScreen(navController = navController, modifier = modifier)
             }
         }
         composable(route = Screen.Camera.route) {
@@ -75,9 +75,14 @@ fun NavGraph(
         composable(Screen.SignUp.route) {
             SignUpScreen(navController = navController)
         }
-        composable(route = Screen.MyPage.route) {
+        composable(
+            route = "${Screen.MyPage.route}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) {backStackEntry ->
+            val arguments = requireNotNull(backStackEntry.arguments)
+            val userId = arguments.getLong("id") ?: -1
             BaseFrame(navController, screen = Screen.MyPage) {
-                MypageScreen(navController = navController)
+                MypageScreen(navController = navController, id = userId)
             }
         }
         composable(

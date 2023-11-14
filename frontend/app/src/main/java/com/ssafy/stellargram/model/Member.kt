@@ -55,11 +55,7 @@ data class MemberSignUpResponse(
 data class MemberResponse(
     val code: String,
     val message: String,
-    val data: MembersData
-)
-
-data class MembersData(
-    val members: MutableList<Member>
+    val data: Member
 )
 
 data class Member(
@@ -86,3 +82,9 @@ data class MemberMeResponse(
         val cardCount : Int
     )
 }
+
+data class FollowCancelResponse(
+    val code: String,
+    val message: String,
+    val data: MemberMeResponse.Data
+)
