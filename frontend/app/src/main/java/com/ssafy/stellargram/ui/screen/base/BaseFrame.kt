@@ -34,9 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.font.FontWeight
-import com.ssafy.stellargram.ui.Screen
-import com.ssafy.stellargram.R
 import com.ssafy.stellargram.StellargramApplication
 
 @OptIn(ExperimentalMaterial3Api::class)
