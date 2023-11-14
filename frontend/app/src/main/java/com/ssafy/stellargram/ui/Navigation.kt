@@ -14,13 +14,15 @@ sealed class Screen(
     object Kakao : Screen("kakao", "")
     object Home : Screen("home", "메인", R.drawable.home_page)
     object Search : Screen("search", "")
+    object StarDetail : Screen("stardetail", "별 정보")
     object Example : Screen("example", "")
     object GoogleMap : Screen("googlemap", "지도", R.drawable.address)
     object MyPage : Screen("mypage", "마이페이지", R.drawable.account)
     object SkyMap : Screen("skymap", "천구", R.drawable.constellation)
+    object SignUp : Screen("signup", "회원가입")
     object Camera : Screen("camera", "사진", R.drawable.google_images)
-    // TODO: 아이콘 지우기
-    object ChatRoom : Screen("chatroom","채팅", com.kakao.sdk.v2.all.R.drawable.kakao_sdk_ico_chattype_openchat)
+    object ChatRoom : Screen("chatroom","채팅")
+    object ChatRoomList : Screen("chatroomlist","채팅방목록")
 }
 
 @Composable

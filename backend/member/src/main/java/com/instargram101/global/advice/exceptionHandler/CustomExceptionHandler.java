@@ -1,7 +1,6 @@
 package com.instargram101.global.advice.exceptionHandler;
 
 import com.instargram101.global.common.exception.customException.CustomException;
-import com.instargram101.global.common.exception.errorCode.ErrorCode;
 import com.instargram101.global.common.response.CommonApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -29,11 +28,8 @@ public class CustomExceptionHandler {
         var status = exception.getErrorCodeInterface().getCode();
         var description = exception.getDescription();
 
-        log.info(status.toString());
-        log.info(description);
-
         return ResponseEntity
                 .status(status)
-                .body(CommonApiResponse.ERROR(ErrorCode.SERVER_ERROR, description));
+                .body(CommonApiResponse.ERROR(exception.getErrorCodeInterface(), description));
     }
 }

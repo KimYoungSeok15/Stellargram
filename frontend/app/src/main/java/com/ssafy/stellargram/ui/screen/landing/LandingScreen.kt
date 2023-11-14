@@ -60,12 +60,11 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
             painterResource(id = R.drawable.stellargram_1_),
             contentDescription = "LOGO",
             modifier = Modifier.size(200.dp)
-
         )
         Image(
             painter =
             painterResource(id = R.drawable.kakao_login_large_narrow),
-            contentDescription = null,
+            contentDescription = "LOGIN",
             modifier = Modifier
                 .clickable { navController.navigate("kakao") }
         )

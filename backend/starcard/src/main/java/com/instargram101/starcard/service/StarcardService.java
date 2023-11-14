@@ -1,6 +1,7 @@
 package com.instargram101.starcard.service;
 
 import com.instargram101.starcard.dto.request.SaveCardRequestDto;
+import com.instargram101.starcard.dto.response.FindCardResponseDto;
 import com.instargram101.starcard.dto.response.FindCardsResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,6 @@ public interface StarcardService {
     List<Long> findLikeedMembers(Long cardId);
 
     String likeCard(Long myId, Long cardId);
+
+    FindCardResponseDto recommandCard(Long myId);
 }

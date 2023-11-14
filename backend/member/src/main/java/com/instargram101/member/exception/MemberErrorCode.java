@@ -22,7 +22,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MemberErrorCode implements ErrorCodeInterface {
 
-    Member_Not_Found(404, "User Not Found.") //TODO: 추가로 여기다 채워넣으면 됩니다.
+    Member_Not_Found(404, "User Not Found."),
+    Invalid_User(400, "Invalid User")
+    //TODO: 추가로 여기다 채워넣으면 됩니다.
     ;
 
     private final Integer code;

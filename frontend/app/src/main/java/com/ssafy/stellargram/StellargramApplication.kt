@@ -2,7 +2,9 @@ package com.ssafy.stellargram
 
 import android.app.Application
 import android.content.Context
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.kakao.sdk.common.KakaoSdk
+import com.ssafy.stellargram.util.PreferenceUtil
 import dagger.hilt.android.HiltAndroidApp
 import java.io.FileOutputStream
 import java.io.IOException
@@ -14,13 +16,19 @@ class StellargramApplication : Application() {
     private var instance: StellargramApplication? = null
 
     companion object {
-        const val INSTARGRAM_APP_URI = "http://k9a101.p.ssafy.io:8000"
+        const val INSTARGRAM_APP_URI = "http://k9a101.p.ssafy.io:8000/"
+        lateinit var prefs: PreferenceUtil
+            private set
+        // TODO: 인식요청은 8001번으로 보내야할 수 있음
+
     }
     override fun onCreate() {
         super.onCreate()
         instance = this
         KakaoSdk.init(this, "36c2ac2060a5b0da3ece614fcae40854")
 //        copyDatabaseFromAssets(this,"StarData.db")
+        AndroidThreeTen.init(this);
+        prefs = PreferenceUtil(applicationContext)
     }
 }
 
