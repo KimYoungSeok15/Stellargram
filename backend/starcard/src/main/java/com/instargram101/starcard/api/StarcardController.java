@@ -42,7 +42,7 @@ public class StarcardController {
     }
 
 //    @PostMapping(value ="/card", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<CommonApiResponse> saveCard(@RequestHeader("myId") Long myId, @RequestPart SaveCardRequestDto requestDto, @RequestPart MultipartFile imageFile) throws IOException {
         return ResponseEntity.ok(CommonApiResponse.OK("카드저장성공", starcardService.saveCard(myId, requestDto, imageFile)));
     }
