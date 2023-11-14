@@ -44,9 +44,12 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardsData
+import com.ssafy.stellargram.model.CardsResponse
+import com.ssafy.stellargram.model.Response
 import java.io.IOException
 import java.util.Locale
 import kotlin.math.abs
@@ -165,11 +168,11 @@ fun AutoScrollingText(text:String) {
 }
 
 // 오늘의 추천 사진 가져오기
-suspend fun GetTodaysPicture(): CardsData? {
+suspend fun GetTodaysPicture(): retrofit2.Response<CardsResponse>? {
     return try {
-        val response = NetworkModule.provideRetrofitInstanceCards().getCards()
-        if (response.code == 200) {
-            response.data
+        val response = NetworkModule.provideRetrofitInstanceCards().getCards(3140000396)
+        if (response.isSuccessful) {
+            response
         } else {
             null
         }
@@ -184,7 +187,7 @@ suspend fun GetTodaysPicture(): CardsData? {
 @Composable
 fun TodaysPicture() {
     var dummyCardsData by remember { mutableStateOf<CardsData?>(null) }
-
+    Log.d("사진", StellargramApplication.prefs.getString("memberId","없음"))
     LaunchedEffect(Unit) {
         // API에서 카드 정보 가져오기 (실제 API 호출)
         // val data = GetTodaysPicture()
@@ -194,8 +197,8 @@ fun TodaysPicture() {
         val card = Card(
             cardId = 5,
             memberId = 99,
-            memberNickName = "Hyundolee199543413413431",
-            memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
+            memberNickname = "Hyundolee199543413413431",
+            memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
             observeSiteId = "144",
             imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
             content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
@@ -240,7 +243,7 @@ fun TodaysPicture() {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         GlideImage(
-                            model = card.memberImagePath,
+                            model = card.memberProfileImageUrl,
                             contentDescription = "123",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -248,7 +251,7 @@ fun TodaysPicture() {
                                 .clip(CircleShape), // 동그라미 모양으로 잘라주기
                         )
                         Text(
-                            text = card.memberNickName,
+                            text = card.memberNickname,
                             style = TextStyle(fontSize = 20.sp),
                             modifier = Modifier
                                 .padding(start = 8.dp).width(150.dp),
@@ -274,7 +277,7 @@ fun TodaysPicture() {
 
                 // 사진 표시
                 GlideImage(
-                    model = card.memberImagePath,
+                    model = card.memberProfileImageUrl,
                     contentDescription = "123",
                     modifier = Modifier.fillMaxSize(),
                 )
