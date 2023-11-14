@@ -12,8 +12,8 @@ def preprocess_image(image_in):
 
     # image 채널에 따라 변환 혹은 그대로 두기
     if image_cv2.shape[2] not in (1, 3):
-        print("shape2")
-        print(image_cv2.shape[2])
+        # print("shape2")
+        # print(image_cv2.shape[2])
         processed = cv2.cvtColor(image_cv2, cv2.COLOR_RGBA2RGB)
     else:
         processed = image_cv2

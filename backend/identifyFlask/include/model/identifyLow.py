@@ -36,7 +36,7 @@ def identify_with_tetra(imageIn):
         pil_image_identified = result.pop('visual')
 
         # TODO: 로컬 확인용 사진띄우기
-        pil_image_identified.show()
+        # pil_image_identified.show()
 
         # 인식된 전체 좌표에 대해 찾아서 병합 후 반환
         matched_stars = result.get("matched_stars")
@@ -45,11 +45,11 @@ def identify_with_tetra(imageIn):
 
     # print(result)
 
-    # if identified_star is not None and len(identified_star) != 0:
-    #     result['matched'] = identified_star
-    #     result.pop("matched_stars")
-    #     result.pop("matched_centroids")
-    # else:
+    if identified_star is not None and len(identified_star) != 0:
+        result['matched'] = identified_star
+        result.pop("matched_stars")
+        result.pop("matched_centroids")
+    else:
         result['matched'] = None
 
     return result
