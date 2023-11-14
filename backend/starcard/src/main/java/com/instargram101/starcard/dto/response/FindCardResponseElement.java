@@ -17,6 +17,7 @@ public class FindCardResponseElement {
     private String memberProfileImageUrl;
     private String observeSiteId;
     private String imagePath;
+    private String imageUrl;
     private String content;
     private LocalDateTime photoAt;
     private Enum<StarcardCategory> category;
@@ -31,6 +32,7 @@ public class FindCardResponseElement {
                 .memberId(starcardWithAmILikeQueryDto.getMemberId())
                 .observeSiteId(starcardWithAmILikeQueryDto.getObserveSiteId())
                 .imagePath(starcardWithAmILikeQueryDto.getImagePath())
+                .imageUrl(starcardWithAmILikeQueryDto.getImagePath())
                 .content(starcardWithAmILikeQueryDto.getContent())
                 .photoAt(starcardWithAmILikeQueryDto.getPhotoAt())
                 .category(starcardWithAmILikeQueryDto.getCategory())
