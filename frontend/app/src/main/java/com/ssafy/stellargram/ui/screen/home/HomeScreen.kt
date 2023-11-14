@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -109,6 +110,7 @@ fun HomeScreen(navController: NavController) {
         coordinatesXy = coordinates
     }
 
+
     // 기기에서 위치정보 권한을 허락 받았을 경우 vs 못 받았을 경우
     if (ContextCompat.checkSelfPermission(
             context,
@@ -116,12 +118,17 @@ fun HomeScreen(navController: NavController) {
         ) == PackageManager.PERMISSION_GRANTED
     ) {
         // 허용된 경우
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            1000,
-            1.0f,
-            locationListener
-        )
+        DisposableEffect(Unit){
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                5000,
+                10.0f,
+                locationListener
+            )
+            onDispose {
+                locationManager.removeUpdates(locationListener)
+            }
+        }
     } else {
         // 위치 권한이 허용되지 않은 경우
         // 사용자에게 위치 권한을 요청할 수 있음 ( 추후 구현 )
