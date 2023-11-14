@@ -14,11 +14,9 @@ import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
-import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.ObserveSiteListResponse
 import com.ssafy.stellargram.model.ObserveSiteRequest
 import com.ssafy.stellargram.model.ObserveSiteResponse
-import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.SiteInfoResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import retrofit2.Call
@@ -30,7 +28,6 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.Path
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
