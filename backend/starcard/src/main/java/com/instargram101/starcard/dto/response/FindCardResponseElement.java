@@ -32,7 +32,7 @@ public class FindCardResponseElement {
                 .memberId(starcardWithAmILikeQueryDto.getMemberId())
                 .observeSiteId(starcardWithAmILikeQueryDto.getObserveSiteId())
                 .imagePath(starcardWithAmILikeQueryDto.getImagePath())
-                .imageUrl(starcardWithAmILikeQueryDto.getImagePath())
+                .imageUrl(starcardWithAmILikeQueryDto.getImageUrl())
                 .content(starcardWithAmILikeQueryDto.getContent())
                 .photoAt(starcardWithAmILikeQueryDto.getPhotoAt())
                 .category(starcardWithAmILikeQueryDto.getCategory())
