@@ -100,6 +100,7 @@ public class ObserveSearchService {
         for(long longi = startXChunk; longi <= endXChunk; longi++){
             for(long lati = startYChunk; lati <= endYChunk; lati++){
                 long id = allSearchDict.getIdByLongLatiChunk(longi, lati);
+                if(allSearchDict.getSize(id) == 0) continue;
                 chunkList.add(id);
             }
         }
