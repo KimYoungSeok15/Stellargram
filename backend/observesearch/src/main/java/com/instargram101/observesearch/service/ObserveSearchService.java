@@ -122,10 +122,10 @@ public class ObserveSearchService {
         for(; i < maximumObserveSite && j < totalCount; j++){
             int id = allSearchDict.getTopObserveSite(chunkList, orders);
             ObserveSite observeSite = allSearchDict.getObserveSite(chunkList.get(id), orders.get(id));
-            if(observeSite.getLongitude() >= startX &&
-                    observeSite.getLongitude() <= endX &&
-                    observeSite.getLatitude() >= startY &&
-                    observeSite.getLatitude() <= endY
+            if(observeSite.getLatitude() >= startX &&
+                    observeSite.getLatitude() <= endX &&
+                    observeSite.getLongitude() >= startY &&
+                    observeSite.getLongitude() <= endY
             ){
                 observeSites.add(allSearchDict.getObserveSite(chunkList.get(id), orders.get(id)));
                 int order = orders.get(id);

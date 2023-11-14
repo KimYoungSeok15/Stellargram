@@ -6,6 +6,7 @@ import com.instargram101.observesearch.repository.ObserveSearchRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -14,6 +15,7 @@ import java.util.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Slf4j
 public class AllSearchDict {
 
     private final ObserveSiteSorter observeSiteSorter;
@@ -37,7 +39,7 @@ public class AllSearchDict {
     */
     public void addObserveSite(long longChunk, long latiChunk, ObserveSite observeSite){
         // 2차원 해시맵을 사용하지 않고 chunk의 최대 개수보다 큰 bigNumber를 이용하여 id를 만들어줌
-        long id = getIdByLongLatiChunk(longChunk, latiChunk);
+        long id = getIdByLongLatiChunk(latiChunk, longChunk);
 
         //우선 해당 id가 있으면 그 안에 넣고, 아님 해당 id에 새로운 List를 만들어준 뒤 그 안에 observeSite를 집어넣기
         if(!dict.containsKey(id))
@@ -52,6 +54,7 @@ public class AllSearchDict {
     }
 
     public long getSize(long id){
+        log.info(String.format("id: %d", id));
         return dict.get(id).size();
     }
 
@@ -65,6 +68,9 @@ public class AllSearchDict {
     public void sortSitesById(long longChunk, long latiChunk){
         long id = Long.valueOf(getIdByLongLatiChunk(longChunk, latiChunk));
         List<ObserveSite> sites = dict.get(id);
+        for(ObserveSite site : sites){
+            log.info(String.format("Observe %s", site.getObserveSiteId()));
+        }
         sites.sort(observeSiteSorter);
     }
 
