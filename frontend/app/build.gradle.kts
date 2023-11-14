@@ -180,6 +180,10 @@ dependencies {
 
     // unixTimestamp 포매팅 라이브러리
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
+
+    // rating 컴포넌트 라이브러리
+    implementation ("com.github.a914-gowtham:compose-ratingbar:1.3.4")
+
 }
 
 // Dependency injection with Hilt
