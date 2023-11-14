@@ -14,3 +14,4 @@ scipy==1.11.3
 tetra3 @ git+https://github.com/esa/tetra3.git@f98bb4f769f6054cdc1fbc023a07934700ceb70e
 Werkzeug==3.0.1
 zipp==3.17.0
+gunicorn==21.2.0
