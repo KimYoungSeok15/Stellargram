@@ -132,6 +132,7 @@ fun HomeScreen(navController: NavController) {
         }
     }
 
+
     // API 호출 및 데이터 가져오기
     LaunchedEffect(key1 = refreshClickCount, key2 = isLocationUpdateComplete) {
         if (isLocationUpdateComplete) {
@@ -163,6 +164,12 @@ fun HomeScreen(navController: NavController) {
                         Log.d("weather response", "Gson 시작후")
                         // 필터링할 카테고리 목록
                         val targetCategories = setOf("T1H", "SKY", "PTY")
+                        
+                    // targetCategories에 속하는 카테고리만 필터링
+                    var filteredItems = emptyList<WeatherItem>()
+                    if (items != null){
+                        filteredItems = items.filter { it.category in targetCategories }
+                    }
 
                         // targetCategories에 속하는 카테고리만 필터링
                         val filteredItems = items.filter { it.category in targetCategories }
