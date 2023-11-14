@@ -23,6 +23,7 @@ sealed class Screen(
     object Camera : Screen("camera", "사진", R.drawable.google_images)
     object ChatRoom : Screen("chatroom","채팅")
     object ChatRoomList : Screen("chatroomlist","채팅방목록")
+    object Identify : Screen("identify", "별 인식")
 }
 
 @Composable

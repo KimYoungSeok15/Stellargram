@@ -13,6 +13,7 @@ import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
+import com.ssafy.stellargram.ui.screen.identify.IdentifyScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
@@ -106,6 +107,11 @@ fun NavGraph(
         composable(route = Screen.ChatRoomList.route) {
             BaseFrame(navController, screen = Screen.ChatRoomList) {
                 ChatRoomListScreen(navController = navController)
+            }
+        }
+        composable(route = Screen.Identify.route){
+            BaseFrame(navController, screen = Screen.Identify){
+                IdentifyScreen(navController = navController)
             }
         }
     }
