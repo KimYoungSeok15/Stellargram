@@ -11,7 +11,6 @@ import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
