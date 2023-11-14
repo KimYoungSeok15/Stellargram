@@ -1,5 +1,7 @@
 package com.ssafy.stellargram.ui.screen.home
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
@@ -54,6 +56,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -145,6 +151,8 @@ fun getAddressFromLocation(context: Context, latitude: Double, longitude: Double
 }
 
 // 메인함수
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     var weatherData by remember { mutableStateOf<List<WeatherItem>>(emptyList()) }
@@ -193,23 +201,25 @@ fun HomeScreen(navController: NavController) {
         coordinatesXy = coordinates
     }
 
-    // 기기에서 위치정보 권한을 허락 받았을 경우 vs 못 받았을 경우
-    if (ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        // 허용된 경우
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            1000,
-            1.0f,
-            locationListener
-        )
-    } else {
+    val locationPermissionState = rememberMultiplePermissionsState(
+        listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    )
+    LaunchedEffect(locationPermissionState.allPermissionsGranted) {
         // 위치 권한이 허용되지 않은 경우
-        // 사용자에게 위치 권한을 요청할 수 있음 ( 추후 구현 )
+        if (!locationPermissionState.allPermissionsGranted) {
+            locationPermissionState.launchMultiplePermissionRequest()
+        }
+        else {
+            // 허용된 경우
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                1000,
+                1.0f,
+                locationListener
+            )
+        }
     }
+
     // API 호출 및 데이터 가져오기
     LaunchedEffect(key1 = coordinatesXy) {
         coordinatesXy?.let { coordinates ->
