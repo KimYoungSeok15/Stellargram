@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -183,7 +182,7 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
 //    var lat by remember { mutableStateOf("")}
 //    var lng by remember { mutableStateOf("")}
 
-    var markerList: MutableList<Pair<LatLng, String>> = remember { mutableStateListOf() }
+    var markerList by remember { mutableStateOf(viewModel.getObserveSiteLists(cameraPositionState.position.zoom)) }
 
     LaunchedEffect(key1 = cameraPositionState.isMoving){
         if (!cameraPositionState.isMoving) {

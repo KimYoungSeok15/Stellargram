@@ -50,6 +50,7 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     var address by mutableStateOf("")
 
     var textIpt by mutableStateOf("")
+    var markerList by mutableStateOf<MutableList<Pair<LatLng, String>>>(mutableListOf())
 
 
 
@@ -155,28 +156,25 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     }
 
     fun getObserveSiteLists(zoomLevel: Float): MutableList<Pair<LatLng, String>>{
-        var obsSiteList: MutableList<Pair<LatLng, String>> = mutableListOf()
+        markerList = mutableListOf()
         viewModelScope.launch {
             val lat = currentLatLong.latitude
             val lng = currentLatLong.longitude
 
             val radius = calcZoom.getScreenDiameter(zoomLevel)
-            try{
-
-                val response = NetworkModule.provideRetrofitInstanceObserveSearch().getObserveSearch(
-                    lat.toFloat() - 1.5f * radius,
-                    lat.toFloat() + 1.5f * radius,
-                    lng.toFloat() - 1.5f * radius,
-                    lng.toFloat() + 1.5f * radius)
-                Log.d("content", response.toString())
-                response.data.forEach{
-                    val new_latLng = LatLng(it.latitude.toDouble(), it.longitude.toDouble())
-                    obsSiteList.add(Pair(new_latLng, getFullAddress(new_latLng)))
-                }
+            val response = NetworkModule.provideRetrofitInstanceObserveSearch().getObserveSearch(
+                lat.toFloat() - 1.5f * radius,
+                lat.toFloat() + 1.5f * radius,
+                lng.toFloat() - 1.5f * radius,
+                lng.toFloat() + 1.5f * radius)
+            Log.d("content", response.toString())
+            response.data.forEach{
+                val new_latLng = LatLng(it.latitude.toDouble(), it.longitude.toDouble())
+                markerList.add(Pair(new_latLng, getFullAddress(new_latLng)))
             }
-            catch(e: Exception){
-            }
+            Log.d("content", "close1: ${markerList.size}")
         }
-        return obsSiteList
+        Log.d("content", "close2: ${markerList.size}")
+        return markerList
     }
 }
