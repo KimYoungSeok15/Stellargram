@@ -206,6 +206,9 @@ dependencies {
     // unixTimestamp 포매팅 라이브러리
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
 
+    // rating 컴포넌트 라이브러리
+    implementation ("com.github.a914-gowtham:compose-ratingbar:1.3.4")
+
     // XML Parser - https://bb-library.tistory.com/177
     implementation("com.tickaroo.tikxml:annotation:0.8.13")
     implementation("com.tickaroo.tikxml:core:0.8.13")

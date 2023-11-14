@@ -167,10 +167,23 @@ object NetworkModule {
     fun provideRetrofitInstanceChat(): ApiServiceForChat {
         return Retrofit.Builder()
             .baseUrl(BASE_URL) // 기본 URL을 여기에 설정해야 합니다.
-            .client(provideHttpClient())
+            .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForChat::class.java)
     }
+
+    // 관측소 관련 API
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceSite(): ApiServiceForSite {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(provideHttpClient())
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForSite::class.java)
+    }
+
 
 }
