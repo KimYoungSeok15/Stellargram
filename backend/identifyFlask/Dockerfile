@@ -14,4 +14,4 @@ RUN python3 create_database.py
 
 EXPOSE 5000
 #CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
-CMD ["gunicorn", "app:app", "-w", "4", "--bind", "0.0.0.0:5000"]
+CMD ["gunicorn", "app:app", "--workers", "5", "--bind", "0.0.0.0:5000"]
