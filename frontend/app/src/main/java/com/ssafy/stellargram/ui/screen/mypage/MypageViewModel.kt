@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.DraggableState
@@ -48,15 +49,21 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.data.remote.ApiServiceForCards
+import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.Member
+import com.ssafy.stellargram.model.MemberMeResponse
+import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.Star
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -84,80 +91,85 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    // API 호출을 트리거하고 결과를 업데이트하는 함수
-    fun getMemberInfo(text: String) {
-        viewModelScope.launch {
-            _memberResults.value = fetchMemberInfoInternal(text)
-        }
-    }
-
     // Add these methods for managing tabs
     fun updateTabIndex(index: Int) {
         _tabIndex.value = index
     }
 
+    // API 호출을 트리거하고 결과를 업데이트하는 함수
+    fun getMemberInfo(id: Long) {
+        viewModelScope.launch {
+            _memberResults.value = try {
+                withContext(Dispatchers.IO) {
+                    val response = NetworkModule.provideRetrofitInstance().getMember(userId = id)
+                    Log.d("마이페이지", response.toString())
 
-    // 실제 API 호출이 이루어지는 함수
-    private suspend fun fetchMemberInfoInternal(text: String): List<Member> {
-        return withContext(Dispatchers.IO) {
-            // 여기에 실제 API 호출을 하고 결과를 반환하세요.
-            getMemberInfoFromApi(text)
+                    if (response.isSuccessful) {
+                        val memberResponse = response.body()
+
+                        memberResponse?.data?.let { data ->
+                            val member = Member(
+                                memberId = data.memberId,
+                                nickname = data.nickname,
+                                profileImageUrl = data.profileImageUrl,
+                                followCount = data.followCount,
+                                followingCount = data.followingCount,
+                                cardCount = data.cardCount,
+                                isFollow = data.isFollow // TODO: ifFollow도 응답을 받으면 UI로 팔로우, 팔로잉을 넣어주자
+                            )
+                            return@withContext listOf(member)
+                        } ?: emptyList()
+                    } else {
+                        Log.e("마이페이지", "API 호출 실패: ${response.code()} - ${response.message()}")
+                        emptyList()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("마이페이지", "API 호출 중 예외 발생: ${e.message}")
+                emptyList()
+            }
         }
     }
 
-    // 실제 API 호출을 대체하는 함수 (더미 데이터 형태로 구현)
-    private fun getMemberInfoFromApi(text: String): List<Member> {
-        // 실제 API 로직으로 대체
-        return listOf(
-            Member(
-                memberId = 2,
-                nickname = "Karina",
-                profileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                isFollow = true,
-                followCount = 123,
-                followingCount = 321,
-                cardCount = 2
-            )
-        )
-    }
     var myCards = mutableStateOf<List<Card>>(emptyList())
     var favStars = mutableStateOf<List<Star>>(emptyList())
     var likeCards = mutableStateOf<List<Card>>(emptyList())
-    fun getMyCards(id: Int): List<Card> {
-        // 카드 검색 로직 : 내 id를 sharedPreferences 에서 가져와서 건내주자.
-        // 현재는 더미데이터
-        val results : List<Card>
-        results = listOf<Card>(
-            Card(
-                cardId = 5,
-                memberId = 99,
-                memberNickName = "Hyundolee199543413413431",
-                memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                observeSiteId = "144",
-                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-                photoAt = "2023-10-27T01:49:22",
-                category = "GALAXY",
-                tools = "엄청 좋은 카메라",
-                likeCount = 156,
-                amILikeThis = false
-            ),
-            Card(
-                cardId = 5,
-                memberId = 99,
-                memberNickName = "Hyundolee199543413413431",
-                memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                observeSiteId = "144",
-                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-                photoAt = "2023-10-27T01:49:22",
-                category = "GALAXY",
-                tools = "엄청 좋은 카메라",
-                likeCount = 2,
-                amILikeThis = true
-            )
-        )
-        return results
+
+    suspend fun fetchUserCards(id: Long): List<Card> {
+        Log.d("마이페이지", "시작")
+        return try {
+            val response = NetworkModule.ProvideRetrofitCards().getCards(memberId = id)
+            Log.d("마이페이지", "디버깅 : $response")
+            if (response.isSuccessful) {
+                val cardsResponse = response.body()
+                Log.d("마이페이지", "내 카드들 : ${response.body()?.data?.starcards}")
+                cardsResponse?.data?.let { data ->
+                    // 필요한 데이터를 추출하고 Card 객체를 생성합니다.
+                    return data.starcards.map { starCardData ->
+                        Card(
+                            cardId = starCardData.cardId,
+                            memberId = starCardData.memberId,
+                            memberNickname = starCardData.memberNickname,
+                            memberProfileImageUrl = starCardData.memberProfileImageUrl,
+                            observeSiteId = starCardData.observeSiteId,
+                            imagePath = starCardData.imagePath,
+                            content = starCardData.content,
+                            photoAt = starCardData.photoAt,
+                            category = starCardData.category,
+                            tools = starCardData.tools,
+                            likeCount = starCardData.likeCount,
+                            amILikeThis = starCardData.amILikeThis
+                        )
+                    }
+                } ?: emptyList()
+            } else {
+                Log.d("마이페이지", "API 호출 실패: ${response.code()} - ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("마이페이지", "API 호출 실패 $e")
+            emptyList()
+        }
     }
 
     fun getFavStars(): List<Star> {
@@ -188,41 +200,42 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         )
         return results
     }
-    fun getLikeCards(id: Int): List<Card> {
-        // 카드 검색 로직
-        // 현재는 더미데이터
-        val results : List<Card>
-        results = listOf<Card>(
-            Card(
-                cardId = 5,
-                memberId = 99,
-                memberNickName = "Hyundolee199543413413431",
-                memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                observeSiteId = "144",
-                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-                photoAt = "2023-10-27T01:49:22",
-                category = "GALAXY",
-                tools = "엄청 좋은 카메라",
-                likeCount = 156,
-                amILikeThis = false
-            ),
-            Card(
-                cardId = 5,
-                memberId = 99,
-                memberNickName = "Hyundolee199543413413431",
-                memberImagePath = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                observeSiteId = "144",
-                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-                photoAt = "2023-10-27T01:49:22",
-                category = "GALAXY",
-                tools = "엄청 좋은 카메라",
-                likeCount = 2,
-                amILikeThis = true
-            )
-        )
-        return results
+    suspend fun fetchLikeCards(id: Long): List<Card> {
+        return try {
+            val response = NetworkModule.ProvideRetrofitCards().getLikeCards(memberId = id)
+
+            if (response.isSuccessful) {
+                val cardsResponse = response.body()
+                Log.d("마이페이지", "내가 좋아하는 카드들 : ${response.body()?.data?.starcards}")
+                cardsResponse?.data?.let { data ->
+                    // 필요한 데이터를 추출하고 Card 객체를 생성합니다.
+                    return data.starcards.map { starCardData ->
+                        Card(
+                            cardId = starCardData.cardId,
+                            memberId = starCardData.memberId,
+                            memberNickname = starCardData.memberNickname,
+                            memberProfileImageUrl = starCardData.memberProfileImageUrl,
+                            observeSiteId = starCardData.observeSiteId,
+                            imagePath = starCardData.imagePath,
+                            content = starCardData.content,
+                            photoAt = starCardData.photoAt,
+                            category = starCardData.category,
+                            tools = starCardData.tools,
+                            likeCount = starCardData.likeCount,
+                            amILikeThis = starCardData.amILikeThis
+                        )
+                    }
+                } ?: emptyList()
+            } else {
+                // API 에러 응답을 처리합니다.
+                // 에러를 로그에 남기거나 사용자에게 메시지를 표시합니다.
+                emptyList()
+            }
+        } catch (e: Exception) {
+            // 예외를 처리합니다 (예: 네트워크 오류).
+            // 예외를 로그에 남기거나 사용자에게 메시지를 표시합니다.
+            emptyList()
+        }
     }
 }
 
@@ -318,12 +331,10 @@ fun LikeCardsScreen(viewModel: MypageViewModel, likeCards: MutableState<List<Car
     }
 }
 
-suspend fun getResults(viewModel: MypageViewModel): List<Any> = coroutineScope {
-    val id = 1 // sharedPreferences 에서 id 가져오기
-    // val id = Stellargram.prefs.getString(memberId, DEFAULT)
-    val myCardsDeferred = async { viewModel.getMyCards(id=id) }
+suspend fun getResults(viewModel: MypageViewModel, id:Long): List<Any> = coroutineScope {
+    val myCardsDeferred = async { viewModel.fetchUserCards(id=id) }
     val favStarsDeferred = async { viewModel.getFavStars() }
-    val likeCardsDeferred = async { viewModel.getLikeCards(id=id) }
+    val likeCardsDeferred = async { viewModel.fetchLikeCards(id=id) }
 
     val myCards = myCardsDeferred.await()
     val favStars = favStarsDeferred.await()
@@ -332,12 +343,12 @@ suspend fun getResults(viewModel: MypageViewModel): List<Any> = coroutineScope {
     viewModel.myCards.value = myCards
     viewModel.favStars.value = favStars
     viewModel.likeCards.value = likeCards
-
     val results = mutableListOf<Any>()
     results.addAll(myCards)
     results.addAll(favStars)
     results.addAll(likeCards)
 
+    Log.d("마이페이지","$results")
     results
 }
 
@@ -364,7 +375,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     GlideImage(
-                        model = card.memberImagePath,
+                        model = card.memberProfileImageUrl,
                         contentDescription = "123",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -372,7 +383,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                             .clip(CircleShape) // 동그라미 모양으로 잘라주기
                     )
                     Text(
-                        text = card.memberNickName,
+                        text = card.memberNickname,
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier
                             .padding(start = 8.dp)
@@ -536,7 +547,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     GlideImage(
-                        model = card.memberImagePath,
+                        model = card.memberProfileImageUrl,
                         contentDescription = "123",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -544,7 +555,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                             .clip(CircleShape) // 동그라미 모양으로 잘라주기
                     )
                     Text(
-                        text = card.memberNickName,
+                        text = card.memberNickname,
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier
                             .padding(start = 8.dp)

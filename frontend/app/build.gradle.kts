@@ -21,8 +21,8 @@ android {
         applicationId = "com.ssafy.stellargram"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 2_6
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         kapt {
@@ -183,6 +183,20 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
+
+        //카메라X 사용
+        val camerax_version = "1.1.0-beta01"
+        implementation ("androidx.camera:camera-core:${camerax_version}")
+        implementation ("androidx.camera:camera-camera2:${camerax_version}")
+        implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
+
+        implementation ("androidx.camera:camera-view:${camerax_version}")
+        implementation ("androidx.camera:camera-extensions:${camerax_version}")
+
+        implementation ("androidx.camera:camera-camera2:1.1.0-beta01")
+        implementation ("androidx.camera:camera-core:1.1.0-beta01")
+
+
     // STOMP 사용을 위한 라이브러리
     implementation("com.github.bishoybasily:stomp:2.0.5")
 
@@ -191,6 +205,19 @@ dependencies {
 
     // unixTimestamp 포매팅 라이브러리
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
+
+    // rating 컴포넌트 라이브러리
+    implementation ("com.github.a914-gowtham:compose-ratingbar:1.3.4")
+
+    // XML Parser - https://bb-library.tistory.com/177
+    implementation("com.tickaroo.tikxml:annotation:0.8.13")
+    implementation("com.tickaroo.tikxml:core:0.8.13")
+    implementation("com.tickaroo.tikxml:retrofit-converter:0.8.13")
+    kapt("com.tickaroo.tikxml:processor:0.8.13")
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.3.0")
+
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+
 }
 
 // Dependency injection with Hilt
