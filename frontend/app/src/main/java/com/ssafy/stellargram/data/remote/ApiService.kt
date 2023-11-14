@@ -90,6 +90,13 @@ interface ApiServiceForCards {
         @Path("memberId") memberId: Long
     ): Response<CardsResponse>
 
+    // 키워드로 카드 검색
+    @GET("starcard/search")
+    suspend fun searchStarCards(
+        @Query("keyword") keyword: String,
+        @Query("category") category: String = "galaxy"
+    ): Response<CardsResponse>
+
 }
 
 interface ApiServiceForWeather{
