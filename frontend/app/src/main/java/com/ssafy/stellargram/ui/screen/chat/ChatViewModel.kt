@@ -24,12 +24,13 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     val initRoomId: Int = -1
     val initPersonnel = 0
     val initSiteId = "initSite"
+    val initCursor: Int = -2
 
     // 채팅방 정보
-    private var roomId: Int = -1
-    private var personnel: Int = 0
-    private var siteId: String = "initSite"
-    private var nextCursor: Int = 0
+    var roomId: Int = initRoomId
+    private var personnel: Int = initPersonnel
+    private var siteId: String = initSiteId
+    var nextCursor: Int = initCursor
 
 //    private val privateMessages : MutableList<MessageInfo>= mutableStateListOf(*initialMessages.toTypedArray())
 //
@@ -60,21 +61,47 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         val response =
             NetworkModule.provideRetrofitInstanceChat().getRecentCursor(chatRoomId = roomId)
         if (response?.code == 200) {
+            Log.d("get cursor", response.data.toString())
             nextCursor = response.data
         }
 
     }
 
     suspend fun getMessages() {
+        if (nextCursor == initCursor) return
+        if (nextCursor == -1) return
         if (roomId != initRoomId) {
+
             val response = NetworkModule.provideRetrofitInstanceChat()
                 .getPrevChats(myId = TestValue.myId, chatRoomId = roomId, cursor = nextCursor)
             if (response?.code == 200) {
                 Log.d("getMessages response", response.data.messageList.toString())
-                privateMessages.addAll(response.data.messageList)
+                privateMessages.addAll(response.data.messageList.reversed())
                 nextCursor = response.data.nextCursor
             } else {
                 null
+            }
+        }
+    }
+
+    suspend fun enterRoom() {
+        val responseCursor =
+            NetworkModule.provideRetrofitInstanceChat().getRecentCursor(chatRoomId = roomId)
+        if (responseCursor?.code == 200) {
+            Log.d("get cursor", responseCursor.data.toString())
+            nextCursor = responseCursor.data
+
+            if (roomId != initRoomId) {
+
+                val response = NetworkModule.provideRetrofitInstanceChat()
+                    .getPrevChats(myId = TestValue.myId, chatRoomId = roomId, cursor = nextCursor)
+                if (response?.code == 200) {
+                    Log.d("getMessages response", response.data.messageList.toString())
+                    privateMessages.addAll(response.data.messageList.reversed())
+                    nextCursor = response.data.nextCursor
+                } else {
+                    null
+                }
             }
         }
     }
@@ -148,7 +175,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                         memberImagePath = result.memberImagePath,
                         content = result.content
                     )
-                    privateMessages.add(newMessage)
+                    privateMessages.add(0, newMessage)
                 }
             }
         topic = thisTopic
