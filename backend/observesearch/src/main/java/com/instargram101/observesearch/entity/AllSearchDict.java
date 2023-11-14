@@ -49,13 +49,18 @@ public class AllSearchDict {
 
     public long getSize(long longChunk, long latiChunk){
         long id = getIdByLongLatiChunk(longChunk, latiChunk);
-
-        return dict.get(id).size();
+        if(dict.containsKey(id))
+            return dict.get(id).size();
+        else
+            return 0;
     }
 
     public long getSize(long id){
         log.info(String.format("id: %d", id));
-        return dict.get(id).size();
+        if(dict.containsKey(id))
+            return dict.get(id).size();
+        else
+            return 0;
     }
 
     /**
