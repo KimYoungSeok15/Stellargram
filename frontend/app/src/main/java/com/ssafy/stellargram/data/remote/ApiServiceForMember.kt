@@ -1,5 +1,5 @@
 package com.ssafy.stellargram.data.remote
-
+import com.google.gson.annotations.SerializedName
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardDeleteResponse
 import com.ssafy.stellargram.model.CardLikersResponse
@@ -107,6 +107,9 @@ interface ApiServiceForMember {
     @POST("member/member-list")
     suspend fun getMemberListByIds(@Body memberIds: List<Long>): Response<FollowersResponse>
 }
+data class NickNameUpdateRequest(
+    @SerializedName("nickname") val nickname: String
+)
 
 interface ApiServiceForCards {
     // 내 카드 전체 조회
@@ -199,5 +202,3 @@ interface ApiServiceForChat {
         @Path("chatRoomId") chatRoomId: Int,
     ): CursorResponse
 }
-
-
