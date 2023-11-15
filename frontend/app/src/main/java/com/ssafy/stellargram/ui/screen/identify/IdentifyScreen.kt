@@ -58,8 +58,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -160,6 +162,17 @@ fun IdentifyScreen(navController: NavController) {
             modifier = Modifier.weight(0.5f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "장애물이 없고 화각이 30도에 가까울수록",
+                color = Color.White,
+                style = TextStyle(fontSize = Constant.verySmallText.sp)
+            )
+            Text(
+                text = "인식률이 올라갑니다",
+                color = Color.White,
+                style = TextStyle(fontSize = Constant.verySmallText.sp)
+            )
+
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
@@ -177,15 +190,6 @@ fun IdentifyScreen(navController: NavController) {
                 }
             }
         }
-
-
-//        Button(
-//            onClick = { /*TODO*/ },
-//            modifier = Modifier
-//                .padding(16.dp)
-//        ) {
-//            Text(text = "천체카드 작성하기")
-//        }
     }
 }
 
