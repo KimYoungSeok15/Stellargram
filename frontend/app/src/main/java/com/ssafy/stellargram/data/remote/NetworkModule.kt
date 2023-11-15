@@ -25,6 +25,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private const val BASE_URL: String = INSTARGRAM_APP_URI
+    private const val IDENTIFY_URL: String = "http://k9a101.p.ssafy.io:8002/"
+
     //  Dagger Hilt를 통해 Singleton 스코프를 가진 OkHttpClient 인스턴스를 규정
     @Provides
     @Singleton
@@ -196,9 +198,21 @@ object NetworkModule {
     fun provideRetrofitInstanceSite(): ApiServiceForSite {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(provideHttpClient())
+            .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForSite::class.java)
+    }
+
+    // 별인식 관련 API
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceIdentify(): ApiServiceForIdentify {
+        return Retrofit.Builder()
+            .baseUrl(IDENTIFY_URL)
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForIdentify::class.java)
     }
 }
