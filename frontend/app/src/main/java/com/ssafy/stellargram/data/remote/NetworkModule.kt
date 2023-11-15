@@ -11,14 +11,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
-import java.nio.Buffer
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -53,16 +51,21 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideRetrofitInstance(
-    ): ApiService {
+    ): ApiServiceForMember {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             //json 변화기 Factory
             .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
-            .create(ApiService::class.java)
+            .create(ApiServiceForMember::class.java)
 
     }
+    @Singleton
+    @Provides
+    fun provideApiServiceForCards(): ApiServiceForCards = lazy {
+        ProvideRetrofitCards()
+    }.value
 
     // 카드 retrofit
     @Singleton
@@ -140,14 +143,14 @@ object NetworkModule {
     @Singleton
     @Provides
     fun RetrofitGetMemberInfo(
-    ): ApiService {
+    ): ApiServiceForMember {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             //json 변화기 Factory
             .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
-            .create(ApiService::class.java)
+            .create(ApiServiceForMember::class.java)
     }
 
     @Singleton

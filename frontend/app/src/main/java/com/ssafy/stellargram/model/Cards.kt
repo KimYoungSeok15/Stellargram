@@ -1,6 +1,6 @@
 package com.ssafy.stellargram.model
 
-    data class CardsResponse(
+data class CardsResponse(
     val code: Int,
     val message: String,
     val data: CardsData
@@ -44,6 +44,47 @@ data class Card(
     val photoAt: String?,
     val category: String,
     val tools: String,
+    val likeCount: Int,
+    val amILikeThis: Boolean
+)
+
+data class CardLikersResponse(
+    val code: Int,
+    val message: String,
+    val data: List<Long>
+)
+
+data class CardPostResponse(
+    val code: Int,
+    val message: String,
+    val data: Int
+)
+
+data class CardDeleteResponse(
+    val code: Int,
+    val message: String,
+    val data: String
+)
+
+data class CardRecommendResponse(
+    val code: Int,
+    val message: String,
+    val data: StarCards
+)
+
+data class StarCards(
+    val starcards: List<BestCard>?
+)
+
+data class BestCard(
+    val cardId: Int,
+    val memberId: Long,
+    val observeSiteId: String,
+    val imagePath: String,
+    val content: String,
+    val photoAt: String?,
+    val category: String?,
+    val tools: String?,
     val likeCount: Int,
     val amILikeThis: Boolean
 )
