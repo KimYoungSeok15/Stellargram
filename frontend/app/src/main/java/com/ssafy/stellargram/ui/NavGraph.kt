@@ -1,5 +1,7 @@
 package com.ssafy.stellargram.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -23,6 +25,7 @@ import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
 import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 import com.ssafy.stellargram.ui.screen.stardetail.StarDetailScreen
 
+@RequiresApi(Build.VERSION_CODES.P)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun NavGraph(

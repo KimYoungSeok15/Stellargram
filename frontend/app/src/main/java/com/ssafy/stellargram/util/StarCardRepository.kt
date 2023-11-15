@@ -22,7 +22,6 @@ import javax.inject.Inject
 class StarCardRepository @Inject constructor(
     private val apiService: ApiServiceForCards
 ) {
-
     suspend fun uploadCard(uri: String, content: String, photo_at: String = "", category: String = "galaxy", tool: String = "", observeSiteId: String = ""): Response<CardPostResponse> {
         val imageUri:Uri = Uri.parse(uri)
         val imageFilePart = prepareImageFilePart("imageFile", imageUri)

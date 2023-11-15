@@ -111,15 +111,15 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
 //             Text(text = "별 인식")
 //         }
 //
-//        Button(
-//            onClick = {
-//                navController.navigate(Screen.MakeCard.route)
-//            },
-//            modifier = Modifier
-//                .padding(16.dp)
-//        ) {
-//            Text(text = "천체카드 만들기")
-//        }
+        Button(
+            onClick = {
+                navController.navigate(Screen.MakeCard.route)
+            },
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(text = "천체카드 만들기")
+        }
 
     }
 }
