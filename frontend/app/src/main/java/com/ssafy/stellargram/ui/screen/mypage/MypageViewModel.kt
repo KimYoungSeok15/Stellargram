@@ -69,9 +69,7 @@ import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class MypageViewModel @Inject constructor(
-    private val starCardRepository: StarCardRepository
-) : ViewModel() {
+class MypageViewModel @Inject constructor() : ViewModel() {
     private val _memberResults = mutableStateOf<List<Member>>(emptyList())
     private val _tabIndex: MutableLiveData<Int> = MutableLiveData(0)
     val tabs = listOf("게시물", "즐겨찾기", "좋아요")
@@ -95,13 +93,6 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    // 코루틴을 사용하여 uploadCard 호출
-    fun uploadCard(imageUri: Uri, content: String, photoAt: String, category: String, tool: String, observeSiteId: String) {
-        viewModelScope.launch {
-            val response = starCardRepository.uploadCard(imageUri, content, photoAt, category, tool, observeSiteId)
-            // 응답 처리 코드 작성 (예: 성공 시 UI 갱신)
-        }
-    }
 
     // Add these methods for managing tabs
     fun updateTabIndex(index: Int) {
@@ -150,7 +141,7 @@ class MypageViewModel @Inject constructor(
     suspend fun fetchUserCards(id: Long): List<Card> {
         Log.d("마이페이지", "시작")
         return try {
-            val response = NetworkModule.ProvideRetrofitCards().getCards(memberId = id)
+            val response = NetworkModule.provideRetrofitCards().getCards(memberId = id)
             Log.d("마이페이지", "디버깅 : $response")
             if (response.isSuccessful) {
                 val cardsResponse = response.body()
@@ -165,6 +156,7 @@ class MypageViewModel @Inject constructor(
                             memberProfileImageUrl = starCardData.memberProfileImageUrl,
                             observeSiteId = starCardData.observeSiteId,
                             imagePath = starCardData.imagePath,
+                            imageUrl = starCardData.imageUrl,
                             content = starCardData.content,
                             photoAt = starCardData.photoAt,
                             category = starCardData.category,
@@ -214,7 +206,7 @@ class MypageViewModel @Inject constructor(
     }
     suspend fun fetchLikeCards(id: Long): List<Card> {
         return try {
-            val response = NetworkModule.ProvideRetrofitCards().getLikeCards(memberId = id)
+            val response = NetworkModule.provideRetrofitCards().getLikeCards(memberId = id)
 
             if (response.isSuccessful) {
                 val cardsResponse = response.body()
@@ -229,6 +221,7 @@ class MypageViewModel @Inject constructor(
                             memberProfileImageUrl = starCardData.memberProfileImageUrl,
                             observeSiteId = starCardData.observeSiteId,
                             imagePath = starCardData.imagePath,
+                            imageUrl = starCardData.imageUrl,
                             content = starCardData.content,
                             photoAt = starCardData.photoAt,
                             category = starCardData.category,
@@ -419,7 +412,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
 
             // 사진 표시
             GlideImage(
-                model = card.imagePath,
+                model = card.imageUrl,
                 contentDescription = "Card Image",
                 modifier = Modifier.fillMaxSize()
             )
@@ -591,7 +584,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
 
             // 사진 표시
             GlideImage(
-                model = card.imagePath,
+                model = card.imageUrl,
                 contentDescription = "Card Image",
                 modifier = Modifier.fillMaxSize()
             )

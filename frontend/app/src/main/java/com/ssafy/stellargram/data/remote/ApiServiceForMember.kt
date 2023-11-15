@@ -124,7 +124,7 @@ interface ApiServiceForCards {
     ): Response<CardsResponse>
 
     // 특정회원이 좋아하는 카드 전체 조회
-    @GET("/like/{memberId}")
+    @GET("/starcard/like/{memberId}")
     suspend fun getLikeCards(
         @Path("memberId") memberId: Long
     ): Response<CardsResponse>
@@ -144,7 +144,7 @@ interface ApiServiceForCards {
 
     // ** 카드 등록 **  - 오류 생길 가능성 큼. 테스트 안해봄. 사용 방법은 StarCardRepository.kt 파일을 참조할 것.
     // 참조 - https://ducksever.tistory.com/28 + ChatGPT
-    // 사용 방법: val response = StarCardRepository.uploadCard(imageUri, content, photo_at, category, tool, observeSiteId)
+    // 사용 방법: val response = StarCardRepository.uploadCard(uri, content, photo_at, category, tool, observeSiteId)
     @Multipart
     @POST("/starcard/")
     suspend fun uploadStarCard(

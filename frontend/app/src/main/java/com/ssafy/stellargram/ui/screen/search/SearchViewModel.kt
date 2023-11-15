@@ -202,7 +202,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
             // 카드 검색 로직
             // TODO: category관련 상의할 것. all은 없나? 일단 galaxy 고정하기로
             val response =
-                NetworkModule.provideRetrofitInstanceCards().searchStarCards(text, "galaxy")
+                NetworkModule.provideRetrofitCards().searchStarCards(text, "galaxy")
 
             if (response?.code == 200) {
                 val cardList: List<CardResponse> = response.data.starcards
@@ -220,6 +220,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
                             memberProfileImageUrl = responseMember.body()!!.data.profileImageUrl,
                             observeSiteId = card.observeSiteId,
                             imagePath = card.imagePath,
+                            imageUrl = card.imageUrl,
                             content = card.content,
                             photoAt = card.photoAt,
                             category = card.category,

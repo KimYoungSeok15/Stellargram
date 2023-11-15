@@ -67,7 +67,6 @@ fun MypageScreen(navController: NavController, id:Long) {
     LaunchedEffect(true) {
         viewModel.getMemberInfo(userId)
         getResults(viewModel = viewModel, id = userId)
-        viewModel.uploadCard(imageUri= "123", content= "내내내용", photoAt= "", category= "galaxy", tool= "", observeSiteId="")
     }
 
 
