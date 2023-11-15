@@ -218,6 +218,9 @@ dependencies {
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 
+    // 이미지 크로퍼 라이브러리
+    implementation("io.github.mr0xf00:easycrop:0.1.1")
+
 }
 
 // Dependency injection with Hilt

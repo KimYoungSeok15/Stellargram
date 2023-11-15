@@ -1,27 +1,41 @@
 package com.ssafy.stellargram.ui.screen.identify
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
-import com.beust.klaxon.Klaxon
-import com.gmail.bishoybasily.stomp.lib.Event
-import com.gmail.bishoybasily.stomp.lib.StompClient
-import com.ssafy.stellargram.data.remote.NetworkModule
-import com.ssafy.stellargram.model.ChatRoom
-import com.ssafy.stellargram.model.MessageForReceive
-import com.ssafy.stellargram.model.MessageInfo
-import com.ssafy.stellargram.ui.screen.chat.TestValue
+import android.app.Application
+import android.net.Uri
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.mr0xf00.easycrop.CropError
+import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.ImageCropper
+import com.mr0xf00.easycrop.crop
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Response
-import org.json.JSONObject
-import java.io.IOException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class IdentifyViewModel @Inject constructor() : ViewModel() {
+class IdentifyViewModel @Inject constructor(private val app: Application) : AndroidViewModel(app) {
+    val imageCropper = ImageCropper()
+    private val _selectedImage = MutableStateFlow<ImageBitmap?>(null)
+    val selectedImage = _selectedImage.asStateFlow()
+    private val _cropError = MutableStateFlow<CropError?>(null)
+    val cropError = _cropError.asStateFlow()
 
+    fun cropErrorShown() {
+        _cropError.value = null
+    }
 
+    fun setSelectedImage(uri: Uri) {
+        viewModelScope.launch {
+            when(val result = imageCropper.crop(uri,app)) {
+                CropResult.Cancelled -> {}
+                is CropError -> _cropError.value = result
+                is CropResult.Success -> {
+                    _selectedImage.value = result.bitmap
+                }
+            }
+        }
+    }
 }

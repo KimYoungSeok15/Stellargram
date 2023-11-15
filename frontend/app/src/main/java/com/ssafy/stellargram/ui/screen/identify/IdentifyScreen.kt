@@ -18,9 +18,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,18 +31,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -47,15 +57,26 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.mr0xf00.easycrop.CropError
+import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.CropperLoading
+import com.mr0xf00.easycrop.crop
+import com.mr0xf00.easycrop.rememberImageCropper
+import com.mr0xf00.easycrop.rememberImagePicker
+import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.ssafy.stellargram.ui.screen.camera.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
 import com.ssafy.stellargram.ui.screen.camera.rememberLauncherForGallery
+import com.ssafy.stellargram.ui.theme.EasyCropTheme
+import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.IOException
 import kotlin.math.roundToInt
@@ -65,31 +86,27 @@ import kotlin.math.roundToInt
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun IdentifyScreen(navController: NavController) {
+    val viewModel: IdentifyViewModel = hiltViewModel()
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-//    val contentResolver: ContentResolver = context.contentResolver
+
+    val imagePicker = rememberImagePicker(onImage = { uri -> viewModel.setSelectedImage(uri) })
+
+    val cropState = viewModel.imageCropper.cropState
+    val loadingStatus = viewModel.imageCropper.loadingStatus
+    val selectedImage = viewModel.selectedImage.collectAsState().value
+    val onPick = { imagePicker.pick() }
 
 
+    // 갤러리에서 선택한 이미지 uri
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var pixelx by remember { mutableStateOf(0) }
-    var pixely by remember { mutableStateOf(0) }
-
-    var testx by remember { mutableStateOf(0) }
-
     LaunchedEffect(selectedImageUri) {
         if (selectedImageUri != null) {
-            var bit: Bitmap = ImageDecoder.decodeBitmap(
-                ImageDecoder.createSource(
-                    context.contentResolver,
-                    selectedImageUri!!
-                )
-            )
-            Log.d("bitmap test", bit.byteCount.toString())
-            pixelx = bit.width
-            pixely = bit.height
-            testx = bit.density
+
         }
     }
 
+    // 갤러리 런처
     val galleryLauncher = rememberLauncherForGallery(selectedImageUri) {
         // TODO: 선택 실패시 에러 처리할 것
         Log.d("SelectedImage", it.toString())
@@ -97,105 +114,114 @@ fun IdentifyScreen(navController: NavController) {
     }
 
 
-    var scale by remember { mutableStateOf(1f) }
-    var rotation by remember { mutableStateOf(0f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        scale *= zoomChange
-        if (scale > 1) scale = 1f
-        rotation += rotationChange
-        offset += offsetChange
-    }
-
-
-
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .background(Color.Red),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-//        DraggableTextLowLevel()
-        GlideImage(
-            model = selectedImageUri,
-            contentDescription = "Selected Image",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
-        Box(
-            modifier = Modifier
-                .weight(0.5f)
-                .background(Color.Blue)
-                .transformable(state = state)
-
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                        translationX = offset.x,
-                        translationY = offset.y
-                    )
-                    .background(Color.White)
-                    .fillMaxSize()
-            ) {
-
+        // 크롭창 활성화
+        if (cropState != null) {
+            EasyCropTheme(darkTheme = true) {
+                ImageCropperDialog(state = cropState)
             }
         }
-        Column(modifier = Modifier) {
-            Text(text = "scale=${scale}")
-            Text(text = "offset.x=${offset.x}")
-            Text(text = "offset.y=${offset.y}")
-            Text(text = "pixelx=${pixelx}")
-            Text(text = "pixely=${pixely}")
-            Text(text = "density=${testx}")
+//        // 로딩중 안내메세지
+//        if (cropState == null && loadingStatus != null) {
+//            LoadingDialog(status = loadingStatus)
+//        }
 
+        Column(
+            modifier = Modifier
+//                .weight(0.5f)
+                .background(Color.Yellow),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (selectedImage != null) {
+                Image(
+                    bitmap = selectedImage, contentDescription = null,
+//                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                Column(
+//                    hori,
+//                contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(300.dp)
+//                    .weight(0.5f)
+                        .background(Color.Cyan)
+                ) {
+                    Text("사진을 선택해주세요")
+                }
+            }
         }
-//        GlideImage(
-//            model = selectedImageUri,
-//            contentDescription = "Selected Image",
-//            contentScale = ContentScale.Fit,
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = onPick) { Text("사진 고르기") }
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                Text(text = "별 인식하기")
+            }
+        }
+
+
+//        Button(
+//            onClick = { /*TODO*/ },
 //            modifier = Modifier
-//                .fillMaxWidth()
-//        )
-
-        Button(
-            onClick = {
-                galleryLauncher.launch("image/*")
-
-
-            },
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = "사진 고르기")
-        }
-
-
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = "별 인식하기")
-        }
-
-
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = "천체카드 작성하기")
-        }
+//                .padding(16.dp)
+//        ) {
+//            Text(text = "천체카드 작성하기")
+//        }
     }
 }
 
 fun onClickSelect() {
 
 }
+
+@Composable
+fun CropError.getMessage(): String = remember(this) {
+    when (this) {
+        CropError.LoadingError -> "Error while opening the image !"
+        CropError.SavingError -> "Error while saving the image !"
+    }
+}
+
+
+@Composable
+fun LoadingDialog(status: CropperLoading) {
+    var dismissed by remember(status) { mutableStateOf(false) }
+    if (!dismissed) Dialog(onDismissRequest = { dismissed = true }) {
+        Surface(
+            shape = MaterialTheme.shapes.small
+//            ,  elevation = 6.dp
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                CircularProgressIndicator()
+                Text(text = status.getMessage())
+            }
+        }
+    }
+}
+
+@Composable
+fun CropperLoading.getMessage(): String {
+    return remember(this) {
+        when (this) {
+            CropperLoading.PreparingImage -> "Preparing Image"
+            CropperLoading.SavingResult -> "Saving Result"
+        }
+    }
+}
+
