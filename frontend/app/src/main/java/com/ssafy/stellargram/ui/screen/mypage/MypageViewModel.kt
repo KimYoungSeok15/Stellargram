@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import com.ssafy.stellargram.model.Member
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.Star
+import com.ssafy.stellargram.util.StarCardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +69,9 @@ import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class MypageViewModel @Inject constructor() : ViewModel() {
+class MypageViewModel @Inject constructor(
+    private val starCardRepository: StarCardRepository
+) : ViewModel() {
     private val _memberResults = mutableStateOf<List<Member>>(emptyList())
     private val _tabIndex: MutableLiveData<Int> = MutableLiveData(0)
     val tabs = listOf("게시물", "즐겨찾기", "좋아요")
@@ -88,6 +92,14 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         } else if (delta < 0 && _tabIndex.value!! < tabs.size - 1) {
             // Swipe to the left
             _tabIndex.value = _tabIndex.value!! + 1
+        }
+    }
+
+    // 코루틴을 사용하여 uploadCard 호출
+    fun uploadCard(imageUri: Uri, content: String, photoAt: String, category: String, tool: String, observeSiteId: String) {
+        viewModelScope.launch {
+            val response = starCardRepository.uploadCard(imageUri, content, photoAt, category, tool, observeSiteId)
+            // 응답 처리 코드 작성 (예: 성공 시 UI 갱신)
         }
     }
 

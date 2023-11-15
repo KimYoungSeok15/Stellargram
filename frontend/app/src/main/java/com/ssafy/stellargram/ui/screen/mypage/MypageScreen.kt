@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoViewModel
 import com.ssafy.stellargram.ui.screen.search.MainViewModel
+import com.ssafy.stellargram.util.StarCardRepository
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -65,6 +67,7 @@ fun MypageScreen(navController: NavController, id:Long) {
     LaunchedEffect(true) {
         viewModel.getMemberInfo(userId)
         getResults(viewModel = viewModel, id = userId)
+        viewModel.uploadCard(imageUri= "123", content= "내내내용", photoAt= "", category= "galaxy", tool= "", observeSiteId="")
     }
 
 

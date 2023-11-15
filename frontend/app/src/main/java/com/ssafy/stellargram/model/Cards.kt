@@ -79,8 +79,11 @@ data class StarCards(
 data class BestCard(
     val cardId: Int,
     val memberId: Long,
+    val memberNickname: String,
+    val memberProfileImageUrl: String,
     val observeSiteId: String,
     val imagePath: String,
+    val imageUrl: String,
     val content: String,
     val photoAt: String?,
     val category: String?,
