@@ -87,7 +87,7 @@ public class StarcardServiceImpl implements StarcardService {
 
         Starcard starcard = starcardRepository.findById(cardId)
                 .orElseThrow(()-> new CustomException((StarcardErrorCode.Starcard_Not_Found)));
-        if(starcard.getMemberId() != myId) {
+        if(!starcard.getMemberId().equals(myId)) {
             throw new CustomException(StarcardErrorCode.Starcard_Forbidden);
         }
         starcardRepository.deleteById(cardId);
