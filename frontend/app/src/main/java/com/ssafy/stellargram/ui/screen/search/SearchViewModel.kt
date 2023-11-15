@@ -226,7 +226,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
                             category = card.category,
                             tools = card.tools,
                             likeCount = card.likeCount,
-                            amILikeThis = card.amILikeThis
+                            amILikeThis = card.amILikeThis,
+                            isFollowing = false,
                         )
 
                         result.add(newCardInfo)

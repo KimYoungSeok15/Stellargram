@@ -47,7 +47,8 @@ data class Card(
     val category: String,
     val tools: String,
     val likeCount: Int,
-    val amILikeThis: Boolean
+    val amILikeThis: Boolean,
+    var isFollowing: Boolean  // 작가를 내가 팔로잉 하는지 추후에 판단하기 위한 변수
 )
 
 data class CardLikersResponse(
@@ -91,5 +92,6 @@ data class BestCard(
     val category: String?,
     val tools: String?,
     val likeCount: Int,
-    val amILikeThis: Boolean
+    val amILikeThis: Boolean,
+    var isFollowing: Boolean
 )

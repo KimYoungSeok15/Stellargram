@@ -206,7 +206,8 @@ fun TodaysPicture() {
             category = "GALAXY",
             tools = "엄청 좋은 카메라",
             likeCount = 156,
-            amILikeThis = false
+            amILikeThis = false,
+            isFollowing = false,
         )
 
         val dummyCards = mutableListOf(card)

@@ -50,6 +50,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.ApiServiceForCards
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
@@ -59,6 +60,7 @@ import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.Star
 import com.ssafy.stellargram.util.StarCardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.internal.aggregatedroot.codegen._com_ssafy_stellargram_StellargramApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -133,6 +135,36 @@ class MypageViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+    // 사용자가 팔로우 하는 사람들의 목록을 가져온다. 보고있는 페이지의 주인이 아니다.
+    suspend fun getFollowingList(id: Long): List<Member> {
+        return try {
+            val response = NetworkModule.provideRetrofitInstance().getFollowingList(memberId = id)
+
+            if (response.isSuccessful) {
+                val followersResponse = response.body()
+
+                followersResponse?.data?.let { data ->
+                    return data.members.map { follower ->
+                        Member(
+                            memberId = follower.memberId,
+                            nickname = follower.nickname,
+                            profileImageUrl = follower.profileImageUrl,
+                            isFollow = follower.isFollow,
+                            followCount = follower.followCount,
+                            followingCount = follower.followingCount,
+                            cardCount = follower.cardCount
+                        )
+                    }
+                } ?: emptyList()
+            } else {
+                Log.e("마이페이지", "팔로잉 목록 조회 실패: ${response.code()} - ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("마이페이지", "팔로잉 목록 조회 중 예외 발생: ${e.message}")
+            emptyList()
+        }
+    }
 
     var myCards = mutableStateOf<List<Card>>(emptyList())
     var favStars = mutableStateOf<List<Star>>(emptyList())
@@ -162,7 +194,8 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                             category = starCardData.category,
                             tools = starCardData.tools,
                             likeCount = starCardData.likeCount,
-                            amILikeThis = starCardData.amILikeThis
+                            amILikeThis = starCardData.amILikeThis,
+                            isFollowing = false, // 쓰이지 않음
                         )
                     }
                 } ?: emptyList()
@@ -204,6 +237,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         )
         return results
     }
+
     suspend fun fetchLikeCards(id: Long): List<Card> {
         return try {
             val response = NetworkModule.provideRetrofitCards().getLikeCards(memberId = id)
@@ -227,7 +261,8 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                             category = starCardData.category,
                             tools = starCardData.tools,
                             likeCount = starCardData.likeCount,
-                            amILikeThis = starCardData.amILikeThis
+                            amILikeThis = starCardData.amILikeThis,
+                            isFollowing = true, // 초기값은 false
                         )
                     }
                 } ?: emptyList()
@@ -336,7 +371,7 @@ fun LikeCardsScreen(viewModel: MypageViewModel, likeCards: MutableState<List<Car
     }
 }
 
-suspend fun getResults(viewModel: MypageViewModel, id:Long): List<Any> = coroutineScope {
+suspend fun getResults(viewModel: MypageViewModel, id:Long, followingList:List<Member>): List<Any> = coroutineScope {
     val myCardsDeferred = async { viewModel.fetchUserCards(id=id) }
     val favStarsDeferred = async { viewModel.getFavStars() }
     val likeCardsDeferred = async { viewModel.fetchLikeCards(id=id) }
@@ -348,6 +383,12 @@ suspend fun getResults(viewModel: MypageViewModel, id:Long): List<Any> = corouti
     viewModel.myCards.value = myCards
     viewModel.favStars.value = favStars
     viewModel.likeCards.value = likeCards
+
+    // 좋아하는 카드마다 그 카드의 작가를 팔로잉 중인지 여부 판단
+    likeCards.forEach { card ->
+        card.isFollowing = followingList.any { it.memberId == card.memberId }
+    }
+
     val results = mutableListOf<Any>()
     results.addAll(myCards)
     results.addAll(favStars)
@@ -364,20 +405,23 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
+            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 50.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         cardsState.value.forEach { card ->
             Row(
                 modifier = Modifier
-                    .padding(0.dp, 10.dp)
-                    .fillMaxSize()
-                    .clickable {},
+                    .padding(12.dp, 10.dp, 12.dp, 0.dp)
+                    .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 회원 정보 표시 (이미지, 닉네임)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable
+                    {
+                        // 해당 유저 마이페이지로 이동. 단, 현재 페이지일 경우 무효
+                    },
                 ) {
                     GlideImage(
                         model = card.memberProfileImageUrl,
@@ -395,26 +439,13 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                             .width(150.dp)
                     )
                 }
-                val followText = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = if (card.amILikeThis) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
-                        append(if (card.amILikeThis) "언팔로우" else "팔로우")
-                    }
-                }
-                ClickableText(
-                    text = followText,
-                    style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
-                    onClick = { offset ->
-                        // 팔로우 또는 언팔로우 이벤트 처리
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
 
             // 사진 표시
             GlideImage(
                 model = card.imageUrl,
                 contentDescription = "Card Image",
-                modifier = Modifier.fillMaxSize()
+                contentScale = ContentScale.FillWidth,
             )
 
             // 좋아요 아이콘 및 텍스트
@@ -424,7 +455,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                 painterResource(id = R.drawable.emptyheart)
             }
             Row(
-                modifier = Modifier.padding(0.dp, 4.dp)
+                modifier = Modifier.padding(12.dp, 4.dp)
             ) {
                 Image(
                     painter = likeIcon,
@@ -442,7 +473,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
             Text(
                 text = card.content,
                 style = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.padding(0.dp, 8.dp)
+                modifier = Modifier.padding(12.dp, 0.dp, 12.dp, 20.dp)
             )
         }
     }
@@ -459,7 +490,12 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
     ) {
         starsState.value.forEach { star ->
             // 각 Star에 대한 정보 표시
-            Text(text = "${star.name}", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "${star.name}",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top=12.dp)
+                )
             Column (
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -467,7 +503,8 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
                 GlideImage(
                     model = "https://image.librewiki.net/c/c5/Vega.jpg",
                     contentDescription = "설명",
-                    modifier = Modifier.padding(0.dp, 20.dp)
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    contentScale = ContentScale.FillWidth
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(0.dp, 4.dp),
@@ -490,7 +527,7 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 20.dp),
+                    .padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // 첫 번째 Column (별자리, 적경, 적위 등)
@@ -516,13 +553,10 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
             // 설명
             Text(
-                text = "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다. " +
-                        "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다.",
-                modifier = Modifier.padding(0.dp, 20.dp)
+                text = "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다.",
+                modifier = Modifier.padding(bottom = 20.dp)
             )
         }
     }
@@ -532,24 +566,26 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavController) {
-    // 각 검색 결과를 표시하는 UI 컴포넌트
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
+            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 50.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         cardsState.value.forEach { card ->
             Row(
                 modifier = Modifier
-                    .padding(0.dp, 10.dp)
-                    .fillMaxSize()
-                    .clickable {},
+                    .padding(12.dp, 10.dp, 12.dp, 0.dp)
+                    .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 회원 정보 표시 (이미지, 닉네임)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable
+                    {
+                        // 해당 유저 마이페이지로 이동. 단, 현재 페이지일 경우 무효
+                    },
                 ) {
                     GlideImage(
                         model = card.memberProfileImageUrl,
@@ -567,26 +603,34 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                             .width(150.dp)
                     )
                 }
+                // 팔로우 관련 - 내 카드면 팔로우버튼 없고, 남의 카드면 팔로잉 중일 경우 언팔로우가 뜨도록
                 val followText = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = if (card.amILikeThis) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
-                        append(if (card.amILikeThis) "언팔로우" else "팔로우")
+                    if (card.memberId != StellargramApplication.prefs.getString("memberId","").toLong()) {
+                        withStyle(style = SpanStyle(color = if (card.isFollowing) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
+                            append(if (card.isFollowing) "언팔로우" else "팔로우")
+                        }
                     }
                 }
-                ClickableText(
-                    text = followText,
-                    style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
-                    onClick = { offset ->
-                        // 팔로우 또는 언팔로우 이벤트 처리
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+
+                if (card.memberId != StellargramApplication.prefs.getString("memberId","").toLong()) {
+                    ClickableText(
+                        text = followText,
+                        style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
+                        onClick = { offset ->
+                            // 팔로우 또는 언팔로우 이벤트 처리
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(0.dp))
+                }
             }
 
             // 사진 표시
             GlideImage(
                 model = card.imageUrl,
                 contentDescription = "Card Image",
-                modifier = Modifier.fillMaxSize()
+                contentScale = ContentScale.FillWidth,
             )
 
             // 좋아요 아이콘 및 텍스트
@@ -596,7 +640,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                 painterResource(id = R.drawable.emptyheart)
             }
             Row(
-                modifier = Modifier.padding(0.dp, 4.dp)
+                modifier = Modifier.padding(12.dp, 4.dp)
             ) {
                 Image(
                     painter = likeIcon,
@@ -614,7 +658,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
             Text(
                 text = card.content,
                 style = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.padding(0.dp, 8.dp)
+                modifier = Modifier.padding(12.dp, 0.dp, 12.dp, 20.dp)
             )
         }
     }
