@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.instargram101.starcard.entity.Starcard;
+import com.instargram101.starcard.entity.StarcardLike;
+import com.instargram101.starcard.repoository.StarcardLikeRepository;
 import com.instargram101.starcard.repoository.StarcardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class KafkaConsumer {
 
     private final StarcardRepository starcardRepository;
+    private final StarcardLikeRepository starcardLikeRepository;
 
     @KafkaListener(topics= "test-topic")
     public void deleteMember(String kafkaMessage) {
@@ -37,6 +40,9 @@ public class KafkaConsumer {
         }
 
         List<Starcard> res = starcardRepository.findAllByMemberId(Long.valueOf(String.valueOf(map.get("memberId"))));
+        List<StarcardLike> res2 = starcardLikeRepository.findAllByMemberId(Long.valueOf(String.valueOf(map.get("memberId"))));
+
         starcardRepository.deleteAll(res);
+        starcardLikeRepository.deleteAll(res2);
     }
 }
