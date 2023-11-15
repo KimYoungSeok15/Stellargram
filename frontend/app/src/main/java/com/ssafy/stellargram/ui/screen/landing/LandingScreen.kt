@@ -101,15 +101,15 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
 //             Text(text = "카메라")
 //         }
 //
-//         Button(
-//             onClick = {
-//                 navController.navigate(Screen.Identify.route)
-//             },
-//             modifier = Modifier
-//                 .padding(16.dp)
-//         ) {
-//             Text(text = "별 인식")
-//         }
+         Button(
+             onClick = {
+                 navController.navigate(Screen.Identify.route)
+             },
+             modifier = Modifier
+                 .padding(16.dp)
+         ) {
+             Text(text = "별 인식")
+         }
 //
         Button(
             onClick = {
