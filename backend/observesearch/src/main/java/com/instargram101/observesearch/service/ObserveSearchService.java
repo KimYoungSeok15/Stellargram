@@ -108,32 +108,32 @@ public class ObserveSearchService {
     }
 
     public List<ObserveSite> getTopObserveSites(Double startX, Double endX, Double startY, Double endY){
-        long totalCount = 0L;
-
-        List<Long> chunkList = getAllChunkFromRange(startX, endX, startY, endY);
-        List<Integer> orders = new ArrayList(Collections.nCopies(chunkList.size(), 0));
-
-        for(Long chunk: chunkList){
-            totalCount += allSearchDict.getSize(chunk);
-        }
-
-        List<ObserveSite> observeSites = new ArrayList<>();
-        int i = 0;
-        int j = 0;
-        for(; i < maximumObserveSite && j < totalCount; j++){
-            int id = allSearchDict.getTopObserveSite(chunkList, orders);
-            ObserveSite observeSite = allSearchDict.getObserveSite(chunkList.get(id), orders.get(id));
-            if(observeSite.getLatitude() >= startX &&
-                    observeSite.getLatitude() <= endX &&
-                    observeSite.getLongitude() >= startY &&
-                    observeSite.getLongitude() <= endY
-            ){
-                observeSites.add(allSearchDict.getObserveSite(chunkList.get(id), orders.get(id)));
-                int order = orders.get(id);
-                orders.set(id, order + 1);
-                i++;
-            }
-        }
-        return observeSites;
+//        long totalCount = 0L;
+//
+//        List<Long> chunkList = getAllChunkFromRange(startX, endX, startY, endY);
+//        List<Integer> orders = new ArrayList(Collections.nCopies(chunkList.size(), 0));
+//
+//        for(Long chunk: chunkList){
+//            totalCount += allSearchDict.getSize(chunk);
+//        }
+//
+//        List<ObserveSite> observeSites = new ArrayList<>();
+//        int i = 0;
+//        int j = 0;
+//        for(; i < maximumObserveSite && j < totalCount; j++){
+//            int id = allSearchDict.getTopObserveSite(chunkList, orders);
+//            ObserveSite observeSite = allSearchDict.getObserveSite(chunkList.get(id), orders.get(id));
+//            if(observeSite.getLatitude() >= startX &&
+//                    observeSite.getLatitude() <= endX &&
+//                    observeSite.getLongitude() >= startY &&
+//                    observeSite.getLongitude() <= endY
+//            ){
+//                observeSites.add(allSearchDict.getObserveSite(chunkList.get(id), orders.get(id)));
+//                int order = orders.get(id);
+//                orders.set(id, order + 1);
+//                i++;
+//            }
+//        }
+        return allSearchDict.getTopObserveSite(startX, endX, startY, endY);
     }
 }

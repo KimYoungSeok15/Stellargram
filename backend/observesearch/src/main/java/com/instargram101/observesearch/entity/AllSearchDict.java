@@ -7,9 +7,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+
+import static java.lang.Math.abs;
 
 @Component
 @Getter
@@ -22,7 +25,12 @@ public class AllSearchDict {
 
     private final ObserveSearchRepository observeSearchRepository;
 
+    private List<ObserveSite> dict2 = new ArrayList<>();
+
     private HashMap<Long, List<ObserveSite>> dict = new HashMap<>();
+
+    @Value("${value.maximum_rendering_observe_site}")
+    private int maximumObserveSite;
 
     public long getIdByLongLatiChunk(long longChunk, long latiChunk){
         long bigNumber = 1000000000L;
@@ -38,29 +46,33 @@ public class AllSearchDict {
      * @return 아무것도 반환하지 않음.
     */
     public void addObserveSite(long longChunk, long latiChunk, ObserveSite observeSite){
-        // 2차원 해시맵을 사용하지 않고 chunk의 최대 개수보다 큰 bigNumber를 이용하여 id를 만들어줌
-        long id = getIdByLongLatiChunk(latiChunk, longChunk);
-
-        //우선 해당 id가 있으면 그 안에 넣고, 아님 해당 id에 새로운 List를 만들어준 뒤 그 안에 observeSite를 집어넣기
-        if(!dict.containsKey(id))
-            dict.put(id, new ArrayList<>());
-        dict.get(id).add(observeSite);
+//        // 2차원 해시맵을 사용하지 않고 chunk의 최대 개수보다 큰 bigNumber를 이용하여 id를 만들어줌
+//        long id = getIdByLongLatiChunk(latiChunk, longChunk);
+//
+//        //우선 해당 id가 있으면 그 안에 넣고, 아님 해당 id에 새로운 List를 만들어준 뒤 그 안에 observeSite를 집어넣기
+//        if(!dict.containsKey(id))
+//            dict.put(id, new ArrayList<>());
+//        dict.get(id).add(observeSite);
+//        log.info(String.format("%s", observeSite.getObserveSiteId()));
+        dict2.add(observeSite);
     }
 
     public long getSize(long longChunk, long latiChunk){
-        long id = getIdByLongLatiChunk(longChunk, latiChunk);
-        if(dict.containsKey(id))
-            return dict.get(id).size();
-        else
-            return 0;
+//        long id = getIdByLongLatiChunk(longChunk, latiChunk);
+//        if(dict.containsKey(id))
+//            return dict.get(id).size();
+//        else
+//            return 0;
+        return dict2.size();
     }
 
     public long getSize(long id){
-        log.info(String.format("id: %d", id));
-        if(dict.containsKey(id))
-            return dict.get(id).size();
-        else
-            return 0;
+//        log.info(String.format("id: %d", id));
+//        if(dict.containsKey(id))
+//            return dict.get(id).size();
+//        else
+//            return 0;
+        return dict2.size();
     }
 
     /**
@@ -71,12 +83,14 @@ public class AllSearchDict {
      * @return 아무것도 반환하지 않음
      */
     public void sortSitesById(long longChunk, long latiChunk){
-        long id = Long.valueOf(getIdByLongLatiChunk(longChunk, latiChunk));
-        List<ObserveSite> sites = dict.get(id);
-        for(ObserveSite site : sites){
-            log.info(String.format("Observe %s", site.getObserveSiteId()));
-        }
-        sites.sort(observeSiteSorter);
+//        long id = Long.valueOf(getIdByLongLatiChunk(longChunk, latiChunk));
+//        List<ObserveSite> sites = dict.get(id);
+//        for(ObserveSite site : sites){
+//            log.info(String.format("Observe %s", site.getObserveSiteId()));
+//        }
+//        sites.sort(observeSiteSorter);
+//
+        dict2.sort(observeSiteSorter);
     }
 
     /**
@@ -85,24 +99,34 @@ public class AllSearchDict {
      * @return 아무것도 반환하지 않음
      */
     public void sortAllSites(){
-        for(Long id: dict.keySet()){
-            List<ObserveSite> sites = dict.get(id);
-            sites.sort(observeSiteSorter);
-        }
+//        for(Long id: dict.keySet()){
+//            List<ObserveSite> sites = dict.get(id);
+//            sites.sort(observeSiteSorter);
+//        }
+        dict2.sort(observeSiteSorter);
     }
 
     public void updateObserveSite(long longChunk, long latiChunk, ObserveSite observeSite){
-        long id = Long.valueOf(getIdByLongLatiChunk(longChunk, latiChunk));
-        List<ObserveSite> sites = dict.get(id);
+//        long id = Long.valueOf(getIdByLongLatiChunk(longChunk, latiChunk));
+//        List<ObserveSite> sites = dict.get(id);
+//
+//        String observeId = observeSite.getObserveSiteId();
+//
+//        for(ObserveSite site: sites){
+//            if(site.getObserveSiteId().equals(observeId)){
+//                site = observeSite;
+//                return;
+//            }
+//        }
 
-        String observeId = observeSite.getObserveSiteId();
-
-        for(ObserveSite site: sites){
-            if(site.getObserveSiteId().equals(observeId)){
+        for(ObserveSite site: dict2){
+            var observeId = site.getObserveSiteId();
+            if ((abs(site.getLongitude() - observeSite.getLongitude()) < 1.0E-5) || (abs(site.getLatitude() - observeSite.getLatitude()) < 1.0E-5)){
                 site = observeSite;
                 return;
             }
         }
+
         throw new CustomException(ErrorCode.SERVER_ERROR);
     }
 
@@ -126,6 +150,27 @@ public class AllSearchDict {
             }
         }
         return idx;
+    }
+
+    public List<ObserveSite> getTopObserveSite(Double startX, Double endX, Double startY, Double endY){
+        int i = 0;
+
+        List<ObserveSite> res = new ArrayList<>();
+
+        for(ObserveSite observeSite: dict2){
+            var lat = observeSite.getLatitude();
+            var lng = observeSite.getLongitude();
+
+            if(startX > lat || endX < lat || startY > lng || endY < lng){
+                continue;
+            }
+            i++;
+            res.add(observeSite);
+            if(i >= maximumObserveSite){
+                break;
+            }
+        }
+        return res;
     }
 
     /**
