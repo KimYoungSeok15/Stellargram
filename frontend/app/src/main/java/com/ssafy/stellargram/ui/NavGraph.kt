@@ -18,6 +18,7 @@ import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
 import com.ssafy.stellargram.ui.screen.search.SearchScreen
 import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
+import com.ssafy.stellargram.ui.screen.skymap.SkyMapFrame
 import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 import com.ssafy.stellargram.ui.screen.stardetail.StarDetailScreen
 
@@ -58,7 +59,7 @@ fun NavGraph(
         }
 
         composable(route = Screen.SkyMap.route){
-            BaseFrame(navController, screen = Screen.SkyMap) {
+            SkyMapFrame(navController, screen = Screen.SkyMap) {
                 SkyMapScreen(navController = navController)
             }
         }
