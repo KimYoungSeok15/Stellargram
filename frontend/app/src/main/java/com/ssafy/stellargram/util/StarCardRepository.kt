@@ -22,8 +22,8 @@ import javax.inject.Inject
 class StarCardRepository @Inject constructor(
     private val apiService: ApiServiceForCards
 ) {
-
-    suspend fun uploadCard(imageUri: Uri, content: String, photo_at: String = "", category: String = "galaxy", tool: String = "", observeSiteId: String = ""): Response<CardPostResponse> {
+    suspend fun uploadCard(uri: String, content: String, photo_at: String = "", category: String = "galaxy", tool: String = "", observeSiteId: String = ""): Response<CardPostResponse> {
+        val imageUri:Uri = Uri.parse(uri)
         val imageFilePart = prepareImageFilePart("imageFile", imageUri)
         val requestDto = createRequestDto(content, photo_at, category, tool, observeSiteId)
 

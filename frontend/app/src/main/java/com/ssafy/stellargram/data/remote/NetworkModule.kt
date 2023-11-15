@@ -16,7 +16,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -61,25 +60,17 @@ object NetworkModule {
             .create(ApiServiceForMember::class.java)
 
     }
-    @Singleton
-    @Provides
-    fun provideApiServiceForCards(): ApiServiceForCards = lazy {
-        ProvideRetrofitCards()
-    }.value
 
     // 카드 retrofit
     @Singleton
     @Provides
-    fun ProvideRetrofitCards(
-    ): ApiServiceForCards {
+    fun provideRetrofitCards(): ApiServiceForCards {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            //json 변화기 Factory
+            .baseUrl(BASE_URL) // 기본 URL을 여기에 설정해야 합니다.
             .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForCards::class.java)
-
     }
 
     @Provides
@@ -151,17 +142,6 @@ object NetworkModule {
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForMember::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideRetrofitInstanceCards(): ApiServiceForCards {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL) // 기본 URL을 여기에 설정해야 합니다.
-            .client(provideHttpClientHeader(MyIdInterceptor()))
-            .addConverterFactory(provideConverterFactory())
-            .build()
-            .create(ApiServiceForCards::class.java)
     }
 
     // 채팅 관련 API

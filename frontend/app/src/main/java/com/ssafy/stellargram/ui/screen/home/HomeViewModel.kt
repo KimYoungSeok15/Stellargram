@@ -49,7 +49,6 @@ import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardsData
 import com.ssafy.stellargram.model.CardsResponse
-import com.ssafy.stellargram.model.Response
 import java.io.IOException
 import java.util.Locale
 import kotlin.math.abs
@@ -170,7 +169,7 @@ fun AutoScrollingText(text:String) {
 // 오늘의 추천 사진 가져오기
 suspend fun GetTodaysPicture(): retrofit2.Response<CardsResponse>? {
     return try {
-        val response = NetworkModule.provideRetrofitInstanceCards().getCards(3140000396)
+        val response = NetworkModule.provideRetrofitCards().getCards(3140000396)
         if (response.isSuccessful) {
             response
         } else {
@@ -201,6 +200,7 @@ fun TodaysPicture() {
             memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
             observeSiteId = "144",
             imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
+            imageUrl = "123",
             content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
             photoAt = "2023-10-27T01:49:22",
             category = "GALAXY",

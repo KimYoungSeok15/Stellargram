@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import com.ssafy.stellargram.model.Member
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.Star
+import com.ssafy.stellargram.util.StarCardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,6 +92,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
             _tabIndex.value = _tabIndex.value!! + 1
         }
     }
+
 
     // Add these methods for managing tabs
     fun updateTabIndex(index: Int) {
@@ -138,7 +141,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
     suspend fun fetchUserCards(id: Long): List<Card> {
         Log.d("마이페이지", "시작")
         return try {
-            val response = NetworkModule.ProvideRetrofitCards().getCards(memberId = id)
+            val response = NetworkModule.provideRetrofitCards().getCards(memberId = id)
             Log.d("마이페이지", "디버깅 : $response")
             if (response.isSuccessful) {
                 val cardsResponse = response.body()
@@ -153,6 +156,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                             memberProfileImageUrl = starCardData.memberProfileImageUrl,
                             observeSiteId = starCardData.observeSiteId,
                             imagePath = starCardData.imagePath,
+                            imageUrl = starCardData.imageUrl,
                             content = starCardData.content,
                             photoAt = starCardData.photoAt,
                             category = starCardData.category,
@@ -202,7 +206,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
     }
     suspend fun fetchLikeCards(id: Long): List<Card> {
         return try {
-            val response = NetworkModule.ProvideRetrofitCards().getLikeCards(memberId = id)
+            val response = NetworkModule.provideRetrofitCards().getLikeCards(memberId = id)
 
             if (response.isSuccessful) {
                 val cardsResponse = response.body()
@@ -217,6 +221,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
                             memberProfileImageUrl = starCardData.memberProfileImageUrl,
                             observeSiteId = starCardData.observeSiteId,
                             imagePath = starCardData.imagePath,
+                            imageUrl = starCardData.imageUrl,
                             content = starCardData.content,
                             photoAt = starCardData.photoAt,
                             category = starCardData.category,
@@ -407,7 +412,7 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
 
             // 사진 표시
             GlideImage(
-                model = card.imagePath,
+                model = card.imageUrl,
                 contentDescription = "Card Image",
                 modifier = Modifier.fillMaxSize()
             )
@@ -579,7 +584,7 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
 
             // 사진 표시
             GlideImage(
-                model = card.imagePath,
+                model = card.imageUrl,
                 contentDescription = "Card Image",
                 modifier = Modifier.fillMaxSize()
             )
