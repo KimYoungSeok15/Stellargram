@@ -1,7 +1,5 @@
 package com.ssafy.stellargram.data.remote
 
-import android.net.Uri
-import com.google.gson.Gson
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardDeleteResponse
 import com.ssafy.stellargram.model.CardLikersResponse
@@ -19,17 +17,12 @@ import com.ssafy.stellargram.model.MemberCheckResponse
 import com.ssafy.stellargram.model.MemberIdResponse
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
-import com.ssafy.stellargram.model.MemberSearchResponse
+import com.ssafy.stellargram.model.MemberSearchRes
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.WeatherResponse
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -42,8 +35,6 @@ import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
-import java.io.File
-import javax.inject.Inject
 
 interface ApiServiceForMember {
 
@@ -107,9 +98,10 @@ interface ApiServiceForMember {
     suspend fun getMemberIdByNickName(@Body nickname: String): Response<MemberIdResponse>
     // TODO: 실패할 경우 MemberId에 null이 들어가는 것 확인해보자.
 
+
     // 닉네임으로 유저들 검색
     @POST("member/nickname/search")
-    suspend fun searchMemberByNickname(@Body searchNickname: String): Response<MemberSearchResponse>
+    suspend fun searchMemberByNickname(@Body searchNickname: String): Response<MemberSearchRes>
 
     // 멤버id 리스트로 멤버 정보 조회
     @POST("member/member-list")

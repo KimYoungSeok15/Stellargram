@@ -110,7 +110,7 @@ data class MemberId(
 )
 
 
-data class MemberSearchResponse(
+data class MemberSearchRes(
     val code: String,
     val message: String,
     val data: MembersData
