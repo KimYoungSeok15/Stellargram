@@ -101,10 +101,9 @@ public class MemberServiceImpl implements MemberService {
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
         List<Long> longMemberIds = new ArrayList<>();
-        for (var value : memberIds) {
-            longMemberIds.add(Long.parseLong(String.valueOf(value)));
+        for (Object value : memberIds) {
+            longMemberIds.add(Long.parseLong(""+value));
         }
-
         return memberRepository.findMembersByMemberIdInAndActivated(longMemberIds, true);
     }
 
