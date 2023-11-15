@@ -90,7 +90,6 @@ import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalGlideComposeApi::class)
-@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun IdentifyScreen(navController: NavController) {
     val viewModel: IdentifyViewModel = hiltViewModel()
