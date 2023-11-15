@@ -125,9 +125,3 @@ data class MemberId(
 )
 
 
-data class MemberSearchRes(
-    val code: String,
-    val message: String,
-    val data: MembersData
-)
-

@@ -20,7 +20,6 @@ import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.MemberSearchRequest
 import com.ssafy.stellargram.model.MemberSearchResponse
-import com.ssafy.stellargram.model.MemberSearchRes
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.ObserveSiteListResponse
@@ -105,19 +104,17 @@ interface ApiServiceForMember {
     suspend fun getMemberIdByNickName(@Body nickname: String): Response<MemberIdResponse>
     // TODO: 실패할 경우 MemberId에 null이 들어가는 것 확인해보자.
 
-
-    // 닉네임으로 유저들 검색
+    // 유저 닉네임 검색
     @POST("member/nickname/search")
-    suspend fun searchMemberByNickname(@Body searchNickname: String): Response<MemberSearchRes>
+    suspend fun findMember(
+        @Body postMemberSearchRequest:MemberSearchRequest
+    ): MemberSearchResponse
+
 
     // 멤버id 리스트로 멤버 정보 조회
     @POST("member/member-list")
     suspend fun getMemberListByIds(@Body memberIds: List<Long>): Response<FollowersResponse>
 }
-
-data class NickNameUpdateRequest(
-    @SerializedName("nickname") val nickname: String
-)
 
 interface ApiServiceForCards {
     // 내 카드 전체 조회
@@ -137,7 +134,9 @@ interface ApiServiceForCards {
     suspend fun searchStarCards(
         @Query("keyword") keyword: String,
         @Query("category") category: String = "galaxy"
-    ): Response<CardsResponse>
+    ): CardListResponse
+
+
 
     // 카드 Id로 좋아요한 멤버들 조회
     @GET("starcard/like-member/{cardId}")
