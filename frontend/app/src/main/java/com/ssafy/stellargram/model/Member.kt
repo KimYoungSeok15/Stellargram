@@ -131,17 +131,3 @@ data class MemberSearchRes(
     val data: MembersData
 )
 
-data class MemberSearchResponse(
-    val code: Int,
-    val message: String,
-    val data: MemberList
-)
-
-data class MemberList(
-    val members: List<Member>
-)
-
-data class MemberSearchRequest(
-    @SerializedName("searchNickname")
-    val searchNickname: String
-)
