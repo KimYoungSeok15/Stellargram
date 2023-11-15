@@ -3,8 +3,10 @@ package com.ssafy.stellargram.data.remote
 import android.net.Uri
 import com.google.gson.Gson
 import com.ssafy.stellargram.model.AstronomicalEventResponse
+import com.ssafy.stellargram.model.CardDeleteResponse
 import com.ssafy.stellargram.model.CardLikersResponse
 import com.ssafy.stellargram.model.CardPostResponse
+import com.ssafy.stellargram.model.CardRecommendResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
@@ -122,7 +124,7 @@ interface ApiServiceForCards {
     ): Response<CardsResponse>
 
     // 특정회원이 좋아하는 카드 전체 조회
-    @GET("/starcard/{memberId}")
+    @GET("/like/{memberId}")
     suspend fun getLikeCards(
         @Path("memberId") memberId: Long
     ): Response<CardsResponse>
@@ -139,6 +141,7 @@ interface ApiServiceForCards {
     suspend fun getCardLikers(@Path("cardId") cardId: Int): Response<CardLikersResponse>
 
     // ** 카드 등록 **  - 오류 생길 가능성 큼. 테스트 안해봄. 사용 방법은 StarCardRepository.kt 파일을 참조할 것.
+    // 참조 - https://ducksever.tistory.com/28 + ChatGPT
     // 사용 방법: val response = repository.uploadCard(imageUri, content, photo_at, category, tool, observeSiteId)
     @Multipart
     @POST("/starcard/")
@@ -147,6 +150,15 @@ interface ApiServiceForCards {
         @Part("requestDto") requestDto: RequestBody
     ): Response<CardPostResponse>
 
+    // 내 카드 삭제 - 현재 내 카드도 권한 없다고 응답옴
+    @DELETE("/starcard/{cardId}")
+    suspend fun deleteCard(
+        @Path("cardId") cardId: Int
+    ): Response<CardDeleteResponse>
+
+    // 오늘의 카드 추천
+    @GET("/starcard/recommand")
+    suspend fun recommendCard(): Response<CardRecommendResponse>
 }
 
 interface ApiServiceForWeather{
