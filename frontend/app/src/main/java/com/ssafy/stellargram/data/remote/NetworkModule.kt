@@ -1,6 +1,7 @@
 package com.ssafy.stellargram.data.remote
 
 import android.util.Log
+import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.StellargramApplication.Companion.INSTARGRAM_APP_URI
 import com.tickaroo.tikxml.TikXml
@@ -84,10 +85,20 @@ object NetworkModule {
         HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 
     class MyIdInterceptor : Interceptor {
-//        @Throws(IOException::class)
+        @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain)
                 : Response = with(chain) {
-            val myId = StellargramApplication.prefs.getString("myId","")
+            var myId = StellargramApplication.prefs.getString("myId","")
+            if (myId.isNullOrEmpty()){
+                UserApiClient.instance.me { user, _ ->
+                    if (user != null){
+                        myId = user.id.toString()
+                    }
+                }
+                while (myId.isNullOrEmpty()){
+                    Thread.sleep(100)
+                }
+            }
             Log.d("HEADER",myId)
             val newRequest = request().newBuilder()
                 .addHeader("myId", myId)
