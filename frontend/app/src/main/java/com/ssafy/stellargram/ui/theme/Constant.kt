@@ -1,4 +1,4 @@
-package com.ssafy.stellargram.model
+package com.ssafy.stellargram.ui.theme
 
 object Constant {
     // 박스 코너사이즈
