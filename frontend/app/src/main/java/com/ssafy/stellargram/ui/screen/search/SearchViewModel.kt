@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,8 +51,11 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.data.db.entity.Star
+import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
+import com.ssafy.stellargram.model.CardResponse
 import com.ssafy.stellargram.model.Member
+import com.ssafy.stellargram.model.MemberSearchRequest
 import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.util.SearchStarByName
@@ -68,7 +72,8 @@ fun TabLayout(viewModel: MainViewModel) {
     Column(modifier = Modifier.fillMaxWidth()) {
         TabRow(selectedTabIndex = tabIndex.value!!) {
             viewModel.tabs.forEachIndexed { index, title ->
-                Tab(text = { Text(title) },
+                Tab(
+                    text = { Text(title) },
                     selected = tabIndex.value!! == index,
                     onClick = { viewModel.updateTabIndex(index) },
                 )
@@ -76,9 +81,14 @@ fun TabLayout(viewModel: MainViewModel) {
         }
     }
 }
+
 // 게시물 탭
 @Composable
-fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<Card>>, navController: NavController) {
+fun ArticleScreen(
+    viewModel: MainViewModel,
+    cardResultsState: MutableState<List<Card>>,
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,7 +108,11 @@ fun ArticleScreen(viewModel: MainViewModel, cardResultsState: MutableState<List<
 
 // 계정 탭
 @Composable
-fun AccountScreen(viewModel: MainViewModel, accountCardsState: MutableState<List<Member>>, navController:NavController) {
+fun AccountScreen(
+    viewModel: MainViewModel,
+    accountCardsState: MutableState<List<Member>>,
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -112,13 +126,20 @@ fun AccountScreen(viewModel: MainViewModel, accountCardsState: MutableState<List
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AccountUI(accountCardState = accountCardsState, navController) // accountCardsState.value 대신 accountCardsState 전달
+        AccountUI(
+            accountCardState = accountCardsState,
+            navController
+        ) // accountCardsState.value 대신 accountCardsState 전달
     }
 }
 
 // 별 탭
 @Composable
-fun StarScreen(viewModel: MainViewModel, starCardsState: MutableState<List<Star>>, navController:NavController) {
+fun StarScreen(
+    viewModel: MainViewModel,
+    starCardsState: MutableState<List<Star>>,
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -150,7 +171,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     var isSwipeToTheLeft: Boolean = false
     private val draggableState = DraggableState { delta ->
-        isSwipeToTheLeft= delta > 0
+        isSwipeToTheLeft = delta > 0
     }
 
     private val _dragState = MutableLiveData<DraggableState>(draggableState)
@@ -174,68 +195,73 @@ class MainViewModel @Inject constructor() : ViewModel() {
     var cardResults = mutableStateOf<List<Card>>(emptyList())
     var memberResults = mutableStateOf<List<Member>>(emptyList())
     var starResults = mutableStateOf<List<Star>>(emptyList())
-    fun getCardResults(text: String): List<Card> {
-        // 카드 검색 로직
-        // 현재는 더미데이터
-        val results : List<Card>
-        results = listOf<Card>(
-            Card(
-                cardId = 5,
-                memberId = 99,
-                memberNickname = "Hyundolee199543413413431",
-                memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                observeSiteId = "144",
-                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-                photoAt = "2023-10-27T01:49:22",
-                category = "GALAXY",
-                tools = "엄청 좋은 카메라",
-                likeCount = 156,
-                amILikeThis = false
-            ),
-            Card(
-                cardId = 5,
-                memberId = 99,
-                memberNickname = "Hyundolee199543413413431",
-                memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                observeSiteId = "144",
-                imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-                content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-                photoAt = "2023-10-27T01:49:22",
-                category = "GALAXY",
-                tools = "엄청 좋은 카메라",
-                likeCount = 2,
-                amILikeThis = true
-            )
-        )
-        return results
+    suspend fun getCardResults(text: String): List<Card> {
+        val result: MutableList<Card> = mutableStateListOf()
+
+        try {
+            // 카드 검색 로직
+            // TODO: category관련 상의할 것. all은 없나? 일단 galaxy 고정하기로
+            val response =
+                NetworkModule.provideRetrofitInstanceCards().searchStarCards(text, "galaxy")
+
+            if (response?.code == 200) {
+                val cardList: List<CardResponse> = response.data.starcards
+
+                for (card in cardList) {
+                    // 각 카드에 대해 유저id로 검색
+                    val responseMember =
+                        NetworkModule.RetrofitGetMemberInfo().getMember(card.memberId)
+
+                    if (responseMember.isSuccessful) {
+                        val newCardInfo: Card = Card(
+                            cardId = card.cardId,
+                            memberId = card.memberId,
+                            memberNickname = responseMember.body()!!.data.nickname,
+                            memberProfileImageUrl = responseMember.body()!!.data.profileImageUrl,
+                            observeSiteId = card.observeSiteId,
+                            imagePath = card.imagePath,
+                            content = card.content,
+                            photoAt = card.photoAt,
+                            category = card.category,
+                            tools = card.tools,
+                            likeCount = card.likeCount,
+                            amILikeThis = card.amILikeThis
+                        )
+
+                        result.add(newCardInfo)
+                    }
+                }
+            } else if (response.code == 500) {
+                Log.e("SEARCH CARD", "500 error")
+
+            }
+        } catch (e: Exception) {
+            Log.e("SEARCH CARD", e.toString())
+        }
+
+        return result
     }
 
-    fun getMemberResults(text: String): List<Member> {
-        // 멤버 검색 로직
-        // 현재는 더미데이터
-        val results : List<Member>
-        results = listOf<Member>(
-            Member(
-                memberId = 2,
-                nickname = "닉네임2",
-                profileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                isFollow = true,
-                followCount = 0,
-                followingCount = 0,
-                cardCount = 0
-            ),
-            Member(
-                memberId = 1,
-                nickname = "닉네임",
-                profileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-                isFollow = false,
-                followCount = 0,
-                followingCount = 0,
-                cardCount = 0
-            )
-        )
-        return results
+    suspend fun getMemberResults(text: String): List<Member> {
+
+        var result: List<Member> = emptyList()
+
+        try {
+            // 멤버 검색 로직
+            val response = NetworkModule.RetrofitGetMemberInfo()
+                .findMember(MemberSearchRequest(searchNickname = text))
+
+            if (response?.code == 200) {
+                result = response.data.members
+
+            } else if (response.code == 500) {
+                Log.e("SEARCH CARD", "500 error")
+
+            }
+        } catch (e: Exception) {
+            Log.e("SEARCH CARD", e.toString())
+        }
+        return result
     }
 
     fun getStarResults(text: String): List<Star> {
@@ -254,30 +280,31 @@ class MainViewModel @Inject constructor() : ViewModel() {
 //----------------------------------------이상 탭관련----------------------------------------
 
 //---------------------------------------검색결과-------------------------------------------
-suspend fun getSearchResults(text: String, mainViewModel: MainViewModel): List<Any> = coroutineScope {
-    val cardDeferred = async { mainViewModel.getCardResults(text) }
-    val memberDeferred = async { mainViewModel.getMemberResults(text) }
-    val starDeferred = async { mainViewModel.getStarResults(text) }
+suspend fun getSearchResults(text: String, mainViewModel: MainViewModel): List<Any> =
+    coroutineScope {
+        val cardDeferred = async { mainViewModel.getCardResults(text) }
+        val memberDeferred = async { mainViewModel.getMemberResults(text) }
+        val starDeferred = async { mainViewModel.getStarResults(text) }
 
-    val cardResults = cardDeferred.await()
-    val memberResults = memberDeferred.await()
-    val starResults = starDeferred.await()
+        val cardResults = cardDeferred.await()
+        val memberResults = memberDeferred.await()
+        val starResults = starDeferred.await()
 
-    mainViewModel.cardResults.value = cardResults
-    mainViewModel.memberResults.value = memberResults
-    mainViewModel.starResults.value = starResults
+        mainViewModel.cardResults.value = cardResults
+        mainViewModel.memberResults.value = memberResults
+        mainViewModel.starResults.value = starResults
 
-    val results = mutableListOf<Any>()
-    results.addAll(cardResults)
-    results.addAll(memberResults)
-    results.addAll(starResults)
+        val results = mutableListOf<Any>()
+        results.addAll(cardResults)
+        results.addAll(memberResults)
+        results.addAll(starResults)
 
-    results
-}
+        results
+    }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController) {
+fun ArticleUI(cardsState: MutableState<List<Card>>, navController: NavController) {
     // 각 검색 결과를 표시하는 UI 컴포넌트
     LazyColumn(
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
@@ -314,7 +341,13 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController)
                     )
                 }
                 val followText = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = if (card.amILikeThis) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = if (card.amILikeThis) Color(0xFFFF4040) else Color(
+                                0xFF9DC4FF
+                            )
+                        )
+                    ) {
                         append(if (card.amILikeThis) "언팔로우" else "팔로우")
                     }
                 }
@@ -368,7 +401,7 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController:NavController)
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun AccountUI(accountCardState: MutableState<List<Member>>, navController:NavController) {
+fun AccountUI(accountCardState: MutableState<List<Member>>, navController: NavController) {
     // 계정 탭의 검색 결과를 표시하는 UI 컴포넌트
     LazyColumn(
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 100.dp),
@@ -445,7 +478,7 @@ fun StarUI(starCardsState: MutableState<List<Star>>, navController: NavControlle
             val star = starCardsState.value[index]
             // Row를 클릭 가능하게 변경
             Log.d("search", "ID: ${star}")
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -455,7 +488,7 @@ fun StarUI(starCardsState: MutableState<List<Star>>, navController: NavControlle
             ) {
                 // 별 정보 표시
                 Text(
-                    text = DBModule.nameMap[star.id]?:"Invalid Star",
+                    text = DBModule.nameMap[star.id] ?: "Invalid Star",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(0.dp, 8.dp)
                 )
