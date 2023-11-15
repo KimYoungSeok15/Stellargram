@@ -21,7 +21,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatViewModel @Inject constructor() : ViewModel() {
+class IdentifyViewModel @Inject constructor() : ViewModel() {
 
 
 }
