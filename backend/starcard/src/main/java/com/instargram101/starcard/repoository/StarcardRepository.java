@@ -43,4 +43,11 @@ public interface StarcardRepository extends JpaRepository<Starcard, Long> {
             "WHERE sc.likeCount > 9 " +
             "ORDER BY RAND() ")
     StarcardWithAmILikeQueryDto findOneRandomly(@Param("myId") Long myId, PageRequest pageRequest);
+
+    @Query("DELETE FROM Starcard sc " +
+            "WHERE sc.memberId = :memberId")
+    void deleteByMemberId(@Param("memberId") Long memberId);
+
+    @Query("SELECT sc FROM Starcard sc WHERE sc.memberId =:memberId")
+    List<Starcard> findAllByMemberId(@Param("memberId") Long memberId);
 }
