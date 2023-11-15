@@ -1,32 +1,49 @@
 package com.ssafy.stellargram.data.remote
 
-import com.google.gson.annotations.SerializedName
+import android.net.Uri
+import com.google.gson.Gson
 import com.ssafy.stellargram.model.AstronomicalEventResponse
+import com.ssafy.stellargram.model.CardLikersResponse
+import com.ssafy.stellargram.model.CardPostResponse
 import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
+import com.ssafy.stellargram.model.FollowersResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
 import com.ssafy.stellargram.model.MemberCheckDuplicateResponse
 import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.MemberIdResponse
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
+import com.ssafy.stellargram.model.MemberSearchResponse
 import com.ssafy.stellargram.model.MemberSignUpRequest
 import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.WeatherResponse
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.Path
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Query
+import java.io.File
+import javax.inject.Inject
 
-interface ApiService {
+interface ApiServiceForMember {
 
      @GET("member/check")
      suspend fun getMemberCheck(): Response<MemberCheckResponse>
@@ -60,22 +77,42 @@ interface ApiService {
     suspend fun withdrawal(@Body nickname: String): Response<MemberMeResponse>
 
     // 특정 사용자 팔로우 API
-    @GET("follow/{followingId}")
+    @GET("member/follow/{followingId}")
     suspend fun followUser(
         @Path("followingId") followingId: Long
     ): Response<MemberCheckResponse>
 
     // 특정 사용자 팔로우 취소 API
-    @DELETE("follow/{followingId}")
+    @DELETE("member/follow/{followingId}")
     suspend fun unfollowUser(
         @Path("followingId") followingId: Long
     ): Response<FollowCancelResponse>
 
+    // 특정 멤버가 팔로우하는 멤버 목록
+    @GET("member/following-list/{memberId}")
+    suspend fun getFollowingList(
+        @Path("memberId") memberId: Long
+    ): Response<FollowersResponse>
 
+    // 특정 멤버를 팔로잉하는 멤버 목록
+    @GET("member/follow-list/{memberId}")
+    suspend fun getFollowerList(
+        @Path("memberId") memberId: Long
+    ): Response<FollowersResponse>
+
+    // 닉네임으로 id받아오기
+    @POST("member/id")
+    suspend fun getMemberIdByNickName(@Body nickname: String): Response<MemberIdResponse>
+    // TODO: 실패할 경우 MemberId에 null이 들어가는 것 확인해보자.
+
+    // 닉네임으로 유저들 검색
+    @POST("member/nickname/search")
+    suspend fun searchMemberByNickname(@Body searchNickname: String): Response<MemberSearchResponse>
+
+    // 멤버id 리스트로 멤버 정보 조회
+    @POST("member/member-list")
+    suspend fun getMemberListByIds(@Body memberIds: List<Long>): Response<FollowersResponse>
 }
-data class NickNameUpdateRequest(
-    @SerializedName("nickname") val nickname: String
-)
 
 interface ApiServiceForCards {
     // 내 카드 전체 조회
@@ -84,7 +121,7 @@ interface ApiServiceForCards {
         @Path("memberId") memberId: Long
     ): Response<CardsResponse>
 
-    // 내가 좋아하는 카드 전체 조회
+    // 특정회원이 좋아하는 카드 전체 조회
     @GET("/starcard/{memberId}")
     suspend fun getLikeCards(
         @Path("memberId") memberId: Long
@@ -96,6 +133,19 @@ interface ApiServiceForCards {
         @Query("keyword") keyword: String,
         @Query("category") category: String = "galaxy"
     ): Response<CardsResponse>
+
+    // 카드 Id로 좋아요한 멤버들 조회
+    @GET("starcard/like-member/{cardId}")
+    suspend fun getCardLikers(@Path("cardId") cardId: Int): Response<CardLikersResponse>
+
+    // ** 카드 등록 **  - 오류 생길 가능성 큼. 테스트 안해봄. 사용 방법은 StarCardRepository.kt 파일을 참조할 것.
+    // 사용 방법: val response = repository.uploadCard(imageUri, content, photo_at, category, tool, observeSiteId)
+    @Multipart
+    @POST("/starcard/")
+    suspend fun uploadStarCard(
+        @Part imageFile: MultipartBody.Part,
+        @Part("requestDto") requestDto: RequestBody
+    ): Response<CardPostResponse>
 
 }
 
@@ -145,3 +195,5 @@ interface ApiServiceForChat {
         @Path("chatRoomId") chatRoomId: Int,
     ): CursorResponse
 }
+
+

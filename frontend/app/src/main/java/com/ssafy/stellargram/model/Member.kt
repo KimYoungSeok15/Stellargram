@@ -79,7 +79,7 @@ data class MemberMeResponse(
         val profileImageUrl : String,
         val followCount : Int,
         val followingCount : Int,
-        val cardCount : Int
+        val cardCount : Int? // 가끔 null이 들어올 수 있음
     )
 }
 
@@ -87,4 +87,31 @@ data class FollowCancelResponse(
     val code: String,
     val message: String,
     val data: MemberMeResponse.Data
+)
+
+data class FollowersResponse(
+    val code: String,
+    val message: String,
+    val data: MembersData
+)
+
+data class MembersData(
+    val members: List<Member>
+)
+
+data class MemberIdResponse(
+    val code: String,
+    val message: String,
+    val data: MemberId? // 실패한 경우에는 null이 들어갈 예정.
+)
+
+data class MemberId(
+    val memberId: Long
+)
+
+
+data class MemberSearchResponse(
+    val code: String,
+    val message: String,
+    val data: MembersData
 )

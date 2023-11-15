@@ -24,3 +24,15 @@ data class Card(
     val likeCount: Int,
     val amILikeThis: Boolean
 )
+
+data class CardLikersResponse(
+    val code: Int,
+    val message: String,
+    val data: List<Long>
+)
+
+data class CardPostResponse(
+    val code: Int,
+    val message: String,
+    val data: Int
+)
