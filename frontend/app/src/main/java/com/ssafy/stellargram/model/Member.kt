@@ -8,7 +8,7 @@ data class MemberCheckResponse(
     val code: String,
     val message: String,
     val data: Data
-){
+) {
     data class Data(
         val status: Boolean
     )
@@ -16,14 +16,14 @@ data class MemberCheckResponse(
 
 data class MemberCheckDuplicateRequest(
     @SerializedName("nickname")
-    val nickname : String
+    val nickname: String
 )
 
 data class MemberCheckDuplicateResponse(
     val code: String,
     val message: String,
     val data: Data
-){
+) {
     data class Data(
         val status: Boolean
     )
@@ -31,9 +31,9 @@ data class MemberCheckDuplicateResponse(
 
 data class MemberSignUpRequest(
     @SerializedName("nickname")
-    val nickname : String,
+    val nickname: String,
     @SerializedName("profileImageUrl")
-    val profileImageUrl : String
+    val profileImageUrl: String
 )
 
 data class MemberSignUpResponse(
@@ -42,12 +42,12 @@ data class MemberSignUpResponse(
     val data: Data
 ) {
     data class Data(
-        val memberId : Long,
-        val nickname : String,
-        val profileImageUrl : String,
-        val followCount : Int,
-        val followingCount : Int,
-        val cardCount : Int
+        val memberId: Long,
+        val nickname: String,
+        val profileImageUrl: String,
+        val followCount: Int,
+        val followingCount: Int,
+        val cardCount: Int
     )
 }
 
@@ -74,12 +74,12 @@ data class MemberMeResponse(
     val data: Data
 ) {
     data class Data(
-        val memberId : Long,
-        val nickname : String,
-        val profileImageUrl : String,
-        val followCount : Int,
-        val followingCount : Int,
-        val cardCount : Int? // 가끔 null이 들어올 수 있음
+        val memberId: Long,
+        val nickname: String,
+        val profileImageUrl: String,
+        val followCount: Int,
+        val followingCount: Int,
+        val cardCount: Int
     )
 }
 
@@ -114,4 +114,19 @@ data class MemberSearchRes(
     val code: String,
     val message: String,
     val data: MembersData
+)
+
+data class MemberSearchResponse(
+    val code: Int,
+    val message: String,
+    val data: MemberList
+)
+
+data class MemberList(
+    val members: List<Member>
+)
+
+data class MemberSearchRequest(
+    @SerializedName("searchNickname")
+    val searchNickname: String
 )
