@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
@@ -32,6 +33,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +49,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -73,9 +76,11 @@ import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.rememberImagePicker
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
+import com.ssafy.stellargram.model.Constant
 import com.ssafy.stellargram.ui.screen.camera.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
 import com.ssafy.stellargram.ui.screen.camera.rememberLauncherForGallery
 import com.ssafy.stellargram.ui.theme.EasyCropTheme
+import com.ssafy.stellargram.ui.theme.Purple80
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -98,27 +103,10 @@ fun IdentifyScreen(navController: NavController) {
     val onPick = { imagePicker.pick() }
 
 
-    // 갤러리에서 선택한 이미지 uri
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    LaunchedEffect(selectedImageUri) {
-        if (selectedImageUri != null) {
-
-        }
-    }
-
-    // 갤러리 런처
-    val galleryLauncher = rememberLauncherForGallery(selectedImageUri) {
-        // TODO: 선택 실패시 에러 처리할 것
-        Log.d("SelectedImage", it.toString())
-        selectedImageUri = it
-    }
-
-
     Column(
         modifier = Modifier
-            .fillMaxSize()
             .padding(horizontal = 20.dp)
-            .background(Color.Red),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // 크롭창 활성화
@@ -127,47 +115,66 @@ fun IdentifyScreen(navController: NavController) {
                 ImageCropperDialog(state = cropState)
             }
         }
-//        // 로딩중 안내메세지
-//        if (cropState == null && loadingStatus != null) {
-//            LoadingDialog(status = loadingStatus)
-//        }
+        // 로딩중 안내메세지
+        if (cropState == null && loadingStatus != null) {
+            LoadingDialog(status = loadingStatus)
+        }
 
         Column(
             modifier = Modifier
-//                .weight(0.5f)
-                .background(Color.Yellow),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(20.dp)
+                .fillMaxSize()
+                .clip(
+                    RoundedCornerShape(Constant.boxCornerSize.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    Purple80,
+                    shape = RoundedCornerShape(Constant.boxCornerSize.dp)
+                )
+                .weight(0.5f)
+                .background(if (selectedImage == null) Color.DarkGray else Color.Unspecified),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             if (selectedImage != null) {
-                Image(
-                    bitmap = selectedImage, contentDescription = null,
-//                    modifier = Modifier.weight(1f)
-                )
-            } else {
-                Column(
-//                    hori,
-//                contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .height(300.dp)
-//                    .weight(0.5f)
-                        .background(Color.Cyan)
-                ) {
-                    Text("사진을 선택해주세요")
+                if (selectedImage.width > selectedImage.height) {
+                    GlideImage(model = selectedImage, contentDescription = null)
+                    Image(
+                        bitmap = selectedImage, contentDescription = null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Image(
+                        bitmap = selectedImage, contentDescription = null,
+                        modifier = Modifier.fillMaxHeight()
+                    )
                 }
+
+
+            } else {
+                Text("사진을 선택해주세요")
             }
         }
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.weight(0.5f),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(onClick = onPick) { Text("사진 고르기") }
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .padding(16.dp)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "별 인식하기")
+                Button(
+                    onClick = onPick, modifier = Modifier
+                        .padding(10.dp)
+                ) { Text("사진 고르기") }
+                Button(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                        .padding(10.dp)
+                ) {
+                    Text(text = "별 인식하기")
+                }
             }
         }
 
