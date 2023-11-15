@@ -13,6 +13,6 @@ public interface StarcardLikeRepository extends JpaRepository<StarcardLike, Long
     @Query("SELECT sl FROM StarcardLike sl WHERE sl.memberId =:myId AND sl.card.cardId =:cardId")
     Optional<StarcardLike> findByMemberIdAndCardId(@Param("myId") Long myId, @Param("cardId") Long cardId);
 
-    @Query("SELECT sl FROM StarcardLike sl WHERE sl.memberId =: memberId")
+    @Query("SELECT sl FROM StarcardLike sl WHERE sl.memberId =:memberId")
     List<StarcardLike> findAllByMemberId(@Param("memberId") Long memberId);
 }
