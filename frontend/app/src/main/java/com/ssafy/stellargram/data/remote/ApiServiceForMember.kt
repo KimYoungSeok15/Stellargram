@@ -1,6 +1,5 @@
 package com.ssafy.stellargram.data.remote
 
-import com.google.gson.annotations.SerializedName
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardDeleteResponse
 import com.ssafy.stellargram.model.CardLikersResponse
@@ -11,6 +10,7 @@ import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
 import com.ssafy.stellargram.model.FollowersResponse
+import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
@@ -247,8 +247,9 @@ interface ApiServiceForSite {
 // TODO: 멀티파트 파일 가능하도록 하기
 // 인식 관련
 interface ApiServiceForIdentify {
+    @Multipart
     @POST("/identify/tetraIdentify")
-    fun getIdentifyData(
-        file: MultipartBody.Part,
-    ): IdentifyResponse
+    suspend fun getIdentifyData(
+        @Part file: MultipartBody.Part,
+    ): Response<IdentifyPhotoData>
 }
