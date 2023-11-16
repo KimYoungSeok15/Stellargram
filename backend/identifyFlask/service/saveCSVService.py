@@ -13,20 +13,20 @@ def create_star_table():
     DROP TABLE IF EXISTS stars_info
     ''')
 
-    # 테이블 생성
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS stars_info (
-            id INTEGER,
-            hipid INTEGER,
-            ra REAL,
-            dec REAL,
-            mag REAL,
-            absmag REAL,
-            rarad REAL,
-            decrad REAL,
-            con TEXT
-        )
-    ''')
+    # # 테이블 생성
+    # cursor.execute('''
+    #     CREATE TABLE IF NOT EXISTS stars_info (
+    #         id INTEGER,
+    #         hipid INTEGER,
+    #         ra REAL,
+    #         dec REAL,
+    #         mag REAL,
+    #         absmag REAL,
+    #         rarad REAL,
+    #         decrad REAL,
+    #         con TEXT
+    #     )
+    # ''')
 
     # 커밋 및 연결 종료
     conn.commit()
