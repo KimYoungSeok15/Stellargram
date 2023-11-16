@@ -7,6 +7,8 @@ from service.makeTetraDB import make_database
 from service.saveCSVService import  create_star_table, input_csv_data
 from service.preprocessImageService import preprocess_image
 
+import os
+
 # 플라스크 객체 인스턴스 생성
 app = Flask(__name__)
 
@@ -21,6 +23,9 @@ def initialize():
     # 최초 1회에만 실행될 csv -> DB 함수
     create_star_table()
     input_csv_data()
+
+current_directory = os.path.dirname(__file__)
+file_path = os.path.join(current_directory, 'service', 'your_module.py')
 
 # 최초 1회에만 csv -> DB 함수 실행
 initialize()
