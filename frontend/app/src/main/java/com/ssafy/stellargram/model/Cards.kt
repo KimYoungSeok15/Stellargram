@@ -28,7 +28,7 @@ data class CardResponse(
     val imageUrl: String,
     val content: String,
     val photoAt: String?,
-    val category: String,
+    val category: String?,
     val tools: String,
     val likeCount: Int,
     val amILikeThis: Boolean
@@ -44,7 +44,7 @@ data class Card(
     val imageUrl: String,
     val content: String,
     val photoAt: String?,
-    val category: String,
+    val category: String?,
     val tools: String,
     val likeCount: Int,
     val amILikeThis: Boolean,
