@@ -43,6 +43,7 @@ import com.mr0xf00.easycrop.CropperLoading
 import com.mr0xf00.easycrop.rememberImagePicker
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.ssafy.stellargram.ui.common.CustomSpinner
+import com.ssafy.stellargram.ui.common.CustomTextButton
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.EasyCropTheme
 import com.ssafy.stellargram.ui.theme.Purple80
@@ -126,32 +127,44 @@ fun IdentifyScreen(navController: NavController) {
             Text(
                 text = "장애물이 없고 화각이 30도에 가까울수록",
                 color = Color.White,
-                style = TextStyle(fontSize = Constant.tinyText.sp)
+                style = TextStyle(fontSize = Constant.verySmallText.sp)
             )
             Text(
                 text = "인식률이 올라갑니다",
                 color = Color.White,
-                style = TextStyle(fontSize = Constant.tinyText.sp)
+                style = TextStyle(fontSize = Constant.verySmallText.sp)
             )
 
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    onClick = onPick, modifier = Modifier.padding(10.dp)
-                ) { Text("사진 고르기") }
-                Button(
+                CustomTextButton(
+                    text = "사진 고르기",
+                    onClick = onPick,
+                    margin = 10.dp,
+                    isBold = false
+                )
+                CustomTextButton(
+                    text = "별 인식하기",
                     onClick = {
 
                         if (selectedImage != null) viewModel.identifyStarsFromBitmap(
                             selectedImage
                         )
                         else Toast.makeText(context, "사진을 선택해주세요", Toast.LENGTH_SHORT)
-                    }, modifier = Modifier.padding(10.dp)
-                ) {
-                    Text(text = "별 인식하기")
-                }
+                    },
+                    margin = 10.dp,
+                    isBold = false
+                )
+//                Button(
+//                    onClick = onPick, modifier = Modifier.padding(10.dp)
+//                ) { Text("사진 고르기") }
+//                Button(
+//                    onClick =, modifier = Modifier.padding(10.dp)
+//                ) {
+//                    Text(text = "별 인식하기")
+//                }
             }
 
             if (viewModel.isFailed) {
