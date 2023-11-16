@@ -29,6 +29,7 @@ import java.nio.ByteBuffer
 class CameraX(
     private var context: Context,
     private var owner: LifecycleOwner,
+
 ) {
     private var imageCapture: ImageCapture? = null
 
@@ -38,6 +39,7 @@ class CameraX(
         val preview = Preview.Builder().build().also {
             it.setSurfaceProvider(previewView.surfaceProvider)
         }
+
 
         imageCapture = ImageCapture.Builder().build()
 
