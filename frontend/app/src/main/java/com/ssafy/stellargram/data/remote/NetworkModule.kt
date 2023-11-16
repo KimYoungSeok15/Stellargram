@@ -124,10 +124,9 @@ object NetworkModule {
             .create(ApiServiceForWeather::class.java)
     }
 
-    // 천문현상 가져오는 retrofit
+    // 천문현상
     object RetrofitClient {
         private var instance: Retrofit? = null
-
         fun getInstance(): Retrofit {
             if (instance == null) {
                 instance = Retrofit.Builder()

@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,16 +43,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
+import com.ssafy.stellargram.model.BestCard
 import com.ssafy.stellargram.model.Card
 import com.ssafy.stellargram.model.CardsData
 import com.ssafy.stellargram.model.CardsResponse
+import com.ssafy.stellargram.model.FollowCancelResponse
+import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.Response
+import com.ssafy.stellargram.model.StarCards
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.atan2
@@ -122,6 +134,11 @@ class CoordinateConverter {
     }
 }
 
+@HiltViewModel
+class HomeViewModel @Inject constructor() : ViewModel() {
+
+}
+
 // 현재 주소를 위경도를 통해 받아오는 함수
 fun getAddressFromLocation(context: Context, latitude: Double, longitude: Double): String {
     val geocoder = Geocoder(context, Locale.getDefault())
@@ -166,56 +183,100 @@ fun AutoScrollingText(text:String) {
     }
 }
 
-// 오늘의 추천 사진 가져오기
-suspend fun GetTodaysPicture(): retrofit2.Response<CardsResponse>? {
-    return try {
-        val response = NetworkModule.provideRetrofitCards().getCards(3140000396)
-        if (response.isSuccessful) {
-            response
-        } else {
-            null
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
 
 // 오늘의 추천 사진 UI
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun TodaysPicture() {
-    var dummyCardsData by remember { mutableStateOf<CardsData?>(null) }
-    Log.d("사진", StellargramApplication.prefs.getString("memberId","없음"))
+fun TodaysPicture(viewModel: HomeViewModel) {
+    var cardData by remember { mutableStateOf<StarCards?>(null) }
+
+    // 추천카드 정보 가져오기
     LaunchedEffect(Unit) {
-        // API에서 카드 정보 가져오기 (실제 API 호출)
-        // val data = GetTodaysPicture()
-        // dummyCardsData = data
+        try {
+            val response = NetworkModule.provideRetrofitCards().recommendCard()
 
-        // 더미 데이터 (임시 하드코딩)
-        val card = Card(
-            cardId = 5,
-            memberId = 99,
-            memberNickname = "Hyundolee199543413413431",
-            memberProfileImageUrl = "https://i.namu.wiki/i/hyYeK3WTj5JutQxaxAHHjFic9oAQ8kN4jdZo_MBGkzboWMtsr9pQN6JWeWgU9c8rmDon6XLlLhxuVrPbc6djcQ.gif",
-            observeSiteId = "144",
-            imagePath = "https://vinsweb.org/wp-content/uploads/2020/04/AtHome-NightSky-1080x810-1.jpg",
-            imageUrl = "123",
-            content = "사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123사진에 대한 설명123123",
-            photoAt = "2023-10-27T01:49:22",
-            category = "GALAXY",
-            tools = "엄청 좋은 카메라",
-            likeCount = 156,
-            amILikeThis = false
-        )
-
-        val dummyCards = mutableListOf(card)
-        dummyCardsData = CardsData(dummyCards)
+            if (response.isSuccessful) {
+                val cardResponse = response.body()
+                cardData = cardResponse?.data
+                Log.d("추천", "$cardData")
+            } else {
+                Log.e("API Error", "API request failed with code: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Log.e("Network Error", "Failed to fetch data: ${e.message}", e)
+        }
     }
 
     // 제목 및 스타일 설정
     val title = "오늘의 사진"
     val titleTextStyle = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold)
+
+    // 팔로우 또는 언팔로우 클릭시 실행하는 부분
+    fun handleFollowButtonClick(memberId: Long, isFollowing: Boolean) {
+        Log.d("메인","디버그 $memberId $isFollowing")
+        try {
+            if (cardData?.starcard != null) {
+                if (memberId != StellargramApplication.prefs.getString("memberId", "").toLong()) {
+                    if (isFollowing) {
+                        // Unfollow action
+                        viewModel.viewModelScope.launch {
+                            val response = unfollowUser(memberId)
+                            if (response.isSuccessful) {
+                                cardData = cardData?.copy(
+                                    starcard = cardData?.starcard?.copy(isFollowing = false)
+                                )
+                            } else {
+                                // Handle unfollow failure
+                            }
+                        }
+                    } else {
+                        // Follow action
+                        viewModel.viewModelScope.launch {
+                            val response = followUser(memberId)
+                            if (response.isSuccessful) {
+                                cardData = cardData?.copy(
+                                    starcard = cardData?.starcard?.copy(isFollowing = true)
+                                )
+                            } else {
+                                // Handle follow failure
+                            }
+                        }
+                    }
+                } else {
+                    // Handle if memberId is not the same as the logged-in user's memberId
+                }
+            }
+        } catch (e: Exception) {
+            // Handle exception
+        }
+    }
+
+    // 좋아요 버튼 클릭시 실행하는 부분
+    fun handleLikeButtonClick(card: BestCard?, isLiked: Boolean) {
+        try {
+            if (card != null && cardData?.starcard != null) {
+                viewModel.viewModelScope.launch {
+                    try {
+                        val response = NetworkModule.provideRetrofitCards().likeCard(cardId = card.cardId)
+                        if (response.isSuccessful) {
+                            cardData = cardData?.copy(
+                                starcard = cardData?.starcard?.copy(
+                                    likeCount = if (!isLiked) cardData?.starcard?.likeCount?.plus(1) else cardData?.starcard?.likeCount?.minus(1),
+                                    amILikeThis = !isLiked
+                                )
+                            )
+                        } else {
+                            // Handle failure
+                        }
+                    } catch (e: Exception) {
+                        // Handle exception
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Handle exception
+        }
+    }
 
     Box(Modifier.fillMaxWidth()) {
         Column(
@@ -232,16 +293,16 @@ fun TodaysPicture() {
                 )
             }
 
-            // 카드 목록 표시
-            dummyCardsData?.starcards?.forEach { card ->
+            val card = cardData?.starcard
+            Row(
+                modifier = Modifier.padding(0.dp, 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // 회원 정보 표시 (이미지, 닉네임)
                 Row(
-                    modifier = Modifier.padding(0.dp, 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // 회원 정보 표시 (이미지, 닉네임)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                    if (card != null) {
                         GlideImage(
                             model = card.memberProfileImageUrl,
                             contentDescription = "123",
@@ -250,6 +311,8 @@ fun TodaysPicture() {
                                 .size(30.dp) // 이미지 크기
                                 .clip(CircleShape), // 동그라미 모양으로 잘라주기
                         )
+                    }
+                    if (card != null) {
                         Text(
                             text = card.memberNickname,
                             style = TextStyle(fontSize = 20.sp),
@@ -258,52 +321,74 @@ fun TodaysPicture() {
                             overflow = TextOverflow.Ellipsis // 넘칠 경우 "..."으로 표시
                         )
                     }
-                    val text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFF9DC4FF))) {
-                            append("팔로우")
+                }
+                val text = buildAnnotatedString {
+                    if (card != null) {
+                        withStyle(style = SpanStyle(color = if (card.isFollowing) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
+                            if (card.isFollowing) {
+                                append("언팔로우")
+                            } else {
+                                append("팔로우")
+                            }
                         }
                     }
-                    ClickableText(
-                        text = text,
-                        style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
-                        softWrap = true,
-                        overflow = TextOverflow.Clip,
-                        onClick = { offset ->
-                            // Handle text click here
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
+                ClickableText(
+                    text = text,
+                    style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
+                    softWrap = true,
+                    overflow = TextOverflow.Clip,
+                    onClick = { offset ->
+                        if (card != null) {
+                            handleFollowButtonClick(card.memberId, card.isFollowing)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
 
                 // 사진 표시
+            if (card != null) {
                 GlideImage(
                     model = card.memberProfileImageUrl,
                     contentDescription = "123",
                     modifier = Modifier.fillMaxSize(),
                 )
+            }
 
-                // 좋아요 아이콘 및 텍스트
-                val likeIcon = if (card.amILikeThis) {
-                    painterResource(id = R.drawable.filledheart)
-                } else {
-                    painterResource(id = R.drawable.emptyheart)
-                }
-                Row(
-                    modifier = Modifier.padding(0.dp, 4.dp)
-                ) {
-                    Image(
-                        painter = likeIcon,
-                        contentDescription = null, // 이미지 설명
-                        modifier = Modifier.size(24.dp)
-                    )
+            // 좋아요 아이콘 및 텍스트
+            val likeIcon = if (card?.amILikeThis == true) {
+                painterResource(id = R.drawable.filledheart)
+            } else {
+                painterResource(id = R.drawable.emptyheart)
+            }
+            Row(
+                modifier = Modifier.padding(0.dp, 4.dp)
+            ) {
+                Image(
+                    painter = likeIcon,
+                    contentDescription = null, // 이미지 설명
+                    modifier = Modifier.size(24.dp)
+                        .clickable (
+                            interactionSource = remember{ MutableInteractionSource() },
+                            indication = null)
+                        {
+                            if (card != null) {
+                                handleLikeButtonClick(card = card, isLiked = card.amILikeThis)
+                            }
+                        }
+                )
+                if (card != null) {
                     Text(
                         text = "좋아요 ${card.likeCount}",
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
+            }
 
-                // 카드 내용 표시
+            // 카드 내용 표시
+            if (card != null) {
                 Text(
                     text = card.content,
                     style = TextStyle(fontSize = 16.sp),
@@ -311,12 +396,22 @@ fun TodaysPicture() {
                 )
             }
         }
-        if (dummyCardsData == null) {
-            // 데이터를 아직 가져오지 않았을 때의 UI 처리
-            // 예: 로딩 스피너 또는 메시지 표시
-        } else {
-            // cardsData를 사용하여 UI를 그리는 코드
-            // ...
-        }
+    }
+    if (cardData == null) {
+        // 데이터를 아직 가져오지 않았을 때의 UI 처리
+        // 예: 로딩 스피너 또는 메시지 표시
+    } else {
+        // cardsData를 사용하여 UI를 그리는 코드
+        // ...
     }
 }
+
+
+suspend fun unfollowUser(memberId: Long): retrofit2.Response<FollowCancelResponse> {
+    return NetworkModule.provideRetrofitInstance().unfollowUser(followingId = memberId)
+}
+
+suspend fun followUser(memberId: Long): retrofit2.Response<MemberCheckResponse> {
+    return NetworkModule.provideRetrofitInstance().followUser(followingId = memberId)
+}
+

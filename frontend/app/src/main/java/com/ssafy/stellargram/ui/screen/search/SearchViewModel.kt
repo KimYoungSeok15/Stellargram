@@ -226,7 +226,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
                             category = card.category,
                             tools = card.tools,
                             likeCount = card.likeCount,
-                            amILikeThis = card.amILikeThis
+                            amILikeThis = card.amILikeThis,
+                            isFollowing = false,
                         )
 
                         result.add(newCardInfo)
@@ -271,12 +272,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
         val results = searchStars.searchByName(text)
         return results.toList()
     }
-//    init {
-//        // 초기화 시 API 요청을 통해 검색 결과를 가져와서 캐싱
-//        cardResults.value = getCardResults(text)
-//        memberResults.value = getMemberResults(text)
-//        starResults.value = getStarResults(text)
-//    }
 }
 //----------------------------------------이상 탭관련----------------------------------------
 
@@ -364,7 +359,7 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController: NavController
 
             // 사진 표시
             GlideImage(
-                model = card.imagePath,
+                model = card.imageUrl,
                 contentDescription = "Card Image",
                 modifier = Modifier.fillMaxSize()
             )

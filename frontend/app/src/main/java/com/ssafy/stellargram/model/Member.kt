@@ -62,7 +62,7 @@ data class Member(
     val memberId: Long,
     val nickname: String,
     val profileImageUrl: String,
-    val isFollow: Boolean,
+    var isFollow: Boolean,
     val followCount: Int,
     val followingCount: Int,
     val cardCount: Int

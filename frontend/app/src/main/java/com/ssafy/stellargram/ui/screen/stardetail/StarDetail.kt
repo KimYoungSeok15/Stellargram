@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.stardetail
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +29,7 @@ import com.ssafy.stellargram.module.DBModule
 fun StarDetailScreen(navController: NavController, id: Int) {
     val starViewModel: StarDetailViewModel = viewModel()
     var star = DBModule.starMap[id]
+    Log.d("별","$star")
 
 //    // 뷰모델을 초기화하고 데이터를 가져오는 블록
 //    LaunchedEffect(true) {
@@ -51,7 +54,8 @@ fun StarDetailScreen(navController: NavController, id: Int) {
                 GlideImage(
                     model = "https://image.librewiki.net/c/c5/Vega.jpg",
                     contentDescription = "설명",
-                    modifier = Modifier.padding(0.dp, 20.dp)
+                    modifier = Modifier.padding(0.dp, 20.dp),
+                    contentScale = ContentScale.FillWidth
                 )
             }
 
@@ -60,7 +64,7 @@ fun StarDetailScreen(navController: NavController, id: Int) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp),
+                        .padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // 첫 번째 Column (별자리, 적경, 적위 등)
@@ -92,12 +96,10 @@ fun StarDetailScreen(navController: NavController, id: Int) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(20.dp))
                 // 설명
                 Text(
-                    text = "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다. " +
-                            "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다.",
-                    modifier = Modifier.padding(0.dp, 20.dp)
+                    text = "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다. ",
+                    modifier = Modifier.padding(bottom = 20.dp)
                 )
             }
         }
