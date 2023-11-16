@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
+import com.ssafy.stellargram.ui.common.CustomTextButton
+import com.ssafy.stellargram.ui.common.CustomTextButtonDark
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.Purple40
 import com.ssafy.stellargram.ui.theme.Purple80
@@ -73,15 +75,11 @@ fun SiteInfoBox(
 
             // 채팅스크린이라면 리뷰 버튼
             if (isChatScreen) {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "리뷰", color = Color.White)
-                }
+                CustomTextButtonDark(text = "리뷰", onClick = { /*TODO*/ })
             }
             // 리뷰스크린이라면 채팅버튼
             else {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "채팅", color = Color.White)
-                }
+                CustomTextButtonDark(text = "채팅", onClick = { /*TODO*/ })
             }
         }
     }

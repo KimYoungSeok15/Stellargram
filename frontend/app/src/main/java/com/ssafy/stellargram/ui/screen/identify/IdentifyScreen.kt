@@ -37,13 +37,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropperLoading
 import com.mr0xf00.easycrop.rememberImagePicker
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.ssafy.stellargram.ui.common.CustomSpinner
+import com.ssafy.stellargram.ui.common.CustomTextButton
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.EasyCropTheme
 import com.ssafy.stellargram.ui.theme.Purple80
@@ -139,20 +139,32 @@ fun IdentifyScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    onClick = onPick, modifier = Modifier.padding(10.dp)
-                ) { Text("사진 고르기") }
-                Button(
+                CustomTextButton(
+                    text = "사진 고르기",
+                    onClick = onPick,
+                    margin = 10.dp,
+                    isBold = false
+                )
+                CustomTextButton(
+                    text = "별 인식하기",
                     onClick = {
 
                         if (selectedImage != null) viewModel.identifyStarsFromBitmap(
                             selectedImage
                         )
                         else Toast.makeText(context, "사진을 선택해주세요", Toast.LENGTH_SHORT)
-                    }, modifier = Modifier.padding(10.dp)
-                ) {
-                    Text(text = "별 인식하기")
-                }
+                    },
+                    margin = 10.dp,
+                    isBold = false
+                )
+//                Button(
+//                    onClick = onPick, modifier = Modifier.padding(10.dp)
+//                ) { Text("사진 고르기") }
+//                Button(
+//                    onClick =, modifier = Modifier.padding(10.dp)
+//                ) {
+//                    Text(text = "별 인식하기")
+//                }
             }
 
             if (viewModel.isFailed) {
