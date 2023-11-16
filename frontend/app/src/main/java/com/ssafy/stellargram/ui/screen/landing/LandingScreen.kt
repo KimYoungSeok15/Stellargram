@@ -100,7 +100,7 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
 //         ) {
 //             Text(text = "카메라")
 //         }
-
+    }
 }
 
 
