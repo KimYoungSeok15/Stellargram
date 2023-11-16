@@ -37,7 +37,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropperLoading
@@ -127,12 +126,12 @@ fun IdentifyScreen(navController: NavController) {
             Text(
                 text = "장애물이 없고 화각이 30도에 가까울수록",
                 color = Color.White,
-                style = TextStyle(fontSize = Constant.verySmallText.sp)
+                style = TextStyle(fontSize = Constant.tinyText.sp)
             )
             Text(
                 text = "인식률이 올라갑니다",
                 color = Color.White,
-                style = TextStyle(fontSize = Constant.verySmallText.sp)
+                style = TextStyle(fontSize = Constant.tinyText.sp)
             )
 
             Row(
