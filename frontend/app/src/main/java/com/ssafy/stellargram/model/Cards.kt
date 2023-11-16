@@ -69,6 +69,12 @@ data class CardDeleteResponse(
     val data: String
 )
 
+data class CardLikeResponse(
+    val code: Int,
+    val message: String,
+    val data: String
+)
+
 data class CardRecommendResponse(
     val code: Int,
     val message: String,

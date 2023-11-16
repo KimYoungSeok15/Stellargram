@@ -2,6 +2,7 @@ package com.ssafy.stellargram.data.remote
 import com.google.gson.annotations.SerializedName
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardDeleteResponse
+import com.ssafy.stellargram.model.CardLikeResponse
 import com.ssafy.stellargram.model.CardLikersResponse
 import com.ssafy.stellargram.model.CardPostResponse
 import com.ssafy.stellargram.model.CardRecommendResponse
@@ -145,6 +146,7 @@ interface ApiServiceForCards {
     // ** 카드 등록 **  - 오류 생길 가능성 큼. 테스트 안해봄. 사용 방법은 StarCardRepository.kt 파일을 참조할 것.
     // 참조 - https://ducksever.tistory.com/28 + ChatGPT
     // 사용 방법: val response = StarCardRepository.uploadCard(uri, content, photo_at, category, tool, observeSiteId)
+
     @Multipart
     @POST("/starcard/")
     suspend fun uploadStarCard(
@@ -161,6 +163,13 @@ interface ApiServiceForCards {
     // 오늘의 카드 추천
     @GET("/starcard/recommand")
     suspend fun recommendCard(): Response<CardRecommendResponse>
+
+    // 카드 좋아요/해제
+    @GET("/starcard/{cardId}/likes")
+    suspend fun likeCard(
+        @Path("cardId") cardId: Int
+    ): Response<CardLikeResponse>
+
 }
 
 interface ApiServiceForWeather {
