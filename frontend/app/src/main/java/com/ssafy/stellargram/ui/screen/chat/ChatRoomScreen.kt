@@ -1,7 +1,6 @@
 package com.ssafy.stellargram.ui.screen.chat
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.model.ChatRoom
-import com.ssafy.stellargram.model.Constant
+import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.model.MessageInfo
 
 @Preview(showBackground = true)

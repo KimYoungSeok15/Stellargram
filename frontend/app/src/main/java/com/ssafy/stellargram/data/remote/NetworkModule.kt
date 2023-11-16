@@ -14,6 +14,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.IOException
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,6 +25,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private const val BASE_URL: String = INSTARGRAM_APP_URI
+    private const val IDENTIFY_URL: String = "http://k9a101.p.ssafy.io:8002/"
+
     //  Dagger Hilt를 통해 Singleton 스코프를 가진 OkHttpClient 인스턴스를 규정
     @Provides
     @Singleton
@@ -195,9 +198,21 @@ object NetworkModule {
     fun provideRetrofitInstanceSite(): ApiServiceForSite {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(provideHttpClient())
+            .client(provideHttpClientHeader(MyIdInterceptor()))
             .addConverterFactory(provideConverterFactory())
             .build()
             .create(ApiServiceForSite::class.java)
+    }
+
+    // 별인식 관련 API
+    @Singleton
+    @Provides
+    fun provideRetrofitInstanceIdentify(): ApiServiceForIdentify {
+        return Retrofit.Builder()
+            .baseUrl(IDENTIFY_URL)
+            .client(provideHttpClientHeader(MyIdInterceptor()))
+            .addConverterFactory(provideConverterFactory())
+            .build()
+            .create(ApiServiceForIdentify::class.java)
     }
 }

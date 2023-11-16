@@ -114,9 +114,9 @@ fun NavGraph(
             }
         }
         composable(route = Screen.Identify.route){
-//            BaseFrame(navController, screen = Screen.Identify){
+            BaseFrame(navController, screen = Screen.Identify){
                 IdentifyScreen(navController = navController)
-//            }
+            }
         }
         composable(route = Screen.MakeCard.route){
             MakeCardScreen(navController = navController)

@@ -1,5 +1,5 @@
 package com.ssafy.stellargram.data.remote
-import com.google.gson.annotations.SerializedName
+
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardDeleteResponse
 import com.ssafy.stellargram.model.CardLikersResponse
@@ -10,6 +10,8 @@ import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
 import com.ssafy.stellargram.model.FollowersResponse
+import com.ssafy.stellargram.model.IdentifyPhotoData
+import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
@@ -44,24 +46,24 @@ import retrofit2.http.Query
 
 interface ApiServiceForMember {
 
-     @GET("member/check")
-     suspend fun getMemberCheck(): Response<MemberCheckResponse>
+    @GET("member/check")
+    suspend fun getMemberCheck(): Response<MemberCheckResponse>
 
-     @POST("member/check-duplicate/")
-     suspend fun getMemberCheckDuplicate(@Body getMemberCheckDuplicateRequest: MemberCheckDuplicateRequest): Response<MemberCheckDuplicateResponse>
+    @POST("member/check-duplicate/")
+    suspend fun getMemberCheckDuplicate(@Body getMemberCheckDuplicateRequest: MemberCheckDuplicateRequest): Response<MemberCheckDuplicateResponse>
 
-     @POST("member/signup")
-     suspend fun postMemberSignUP(@Body postMemberSignUpRequest : MemberSignUpRequest) : Response<MemberSignUpResponse>
+    @POST("member/signup")
+    suspend fun postMemberSignUP(@Body postMemberSignUpRequest: MemberSignUpRequest): Response<MemberSignUpResponse>
 
-     // 특정회원 정보조회 (본인도 대상으로 가능)
-     @GET("member/others/{userId}")
-     suspend fun getMember(
-         @Path("userId") userId: Long
-     ) : Response<MemberResponse>
+    // 특정회원 정보조회 (본인도 대상으로 가능)
+    @GET("member/others/{userId}")
+    suspend fun getMember(
+        @Path("userId") userId: Long
+    ): Response<MemberResponse>
 
     // 내 정보 조회
     @GET("member/me")
-    suspend fun getMemberMe() : Response<MemberMeResponse>
+    suspend fun getMemberMe(): Response<MemberMeResponse>
 
     // 닉네임 수정
     @PATCH("member/nickname")
@@ -107,7 +109,7 @@ interface ApiServiceForMember {
     // 유저 닉네임 검색
     @POST("member/nickname/search")
     suspend fun findMember(
-        @Body postMemberSearchRequest:MemberSearchRequest
+        @Body postMemberSearchRequest: MemberSearchRequest
     ): MemberSearchResponse
 
 
@@ -135,7 +137,6 @@ interface ApiServiceForCards {
         @Query("keyword") keyword: String,
         @Query("category") category: String = "galaxy"
     ): CardListResponse
-
 
 
     // 카드 Id로 좋아요한 멤버들 조회
@@ -211,7 +212,7 @@ interface ApiServiceForChat {
     ): CursorResponse
 }
 
-interface ApiServiceForObserveSite{
+interface ApiServiceForObserveSite {
 
     //관측지 post
     @POST("observe-site/")
@@ -220,7 +221,7 @@ interface ApiServiceForObserveSite{
     ): ObserveSiteResponse
 }
 
-interface ApiServiceForObserveSearch{
+interface ApiServiceForObserveSearch {
     @GET("observe-search/")
     suspend fun getObserveSearch(
         @Query("startX") startX: Float,
@@ -241,4 +242,14 @@ interface ApiServiceForSite {
         @Path("longitude") longitude: Double,
     ): SiteInfoResponse
 
+}
+
+// TODO: 멀티파트 파일 가능하도록 하기
+// 인식 관련
+interface ApiServiceForIdentify {
+    @Multipart
+    @POST("/identify/tetraIdentify")
+    suspend fun getIdentifyData(
+        @Part file: MultipartBody.Part,
+    ): Response<IdentifyPhotoData>
 }

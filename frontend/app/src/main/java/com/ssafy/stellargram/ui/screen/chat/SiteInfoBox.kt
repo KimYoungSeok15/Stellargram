@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
-import com.ssafy.stellargram.model.Constant
+import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.Purple40
 import com.ssafy.stellargram.ui.theme.Purple80
 
