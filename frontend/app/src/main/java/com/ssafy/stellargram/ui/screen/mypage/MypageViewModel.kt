@@ -553,6 +553,11 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                     text = "좋아요 ${card.likeCount}",
                     style = TextStyle(fontSize = 20.sp),
                     modifier = Modifier.padding(start = 8.dp)
+                        .clickable (
+                            interactionSource = remember{ MutableInteractionSource() },
+                            indication = null){
+//                            viewModel.handleLikersButtonClick(cardId = card.cardId)
+                        }
                 )
             }
 

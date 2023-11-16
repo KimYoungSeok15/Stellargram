@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.stardetail
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import com.ssafy.stellargram.module.DBModule
 fun StarDetailScreen(navController: NavController, id: Int) {
     val starViewModel: StarDetailViewModel = viewModel()
     var star = DBModule.starMap[id]
+    Log.d("별","$star")
 
 //    // 뷰모델을 초기화하고 데이터를 가져오는 블록
 //    LaunchedEffect(true) {

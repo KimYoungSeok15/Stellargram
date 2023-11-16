@@ -82,7 +82,7 @@ data class CardRecommendResponse(
 )
 
 data class StarCards(
-    val starcards: List<BestCard>?
+    val starcard: BestCard?
 )
 
 data class BestCard(
@@ -97,7 +97,7 @@ data class BestCard(
     val photoAt: String?,
     val category: String?,
     val tools: String?,
-    val likeCount: Int,
-    val amILikeThis: Boolean,
+    var likeCount: Int?,
+    var amILikeThis: Boolean,
     var isFollowing: Boolean
 )

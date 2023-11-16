@@ -1,5 +1,7 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.app.AlertDialog
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.gestures.DraggableState
@@ -146,4 +148,19 @@ fun MypageScreen(navController: NavController, id:Long) {
                 }
         }
     }
+}
+
+fun showConfirmationDialog(context: Context, title: String, message: String, onConfirm: () -> Unit) {
+    AlertDialog.Builder(context)
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton("확인") { _, _ ->
+            // "확인" 버튼이 클릭되었을 때 실행되는 람다식
+            onConfirm.invoke()
+        }
+        .setNegativeButton("취소") { dialog, _ ->
+            // "취소" 버튼이 클릭되었을 때 실행되는 람다식 (이 부분은 필요에 따라 수정 가능)
+            dialog.dismiss()
+        }
+        .show()
 }

@@ -243,7 +243,7 @@ fun HomeScreen(navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(30.dp, 0.dp),
+            .padding(16.dp, 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
@@ -355,7 +355,7 @@ fun HomeScreen(navController: NavController) {
                     .padding(16.dp)
                     .background(Color.Transparent)
             ) {
-                TodaysPicture()
+                TodaysPicture(viewModel = HomeViewModel())
             }
         }
     }
