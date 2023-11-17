@@ -149,7 +149,11 @@ public class MessageServiceImpl implements MessageService {
         // 가져온 정보를 memberId를 키로가지는 Map으로 변환
         Map<Long, MemberInfo> memberMap = new HashMap<>();
         for (LinkedHashMap item : memberResponse) {
-            Long thisMemberId = ((Integer) item.get("memberId")).longValue();
+            Long thisMemberId;
+            Object temp = item.get("memberId");
+            if(temp instanceof Long)
+                thisMemberId=((Long) item.get("memberId")).longValue();
+            else thisMemberId = ((Integer) item.get("memberId")).longValue();
             String thisNickname = (String) item.get("nickname");
             String thisProfileImageUrl = (String) item.get("profileImageUrl");
             memberMap.put(thisMemberId,
