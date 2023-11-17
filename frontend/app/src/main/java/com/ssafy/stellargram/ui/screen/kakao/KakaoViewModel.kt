@@ -9,6 +9,7 @@ import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.MemberCheckResponse
+import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.ui.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +37,6 @@ class KakaoViewModel @Inject constructor(
         if (error != null) {
             // Handle login failure here
             Log.e(TAG, "카카오 서버 로그인 실패", error)
-            navController.navigate(Screen.Landing.route)
         } else if (token != null) {
             Log.i(TAG, "카카오 서버 로그인 성공 ${token.accessToken}")
             // After successful login, request user information
@@ -69,6 +69,7 @@ class KakaoViewModel @Inject constructor(
                 val getMemberCheck = response.body()
                 if(getMemberCheck != null){
                     if (getMemberCheck.data.status) {
+                        getMe()
                         withContext(Dispatchers.Main) {
                             navController.navigate(Screen.Home.route)
                         }
@@ -77,6 +78,22 @@ class KakaoViewModel @Inject constructor(
                             navController.navigate(Screen.SignUp.route)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun getMe(){
+        repository.memberMeRequest { response ->
+            if(response.isSuccessful){
+                val memberMeResponse = response.body()
+                if (memberMeResponse != null){
+                    StellargramApplication.prefs.setString("memberId",memberMeResponse.data.memberId.toString())
+                    StellargramApplication.prefs.setString("nickname",memberMeResponse.data.nickname)
+                    StellargramApplication.prefs.setString("profileImageUrl",memberMeResponse.data.profileImageUrl)
+                    StellargramApplication.prefs.setString("followCount",memberMeResponse.data.followCount.toString())
+                    StellargramApplication.prefs.setString("followingCount",memberMeResponse.data.followingCount.toString())
+                    StellargramApplication.prefs.setString("cardCount",memberMeResponse.data.cardCount.toString())
                 }
             }
         }
@@ -111,6 +128,20 @@ class AuthRepository(private val scope: CoroutineScope) {
                 Log.d(tag,response.toString())
                 onComplete(response)
             } catch (e: Exception) {
+                Log.e(tag,e.toString())
+            }
+        }
+    }
+
+    fun memberMeRequest(
+        onComplete: (Response<MemberMeResponse>) -> Unit
+    ){
+        scope.launch(Dispatchers.IO) {
+            try {
+                val response = NetworkModule.provideRetrofitInstance().getMemberMe()
+                Log.d(tag,response.toString())
+                onComplete(response)
+            } catch (e:Exception) {
                 Log.e(tag,e.toString())
             }
         }

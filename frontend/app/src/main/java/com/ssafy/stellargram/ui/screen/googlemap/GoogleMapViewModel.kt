@@ -2,20 +2,26 @@ package com.ssafy.stellargram.ui.screen.googlemap
 
 import android.annotation.SuppressLint
 import android.location.Geocoder
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.ssafy.stellargram.data.remote.NetworkModule
+import com.ssafy.stellargram.model.ObserveSite
+import com.ssafy.stellargram.model.ObserveSiteRequest
+import com.ssafy.stellargram.util.CalcZoom
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,16 +45,15 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     lateinit var fusedLocationClient: FusedLocationProviderClient
     lateinit var placesClient: PlacesClient
     lateinit var geoCoder: Geocoder
+    val calcZoom = CalcZoom()
     var locationState by mutableStateOf<LocationState>(LocationState.NoPermission)
     /** Current geoLocation via LatLng, mutated by 'getCurrentLocation' */
     var currentLatLong by mutableStateOf(LatLng(0.0, 0.0))
     /** Address String, mutated by 'getAddress'  */
     var address by mutableStateOf("")
-
     var textIpt by mutableStateOf("")
-
-
-
+    var zoomLevel by mutableFloatStateOf(0f)
+    var markerList: MutableList<ObserveSite> = mutableListOf(ObserveSite(0f, 0f, "", 0, 0))
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
     fun searchPlaces(query: String) {
         job?.cancel()
@@ -141,5 +146,35 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
             ans = temp?.get(0)?.getAddressLine(0).toString()
         }
         return ans
+    }
+
+    fun postObserveSite(latLng: LatLng){
+        viewModelScope.launch {
+            val request = ObserveSiteRequest(latLng.latitude, latLng.longitude, "")
+            val response = NetworkModule.provideRetrofitInstanceObserveSite().postObserveSite(request)
+        }
+    }
+
+    fun getObserveSiteLists(){
+        viewModelScope.launch {
+            val lat = currentLatLong.latitude
+            val lng = currentLatLong.longitude
+
+            val radius = calcZoom.getScreenDiameter(zoomLevel)
+            try {
+                val response = NetworkModule.provideRetrofitInstanceObserveSearch().getObserveSearch(
+                    lat.toFloat() - 1.5f * radius,
+                    lat.toFloat() + 1.5f * radius,
+                    lng.toFloat() - 1.5f * radius,
+                    lng.toFloat() + 1.5f * radius
+                )
+                Log.d("content", response.toString())
+                if (response.data != null) markerList = response.data
+                Log.d("content", "close2: ${markerList.size}")
+            } catch (e:Exception){
+                Log.e("content",e.toString())
+            }
+
+        }
     }
 }

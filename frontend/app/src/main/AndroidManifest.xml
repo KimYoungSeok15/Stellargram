@@ -6,11 +6,24 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- 카메라X 사용 권한 설정   -->
+    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
     <!--  위치 사용 권한 설정  -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!--  파일 저장 권한 설정  -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name=".StellargramApplication"
+        android:hardwareAccelerated="false"
+        android:largeHeap="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,21 +33,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.INSTARGRAM"
         tools:targetApi="34">
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
+
+        <!-- MainActivity -->
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.INSTARGRAM">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!--   카카오 로그인을 위한 액티비티 선언  -->
+        <!-- 두 번째 액티비티: CameraActivity -->
+        <activity
+            android:name=".ui.screen.camera.CameraActivity"
+            android:label="Camera Activity">
+        </activity>
+
+        <!-- 카카오 로그인을 위한 액티비티 선언 -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -50,5 +72,4 @@
         </activity>
 
     </application>
-
 </manifest>
