@@ -86,7 +86,9 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun afterSignIn(navController: NavController){
-        navController.navigate(Screen.Home.route)
+        viewModelScope.launch(Dispatchers.Main){
+            navController.navigate(Screen.Home.route)
+        }
     }
 
 }

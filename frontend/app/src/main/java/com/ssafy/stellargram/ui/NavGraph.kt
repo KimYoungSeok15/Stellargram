@@ -1,5 +1,7 @@
 package com.ssafy.stellargram.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -13,14 +15,18 @@ import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
 import com.ssafy.stellargram.ui.screen.home.HomeScreen
+import com.ssafy.stellargram.ui.screen.identify.IdentifyScreen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
+import com.ssafy.stellargram.ui.screen.makecard.MakeCardScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
 import com.ssafy.stellargram.ui.screen.search.SearchScreen
 import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
+import com.ssafy.stellargram.ui.screen.skymap.SkyMapFrame
 import com.ssafy.stellargram.ui.screen.skymap.SkyMapScreen
 import com.ssafy.stellargram.ui.screen.stardetail.StarDetailScreen
 
+@RequiresApi(Build.VERSION_CODES.P)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun NavGraph(
@@ -58,26 +64,31 @@ fun NavGraph(
         }
 
         composable(route = Screen.SkyMap.route){
-            BaseFrame(navController, screen = Screen.SkyMap) {
+            SkyMapFrame(navController, screen = Screen.SkyMap) {
                 SkyMapScreen(navController = navController)
             }
         }
-        composable(route = Screen.Camera.route){
+        composable(route = Screen.Camera.route) {
             BaseFrame(navController, screen = Screen.Camera) {
                 CameraScreen(navController = navController)
             }
         }
-        composable(route = Screen.GoogleMap.route){
+        composable(route = Screen.GoogleMap.route) {
             BaseFrame(navController, screen = Screen.GoogleMap) {
                 GoogleMapScreen(navController = navController)
             }
         }
-        composable(Screen.SignUp.route){
+        composable(Screen.SignUp.route) {
             SignUpScreen(navController = navController)
         }
-        composable(route = Screen.MyPage.route){
+        composable(
+            route = "${Screen.MyPage.route}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) {backStackEntry ->
+            val arguments = requireNotNull(backStackEntry.arguments)
+            val userId = arguments.getLong("id") ?: -1
             BaseFrame(navController, screen = Screen.MyPage) {
-                MypageScreen(navController = navController)
+                MypageScreen(navController = navController, id = userId)
             }
         }
         composable(
@@ -88,18 +99,28 @@ fun NavGraph(
                 navArgument("observeSiteId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.let {
-                ChatRoomScreen(
-                    navController = navController,
-                    roomId = it.getInt("roomId"),
-                    personnel = backStackEntry.arguments?.getInt("personnel"),
-                    observeSiteId = backStackEntry.arguments?.getString("observeSiteId"),
-                )
+                BaseFrame(navController, screen = Screen.ChatRoom) {
+                    ChatRoomScreen(
+                        navController = navController,
+                        roomId = it.getInt("roomId"),
+                        personnel = backStackEntry.arguments?.getInt("personnel"),
+                        observeSiteId = backStackEntry.arguments?.getString("observeSiteId"),
+                    )
+                }
             }
         }
         composable(route = Screen.ChatRoomList.route) {
             BaseFrame(navController, screen = Screen.ChatRoomList) {
                 ChatRoomListScreen(navController = navController)
             }
+        }
+        composable(route = Screen.Identify.route){
+            BaseFrame(navController, screen = Screen.Identify){
+                IdentifyScreen(navController = navController)
+            }
+        }
+        composable(route = Screen.MakeCard.route){
+            MakeCardScreen(navController = navController)
         }
     }
 }
