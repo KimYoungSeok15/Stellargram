@@ -1,7 +1,5 @@
 package com.ssafy.stellargram.ui.screen.home
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
@@ -47,10 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,90 +56,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-// 기상청에 맞게 위도 경도를 수정하기 위한 상수들
-const val COEFFICIENT_TO_RADIAN = Math.PI / 180.0
-const val GRID_UNIT_COUNT = 6371.00877 / 5.0
-const val REF_X = 43.0
-const val REF_Y = 136.0
-const val REF_LON_RAD = 126.0 * COEFFICIENT_TO_RADIAN
-const val REF_LAT_RAD = 38.0 * COEFFICIENT_TO_RADIAN
-const val PROJ_LAT_1_RAD = 30.0 * COEFFICIENT_TO_RADIAN
-const val PROJ_LAT_2_RAD = 60.0 * COEFFICIENT_TO_RADIAN
-
-
-// api에 담을 nx, ny가 담긴 변수
-data class CoordinatesXy(val nx: Int, val ny: Int)
-data class CoordinatesLatLon(val lat: Double, val lon: Double)
-
-// 경도 위도 -> nx, ny 변환 or 반대도 가능한 함수
-class CoordinateConverter {
-    private val sn = ln(cos(PROJ_LAT_1_RAD) / cos(PROJ_LAT_2_RAD)) / ln(tan(Math.PI * 0.25 + PROJ_LAT_2_RAD * 0.5) / tan(Math.PI * 0.25 + PROJ_LAT_1_RAD * 0.5))
-    private val sf = tan(Math.PI * 0.25 + PROJ_LAT_1_RAD * 0.5).pow(sn) * cos(PROJ_LAT_1_RAD) / sn
-    private val ro = GRID_UNIT_COUNT * sf / tan(Math.PI * 0.25 + REF_LAT_RAD * 0.5).pow(sn)
-
-    // 위경도 -> xy
-    internal fun convertToXy(lat: Double, lon: Double): CoordinatesXy {
-        val ra = GRID_UNIT_COUNT * sf / tan(Math.PI * 0.25 + lat * COEFFICIENT_TO_RADIAN * 0.5).pow(sn)
-        val theta: Double = lon * COEFFICIENT_TO_RADIAN - REF_LON_RAD
-        val niceTheta = if (theta < -Math.PI) {
-            theta + 2 * Math.PI
-        } else if (theta > Math.PI) {
-            theta - 2 * Math.PI
-        } else theta
-
-        return CoordinatesXy(
-            nx = floor(ra * sin(niceTheta * sn) + REF_X + 0.5).toInt(),
-            ny = floor(ro - ra * cos(niceTheta * sn) + REF_Y + 0.5).toInt()
-        )
-    }
-
-    //xy -> 위경도
-    internal fun convertToLatLon(nx: Double, ny: Double): CoordinatesLatLon {
-        val diffX: Double = nx - REF_X
-        val diffY: Double = ro - ny + REF_Y
-        val distance = sqrt(diffX * diffX + diffY * diffY)
-        val latSign: Int = if (sn < 0) -1 else 1
-        val latRad = 2 * atan((GRID_UNIT_COUNT * sf / distance).pow(1.0 / sn)) - Math.PI * 0.5
-
-        val theta: Double = if (abs(diffX) <= 0) 0.0 else {
-            if (abs(diffY) <= 0) {
-                if (diffX < 0) -Math.PI * 0.5 else Math.PI * 0.5
-            } else atan2(diffX, diffY)
-        }
-
-        val lonRad = theta / sn + REF_LON_RAD
-
-        return CoordinatesLatLon(
-            lat = (latRad * latSign) / COEFFICIENT_TO_RADIAN,
-            lon = lonRad / COEFFICIENT_TO_RADIAN
-        )
-    }
-}
-// 현재 주소를 위경도를 통해 받아오는 함수
-fun getAddressFromLocation(context: Context, latitude: Double, longitude: Double): String {
-    val geocoder = Geocoder(context, Locale.getDefault())
-    var addressText = ""
-    try {
-        val addresses: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
-        if (addresses != null && addresses.isNotEmpty()) {
-            val address = addresses[0]
-            // 주소를 원하는 형식으로 조합하거나 필요한 부분만 추출할 수 있습니다.
-            addressText = address.thoroughfare ?: "주소 정보 없음"
-        } else {
-            addressText = "주소 정보 없음"
-        }
-    } catch (e: IOException) {
-        Log.d("Location1", "위치정보 받아오기 실패")
-        e.printStackTrace()
-        addressText = "주소 정보 없음"
-    }
-    Log.d("Location1", "getAddressFromLocation: $addressText")
-    return addressText
-}
-
-// 메인함수
-@SuppressLint("MissingPermission")
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     var weatherData by remember { mutableStateOf<List<WeatherItem>>(emptyList()) } // 날씨 정보
@@ -221,50 +131,8 @@ fun HomeScreen(navController: NavController) {
         }
     } else {
         // 위치 권한이 허용되지 않은 경우
-        if (!locationPermissionState.allPermissionsGranted) {
-            locationPermissionState.launchMultiplePermissionRequest()
-        }
-        else {
-            // 허용된 경우
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                1000,
-                1.0f,
-                locationListener
-            )
-        }
+        // 사용자에게 위치 권한을 요청할 수 있음 ( 추후 구현 )
     }
-
-    // API 호출 및 데이터 가져오기
-    LaunchedEffect(key1 = coordinatesXy) {
-        coordinatesXy?.let { coordinates ->
-            Log.d("Location1", "날짜: $baseDate 시간: $baseTime")
-            Log.d("weather response", "기상청API 요청 시작 전")
-            CoroutineScope(Dispatchers.IO).launch {
-                val response = NetworkModule.provideRetrofitInstanceWeather().getWeatherData(
-                    serviceKey = "6PIByXLX9AWtK2AOiuXIwPy7yp6W6IsXetSFkmgg6zuMUkeuSar2gkZzmq2CICLoIT9AqbQLMFOieAktc1uUoQ==",
-                    pageNo = 1,
-                    numOfRows = 1000,
-                    dataType = "JSON",
-                    baseDate = baseDate,
-                    baseTime = baseTime,
-                    nx = coordinates.nx, // 사용자의 위치에 따라서 coordinatesXy의 값 사용
-                    ny = coordinates.ny
-                ).execute()
-                Log.d("weather response", response.toString())
-                if (response.isSuccessful) {
-                    val weatherResponse: WeatherResponse? = response.body()
-                    // 파싱
-                    val gson = Gson()
-                    val itemType = object : TypeToken<List<WeatherItem>>() {}.type
-                    Log.d("weather response", "Gson 시작전")
-                    val items = gson.fromJson<List<WeatherItem>>(
-                        gson.toJson(weatherResponse?.response?.body?.items?.item),
-                        itemType
-                    )
-                    Log.d("weather response", "Gson 시작후")
-                    // 필터링할 카테고리 목록
-                    val targetCategories = setOf("T1H", "SKY", "PTY")
 
     LaunchedEffect(Unit,memberID){
         memberID = StellargramApplication.prefs.getString("memberId","0").toLong()
@@ -492,4 +360,3 @@ fun HomeScreen(navController: NavController) {
         }
     }
 }
-
