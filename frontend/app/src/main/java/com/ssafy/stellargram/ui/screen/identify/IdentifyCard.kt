@@ -23,7 +23,7 @@ import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.Purple80
 
 @Composable //info:IdentifyStarInfo
-fun IdentifyCard(info:IdentifyStarInfo) {
+fun IdentifyCard(info:IdentifyStarInfo, index:Int) {
 
     Row(
         modifier = Modifier

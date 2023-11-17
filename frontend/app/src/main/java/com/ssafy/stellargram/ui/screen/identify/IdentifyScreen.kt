@@ -166,14 +166,6 @@ fun IdentifyScreen(navController: NavController) {
                     margin = 10.dp,
                     isBold = false
                 )
-//                Button(
-//                    onClick = onPick, modifier = Modifier.padding(10.dp)
-//                ) { Text("사진 고르기") }
-//                Button(
-//                    onClick =, modifier = Modifier.padding(10.dp)
-//                ) {
-//                    Text(text = "별 인식하기")
-//                }
             }
 
             if (viewModel.isFailed) {
@@ -192,7 +184,7 @@ fun IdentifyScreen(navController: NavController) {
                 ) {
 
                     itemsIndexed(viewModel.starInfoList) { index, starInfo->
-                        IdentifyCard(starInfo)
+                        IdentifyCard(starInfo,index)
                         if(index!=viewModel.starInfoList.lastIndex)
                             Divider(thickness = 2.dp, color = Purple40)
 

@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -14,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mr0xf00.easycrop.CropError
@@ -25,6 +28,7 @@ import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.IdentifyStarInfo
 import com.ssafy.stellargram.module.DBModule
+import com.ssafy.stellargram.ui.theme.starPaintColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,12 +42,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IdentifyViewModel @Inject constructor(private val app: Application) : AndroidViewModel(app) {
+    // ---------- 크롭 관련 ----------
     // 크롭 관련 변수
     val imageCropper = ImageCropper()
     private val _selectedImage = MutableStateFlow<ImageBitmap?>(null)
     val selectedImage = _selectedImage.asStateFlow()
     private val _cropError = MutableStateFlow<CropError?>(null)
     val cropError = _cropError.asStateFlow()
+
+    // 인식된 전체 별 이미지 저장
+    private var _paintedAllImage = MutableStateFlow<ImageBitmap?>(null)
+    val paintedAllImage = _paintedAllImage.asStateFlow()
+
+    // 선택된 별 1개 표시된 이미지 저장
+    private val _paintedImage = MutableStateFlow<ImageBitmap?>(null)
+    val paintedImage = _paintedImage.asStateFlow()
 
     // 인식중인지 표시하는 Boolean
     var isIdentifying: Boolean by mutableStateOf(false) // 인식 중이면 true
@@ -68,6 +81,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         }
     }
 
+    // ---------- 별 인식 관련 ----------
     // 인식된 별 정보 목록
     private val privateStarInfoList: MutableList<IdentifyStarInfo> =
         mutableStateListOf()
@@ -157,6 +171,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
 
     }
 
+    // 비트맵 객체를 전송을 위한 파일로 변환
     private fun saveFileFromIBitmap(imageBitmap: ImageBitmap): File? {
 //        val saveDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 //            .toString() + name
@@ -193,4 +208,79 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         }
         return null
     }
+
+    // ---------- 카드 클릭시 별 표시 ----------
+    val range: Int = 1
+
+
+    fun paintOneStarToNewImage(star:IdentifyStarInfo) {
+        // 선택된 이미지가 없으면 수행하지 않음
+        if (selectedImage.value == null) return
+
+        // 찍는 점 범위의 반지름? 찍는 중심점으로부터 얼마나 멀리까지 찍는지
+        val paintSize: Int = range * 2 + 1
+
+        // 기존 이미지와 새 이미지
+        val originBitmap = selectedImage.value!!.asAndroidBitmap()
+        var newBitmap: Bitmap = originBitmap.copy(originBitmap.config, true)
+        
+        // 이미지 너비 높이
+        val widthX = newBitmap.width
+        val heightY = newBitmap.height
+
+        // 채우는 범위 조각 만들기
+        val pixels = IntArray(paintSize * paintSize) { starPaintColor.value.toInt() }
+
+        // 경계조건
+        if (star.pixelx in 0..widthX && star.pixely in 0 .. heightY) {
+            // 음수 시작점 보정
+            val startX = if (star.pixelx - range < 0) 0 else star.pixelx
+            val startY = if (star.pixely - range < 0) 0 else star.pixely
+            // 칠하기
+            newBitmap.setPixels(pixels, 0, paintSize, startX, startY, paintSize, paintSize)
+        }
+        _paintedImage.value = newBitmap.asImageBitmap()
+
+    }
+
+    fun paintAllStarToNewImage(starInfoList: List<IdentifyStarInfo>) {
+        // 선택된 이미지가 없으면 수행하지 않음
+        if (selectedImage.value == null) return
+
+        // 인식된 별이 없으면 수행하지 않음
+        if(starInfoList.size==0) return
+
+        // 찍는 점 범위의 반지름? 찍는 중심점으로부터 얼마나 멀리까지 찍는지
+        val paintSize: Int = range * 2 + 1
+        
+        // 기존 이미지와 새 이미지
+        val originBitmap = selectedImage.value!!.asAndroidBitmap()
+        val newBitmap = originBitmap.copy(originBitmap.config, true)
+
+        // 이미지 너비 높이
+        val widthX = newBitmap.width
+        val heightY = newBitmap.height
+
+        // 채우는 범위 조각 만들기
+        val pixels = IntArray(paintSize * paintSize) { starPaintColor.value.toInt() }
+
+        // 인식된 별들에 대해
+        for (star in starInfoList) {
+            //경계조건
+            if (star.pixelx in 0..widthX && star.pixely in 0 .. heightY) {
+                // 음수 시작점 보정
+                val startX = if (star.pixelx - range < 0) 0 else star.pixelx
+                val startY = if (star.pixely - range < 0) 0 else star.pixely
+                // 칠하기
+                newBitmap.setPixels(pixels, 0, paintSize, startX, startY, paintSize, paintSize)
+            }
+        }
+        // 생성한 이미지 저장
+        _paintedAllImage.value = newBitmap.asImageBitmap()
+    }
+
+    // ---------- 클릭된 카드 인덱스 관리 ----------
+    var clickedIndex: Int by mutableIntStateOf(-1) // 사진 정가운데의 적위
+
+
 }
