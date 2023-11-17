@@ -12,8 +12,11 @@ import com.ssafy.stellargram.model.MessageForReceive
 import com.ssafy.stellargram.model.MessageInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import org.json.JSONObject
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,12 +24,13 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     val initRoomId: Int = -1
     val initPersonnel = 0
     val initSiteId = "initSite"
+    val initCursor: Int = -2
 
     // 채팅방 정보
-    private var roomId: Int = -1
-    private var personnel: Int = 0
-    private var siteId: String = "initSite"
-    private var nextCursor: Int = 0
+    var roomId: Int = initRoomId
+    private var personnel: Int = initPersonnel
+    private var siteId: String = initSiteId
+    var nextCursor: Int = initCursor
 
 //    private val privateMessages : MutableList<MessageInfo>= mutableStateListOf(*initialMessages.toTypedArray())
 //
@@ -57,18 +61,22 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         val response =
             NetworkModule.provideRetrofitInstanceChat().getRecentCursor(chatRoomId = roomId)
         if (response?.code == 200) {
+            Log.d("get cursor", response.data.toString())
             nextCursor = response.data
         }
 
     }
 
     suspend fun getMessages() {
+        if (nextCursor == initCursor) return
+        if (nextCursor == -1) return
         if (roomId != initRoomId) {
+
             val response = NetworkModule.provideRetrofitInstanceChat()
                 .getPrevChats(myId = TestValue.myId, chatRoomId = roomId, cursor = nextCursor)
             if (response?.code == 200) {
                 Log.d("getMessages response", response.data.messageList.toString())
-                privateMessages.addAll(response.data.messageList)
+                privateMessages.addAll(response.data.messageList.reversed())
                 nextCursor = response.data.nextCursor
             } else {
                 null
@@ -76,19 +84,27 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-//    suspend fun getMyRooms(): ChatRoomsData? {
-//        return try {
-//            val response = NetworkModule.provideRetrofitInstanceChat().getRoomList(myId = myId)
-//            if (response.code == 200) {
-//                response.data
-//            } else {
-//                null
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            null
-//        }
-//    }
+    suspend fun enterRoom() {
+        val responseCursor =
+            NetworkModule.provideRetrofitInstanceChat().getRecentCursor(chatRoomId = roomId)
+        if (responseCursor?.code == 200) {
+            Log.d("get cursor", responseCursor.data.toString())
+            nextCursor = responseCursor.data
+
+            if (roomId != initRoomId) {
+
+                val response = NetworkModule.provideRetrofitInstanceChat()
+                    .getPrevChats(myId = TestValue.myId, chatRoomId = roomId, cursor = nextCursor)
+                if (response?.code == 200) {
+                    Log.d("getMessages response", response.data.messageList.toString())
+                    privateMessages.addAll(response.data.messageList.reversed())
+                    nextCursor = response.data.nextCursor
+                } else {
+                    null
+                }
+            }
+        }
+    }
 
     // STOMP 관련
 
@@ -98,8 +114,9 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     private val baseUrl: String = "ws://k9a101.p.ssafy.io:8000/chat"
     private val endpoint: String = "/ws"
     private val thisUrl: String = baseUrl + endpoint
-    private val intervalMillis = 1000L
+    private val intervalMillis = 4000L
     private val client = OkHttpClient().newBuilder()
+        .addInterceptor(RetryInterceptor())
 //        .readTimeout(10, TimeUnit.SECONDS)
 //        .writeTimeout(10, TimeUnit.SECONDS)
 //        .connectTimeout(10, TimeUnit.SECONDS)
@@ -158,7 +175,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                         memberImagePath = result.memberImagePath,
                         content = result.content
                     )
-                    privateMessages.add(newMessage)
+                    privateMessages.add(0, newMessage)
                 }
             }
         topic = thisTopic
@@ -181,4 +198,26 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     }
 
 
+}
+
+class RetryInterceptor(private val maxRetry: Int = 3) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        var response: Response? = null
+        var retryCount = 0
+
+        while (response == null && retryCount < maxRetry) {
+            try {
+                Log.d("stomp retry", "connect retry ${retryCount}")
+                response = chain.proceed(request)
+            } catch (e: IOException) {
+                retryCount++
+                if (retryCount == maxRetry) {
+                    throw e
+                }
+            }
+        }
+
+        return response!!
+    }
 }

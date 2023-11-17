@@ -1,5 +1,9 @@
 package com.ssafy.stellargram.ui.screen.mypage
 
+import android.app.AlertDialog
+import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,27 +46,33 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoViewModel
 import com.ssafy.stellargram.ui.screen.search.MainViewModel
+import com.ssafy.stellargram.util.StarCardRepository
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MypageScreen(navController: NavController) {
+fun MypageScreen(navController: NavController, id:Long) {
     val viewModel: MypageViewModel = viewModel()
     val tabIndex by viewModel.tabIndex.observeAsState()
-
+    val userId = id // 현재 유저의 id
     var cards by remember { mutableStateOf(viewModel.myCards) }
     var favStars by remember { mutableStateOf(viewModel.favStars) }
     var likeCards by remember { mutableStateOf(viewModel.likeCards) }
+    Log.d("마이페이지", "id: $userId")
 
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
-        viewModel.getMemberInfo("someText")
-        getResults(viewModel = viewModel)
+        viewModel.getMemberInfo(userId)
+        val followingList = viewModel.getFollowingList(userId)
+        Log.d("검사","$followingList")
+        getResults(viewModel = viewModel, id = userId, followingList = followingList)
     }
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -73,7 +83,6 @@ fun MypageScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val member = viewModel.memberResults.value.firstOrNull()
-
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.width(100.dp)
@@ -139,4 +148,19 @@ fun MypageScreen(navController: NavController) {
                 }
         }
     }
+}
+
+fun showConfirmationDialog(context: Context, title: String, message: String, onConfirm: () -> Unit) {
+    AlertDialog.Builder(context)
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton("확인") { _, _ ->
+            // "확인" 버튼이 클릭되었을 때 실행되는 람다식
+            onConfirm.invoke()
+        }
+        .setNegativeButton("취소") { dialog, _ ->
+            // "취소" 버튼이 클릭되었을 때 실행되는 람다식 (이 부분은 필요에 따라 수정 가능)
+            dialog.dismiss()
+        }
+        .show()
 }
