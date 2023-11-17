@@ -43,7 +43,8 @@ data class IdentifyPhotoInfo (
 data class IdentifyStarInfo(
     var absmag: Double, // 절대등급
     var con: String,
-    var id: Int, // db내 
+    var id: Int, // db 내 id
+    var hipid: Int, //hip 리스트의 아이디값
     var mag: Double, // 등급
     var pixelx: Int,
     var pixely: Int
