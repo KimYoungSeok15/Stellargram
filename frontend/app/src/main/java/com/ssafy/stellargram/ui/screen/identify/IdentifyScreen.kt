@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,10 +46,14 @@ import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropperLoading
 import com.mr0xf00.easycrop.rememberImagePicker
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
+import com.ssafy.stellargram.model.IdentifyStarInfo
 import com.ssafy.stellargram.ui.common.CustomSpinner
 import com.ssafy.stellargram.ui.common.CustomTextButton
+import com.ssafy.stellargram.ui.screen.chat.ChatBox
+import com.ssafy.stellargram.ui.screen.chat.TestValue
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.EasyCropTheme
+import com.ssafy.stellargram.ui.theme.Purple40
 import com.ssafy.stellargram.ui.theme.Purple80
 
 
@@ -83,7 +91,8 @@ fun IdentifyScreen(navController: NavController) {
 
         Column(
             modifier = Modifier
-                .padding(20.dp)
+                .weight(0.4f)
+                .padding(vertical = 10.dp)
                 .fillMaxSize()
                 .clip(
                     RoundedCornerShape(Constant.boxCornerSize.dp)
@@ -91,7 +100,7 @@ fun IdentifyScreen(navController: NavController) {
                 .border(
                     width = 2.dp, Purple80, shape = RoundedCornerShape(Constant.boxCornerSize.dp)
                 )
-                .weight(0.5f)
+
                 .background(if (selectedImage == null) Color.DarkGray else Color.Unspecified),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -175,12 +184,22 @@ fun IdentifyScreen(navController: NavController) {
                 )
             } else {
                 // TODO: 인식된 별 리스트 표시하기
-//                IdentifyCard(info = null)
-                Text(
-                    text = "임시",
-                    color = Color.White,
-                    style = TextStyle(fontSize = Constant.smallText.sp)
-                )
+                Divider(thickness = 4.dp, color = Purple80)
+
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+
+                    itemsIndexed(viewModel.starInfoList) { index, starInfo->
+                        IdentifyCard(starInfo)
+                        if(index!=viewModel.starInfoList.lastIndex)
+                            Divider(thickness = 2.dp, color = Purple40)
+
+                    }
+                }
+                Divider(thickness = 4.dp, color = Purple80)
+
             }
         }
     }

@@ -24,6 +24,7 @@ import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.IdentifyStarInfo
+import com.ssafy.stellargram.module.DBModule
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -127,13 +128,19 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
 
                             // 별이 인식 됐다면 목록 리셋 후 저장
                             if (identifyPhotoData.matched != null) {
+
+
                                 privateStarInfoList.clear()
                                 privateStarInfoList.addAll(identifyPhotoData.matched!!)
+                                for (data in privateStarInfoList) {
+                                    var thisName = DBModule.nameMap[data.id]
+                                    data.name = thisName
+                                }
                             }
                         }
                         // 인식이 실패했다면 true 표시
-                        else{
-                            isFailed=true
+                        else {
+                            isFailed = true
                         }
                     }
                 }
