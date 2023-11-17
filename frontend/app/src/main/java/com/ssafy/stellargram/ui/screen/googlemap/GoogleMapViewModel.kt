@@ -178,3 +178,4 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
         }
     }
 }
+

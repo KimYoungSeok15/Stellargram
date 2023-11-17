@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,8 +65,8 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
-import com.ssafy.stellargram.BuildConfig
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.BuildConfig
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -197,16 +198,11 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
         }
     }
 
-
-
-
     LaunchedEffect(key1 = viewModel.currentLatLong ){
         viewModel.zoomLevel = cameraPositionState.position.zoom
         val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, viewModel.zoomLevel)
         cameraPositionState.move(update)
-
     }
-
 
     val bitmap = AppCompatResources.getDrawable(context,R.drawable.telescope_svgrepo_com)!!.toBitmap(100,100)
     Box(Modifier.fillMaxWidth()) {
@@ -218,13 +214,13 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             onMapLongClick = { latLng ->
                     try{
-                        viewModel.postObserveSite(latLng)
-                        viewModel.getObserveSiteLists()
+                    viewModel.postObserveSite(latLng)
+                    viewModel.getObserveSiteLists()
 //                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
-                    } catch(e: Exception) {
-                        Log.d("error", e.message?:"")
-                    }
-                             },
+                } catch(e: Exception) {
+                    Log.d("error", e.message?:"")
+                }
+            },
             content = {
                 viewModel.markerList.forEach {
                     CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap)
@@ -267,7 +263,7 @@ fun Searchbar(viewModel: GoogleMapViewModel){
             onValueChange = {
                 viewModel.textIpt = it
                 viewModel.searchPlaces(it)
-                            },
+            },
             singleLine = true,
             keyboardActions = KeyboardActions(onDone = {Log.d("ENTER_KEY_ACTION",viewModel.address)}),
             modifier = Modifier
