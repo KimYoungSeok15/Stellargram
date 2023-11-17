@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
@@ -25,6 +24,7 @@ import com.ssafy.stellargram.util.CalcZoom
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.round
 
 sealed class LocationState {
     object NoPermission : LocationState()
@@ -49,12 +49,22 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     var locationState by mutableStateOf<LocationState>(LocationState.NoPermission)
     /** Current geoLocation via LatLng, mutated by 'getCurrentLocation' */
     var currentLatLong by mutableStateOf(LatLng(0.0, 0.0))
+
+    /** Current geoLocation of screen(camera) via LatLng, mutated by 'camera.isMoving'*/
+    var currentCameraLatLng by mutableStateOf(LatLng(0.0, 0.0))
+
     /** Address String, mutated by 'getAddress'  */
     var address by mutableStateOf("")
     var textIpt by mutableStateOf("")
     var zoomLevel by mutableFloatStateOf(0f)
     var markerList: MutableList<ObserveSite> = mutableListOf(ObserveSite(0f, 0f, "", 0, 0))
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
+
+    var formShowing by mutableStateOf(false)
+    var newMarkerShowing by mutableStateOf(false)
+    var newMarkerTitle by mutableStateOf("")
+    var newMarkerLatLng by mutableStateOf(LatLng(0.0, 0.0))
+
     fun searchPlaces(query: String) {
         job?.cancel()
         locationAutofill.clear()
@@ -118,9 +128,9 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     /**
      *  Input 'LatLng' -> mutate the value of 'address'
      */
-    fun getAddress(latLng: LatLng) {
+    fun getAddress() {
         viewModelScope.launch {
-            val temp = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            val temp = geoCoder.getFromLocation(currentCameraLatLng.latitude, currentCameraLatLng.longitude, 1)
             if (temp != null && temp.isNotEmpty()) {
                 val addressLines = temp[0].getAddressLine(0).split(" ")
                 if (addressLines.size >= 4) {
@@ -136,29 +146,37 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
+
+    var cameraAddress by mutableStateOf("")
     /**
      * LatLng -> address String
      */
     fun getFullAddress(latLng: LatLng) : String {
-        var ans : String = ""
         viewModelScope.launch {
             val temp = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            ans = temp?.get(0)?.getAddressLine(0).toString()
+            cameraAddress = temp?.get(0)?.getAddressLine(0).toString()
         }
-        return ans
+        return cameraAddress
     }
 
     fun postObserveSite(latLng: LatLng){
         viewModelScope.launch {
-            val request = ObserveSiteRequest(latLng.latitude, latLng.longitude, "")
+//            val address = getFullAddress(latLng)
+            val address = newMarkerTitle
+            val request = ObserveSiteRequest(round(latLng.latitude*1000)/1000.0, round(latLng.longitude*1000)/1000.0, address)
             val response = NetworkModule.provideRetrofitInstanceObserveSite().postObserveSite(request)
+            if (response.data != null){
+                newMarkerShowing = false
+                getObserveSiteLists()
+            }
         }
     }
 
     fun getObserveSiteLists(){
         viewModelScope.launch {
-            val lat = currentLatLong.latitude
-            val lng = currentLatLong.longitude
+            val lat = currentCameraLatLng.latitude
+            val lng = currentCameraLatLng.longitude
 
             val radius = calcZoom.getScreenDiameter(zoomLevel)
             try {
