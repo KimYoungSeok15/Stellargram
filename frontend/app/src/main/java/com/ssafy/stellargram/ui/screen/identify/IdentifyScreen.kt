@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,8 +45,11 @@ import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropperLoading
 import com.mr0xf00.easycrop.rememberImagePicker
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
+import com.ssafy.stellargram.model.IdentifyStarInfo
 import com.ssafy.stellargram.ui.common.CustomSpinner
 import com.ssafy.stellargram.ui.common.CustomTextButton
+import com.ssafy.stellargram.ui.screen.chat.ChatBox
+import com.ssafy.stellargram.ui.screen.chat.TestValue
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.EasyCropTheme
 import com.ssafy.stellargram.ui.theme.Purple80
@@ -83,7 +89,7 @@ fun IdentifyScreen(navController: NavController) {
 
         Column(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(vertical = 10.dp)
                 .fillMaxSize()
                 .clip(
                     RoundedCornerShape(Constant.boxCornerSize.dp)
@@ -174,6 +180,29 @@ fun IdentifyScreen(navController: NavController) {
                     style = TextStyle(fontSize = Constant.smallText.sp)
                 )
             } else {
+
+                val templist =  listOf(1, 2, 3)
+//                LazyColumn(
+//                    modifier = Modifier
+//                        .weight(1f)
+//                ) {
+//
+//                    itemsIndexed(templist) { index, message ->
+//                        ChatBox(
+//                            isMine = (message.memberId == TestValue.myId),
+//                            imgUrl = message.memberImagePath,
+//                            nickname = message.memberNickName,
+//                            content = message.content,
+//                            unixTimestamp = message.time
+//                        )
+//                        if (messageList.size - 1 == index) LaunchedEffect(key1 = true) {
+//                            if (isAtBottomScroll && isAtTopScroll) viewModel.getMessages()
+//                        }
+//                    }
+//                }
+
+
+
                 // TODO: 인식된 별 리스트 표시하기
 //                IdentifyCard(info = null)
                 Text(
