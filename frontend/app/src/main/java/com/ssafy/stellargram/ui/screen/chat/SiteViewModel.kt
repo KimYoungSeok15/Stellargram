@@ -13,9 +13,9 @@ class SiteViewModel @Inject constructor() : ViewModel() {
     // 관측포인트 정보 초기값
     private val initLatitude: Double = 1000.0
     private val initLongitude: Double = 1000.0
-    private val initName: String = "관측소 이름"
-    private val initRatingSum: Int = 5
-    private val initReviewCount: Int = 2
+    private val initName: String = "역삼 멀티 캠퍼스"
+    private val initRatingSum: Int = 49
+    private val initReviewCount: Int = 10
 
     // 관측포인트 정보
     private var latitudePrivate: Double = initLatitude

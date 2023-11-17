@@ -1,6 +1,9 @@
 package com.ssafy.stellargram.ui.screen.chat
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -12,16 +15,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,9 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +51,8 @@ import com.ssafy.stellargram.R
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.model.MessageInfo
+import com.ssafy.stellargram.ui.theme.Purple40
+import com.ssafy.stellargram.ui.theme.Purple80
 
 @Preview(showBackground = true)
 @Composable
@@ -146,7 +156,7 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
 
 
     // css. 메세지 입력박스 modifier
-    var inputModifier: Modifier = Modifier.fillMaxWidth(0.9f)
+    var inputModifier: Modifier = Modifier.fillMaxWidth(0.8f)
 
     // 메세지 입력 필드
     Column(
@@ -177,23 +187,58 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 전송버튼
-            FloatingActionButton(
-                onClick = {
-                    if (messageContent != "") viewModel.publishToChannel(
-                        roomId = roomId, messageContent = messageContent
+
+            Column(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(color = Color.Black),
+                        onClick = {
+                            if (messageContent != "") viewModel.publishToChannel(
+                                roomId = roomId, messageContent = messageContent
+                            )
+                            messageContent = ""
+                        }
                     )
-                    messageContent = ""
-                }, modifier = Modifier.fillMaxHeight()
-//                    .height(intrinsicSize = IntrinsicSize.Max)
-                , shape = RoundedCornerShape(Constant.boxCornerSize)
+                    .clip(
+                        RoundedCornerShape(
+                            Constant.boxCornerSize.dp
+                        )
+                    )
+                    .fillMaxHeight()
+                    .width(120.dp)
+                    .background(Purple40),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.send_violet),
                     contentDescription = "no image", // 이미지 설명
-                    modifier = Modifier.size(Constant.middleText.dp)
+                    modifier = Modifier
+                        .size(Constant.middleText.dp)
+                        .background(Purple40)
                 )
             }
+
+
+            // 전송버튼
+//            FloatingActionButton(
+//                onClick = {
+//                    if (messageContent != "") viewModel.publishToChannel(
+//                        roomId = roomId, messageContent = messageContent
+//                    )
+//                    messageContent = ""
+//                }, modifier = Modifier.fillMaxHeight().background(Purple80)
+////                    .height(intrinsicSize = IntrinsicSize.Max)
+//                , shape = RoundedCornerShape(Constant.boxCornerSize)
+//            ) {
+//                Image(
+//                    painter = painterResource(id = R.drawable.send_violet),
+//                    contentDescription = "no image", // 이미지 설명
+//                    modifier = Modifier.size(Constant.middleText.dp).background(Purple80)
+//                )
+//            }
         }
     }
 }

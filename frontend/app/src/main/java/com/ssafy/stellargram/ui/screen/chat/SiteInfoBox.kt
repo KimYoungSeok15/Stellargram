@@ -73,14 +73,14 @@ fun SiteInfoBox(
             // 리뷰 수
             Text(text = "(${viewModel.reviewCount})", color = Color.Black)
 
-            // 채팅스크린이라면 리뷰 버튼
-            if (isChatScreen) {
-                CustomTextButtonDark(text = "리뷰", onClick = { /*TODO*/ })
-            }
-            // 리뷰스크린이라면 채팅버튼
-            else {
-                CustomTextButtonDark(text = "채팅", onClick = { /*TODO*/ })
-            }
+//            // 채팅스크린이라면 리뷰 버튼
+//            if (isChatScreen) {
+//                CustomTextButtonDark(text = "리뷰", onClick = { /*TODO*/ })
+//            }
+//            // 리뷰스크린이라면 채팅버튼
+//            else {
+//                CustomTextButtonDark(text = "채팅", onClick = { /*TODO*/ })
+//            }
         }
     }
 }
