@@ -8,10 +8,10 @@ def create_star_table():
     conn = sqlite3.connect('stars.db')
     cursor = conn.cursor()
 
-    # #기존 테이블 삭제
-    # cursor.execute('''
-    # DROP TABLE IF EXISTS stars_info
-    # ''')
+    #기존 테이블 삭제
+    cursor.execute('''
+    DROP TABLE IF EXISTS stars_info
+    ''')
 
     # 테이블 생성
     cursor.execute('''
