@@ -63,6 +63,7 @@ fun IdentifyScreen(navController: NavController) {
     val viewModel: IdentifyViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val selectedIndex = viewModel.selectedIndex
 
     val imagePicker = rememberImagePicker(onImage = { uri -> viewModel.setSelectedImage(uri) })
 
@@ -124,8 +125,6 @@ fun IdentifyScreen(navController: NavController) {
                         CustomSpinner()
                     }
                 }
-
-
             } else {
                 Text("사진을 선택해주세요")
             }
@@ -133,6 +132,7 @@ fun IdentifyScreen(navController: NavController) {
         Column(
             modifier = Modifier.weight(0.5f), horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // 안내문구
             Text(
                 text = "장애물이 없고 화각이 30도에 가까울수록",
                 color = Color.White,
@@ -144,55 +144,62 @@ fun IdentifyScreen(navController: NavController) {
                 style = TextStyle(fontSize = Constant.verySmallText.sp)
             )
 
+            // 버튼들
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CustomTextButton(
-                    text = "사진 고르기",
-                    onClick = onPick,
-                    margin = 10.dp,
-                    isBold = false
+                    text = "사진 고르기", onClick = onPick, margin = 10.dp, isBold = false
                 )
                 CustomTextButton(
-                    text = "별 인식하기",
-                    onClick = {
+                    text = "별 인식하기", onClick = {
 
                         if (selectedImage != null) viewModel.identifyStarsFromBitmap(
                             selectedImage
                         )
                         else Toast.makeText(context, "사진을 선택해주세요", Toast.LENGTH_SHORT)
-                    },
-                    margin = 10.dp,
-                    isBold = false
+                    }, margin = 10.dp, isBold = false
                 )
             }
-
+            Divider(thickness = 4.dp, color = Purple80)
+            // 인식된 정보 표시 시작
             if (viewModel.isFailed) {
-                Text(
-                    text = "인식에 실패하였습니다",
-                    color = Color.White,
-                    style = TextStyle(fontSize = Constant.smallText.sp)
-                )
-            } else {
-                // TODO: 인식된 별 리스트 표시하기
-                Divider(thickness = 4.dp, color = Purple80)
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "인식에 실패하였습니다",
+                        color = Color.White,
+                        style = TextStyle(fontSize = Constant.smallText.sp)
+                    )
+                }
 
+            } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
+                    modifier = Modifier.weight(1f)
                 ) {
 
-                    itemsIndexed(viewModel.starInfoList) { index, starInfo->
-                        IdentifyCard(starInfo,index)
-                        if(index!=viewModel.starInfoList.lastIndex)
-                            Divider(thickness = 2.dp, color = Purple40)
-
+                    itemsIndexed(viewModel.starInfoList) { index, starInfo ->
+                        IdentifyCard(info = starInfo,
+                            index = index,
+                            selectedIndex = selectedIndex,
+                            onClickCard = {
+                                if (index != selectedIndex) {
+                                    viewModel.selectedIndex = index
+                                    viewModel.paintOneStarToNewImage(starInfo)
+                                } else {
+                                    viewModel.selectedIndex = -1
+                                }
+                            })
+                        if (index != viewModel.starInfoList.lastIndex) Divider(
+                            thickness = 2.dp, color = Purple40
+                        )
                     }
                 }
-                Divider(thickness = 4.dp, color = Purple80)
-
             }
+            Divider(thickness = 4.dp, color = Purple80)
+
         }
     }
 }

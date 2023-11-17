@@ -279,8 +279,6 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         _paintedAllImage.value = newBitmap.asImageBitmap()
     }
 
-    // ---------- 클릭된 카드 인덱스 관리 ----------
-    var clickedIndex: Int by mutableIntStateOf(-1) // 사진 정가운데의 적위
-
-
+    // ---------- 선택된 카드 인덱스 관리 ----------
+    var selectedIndex: Int by mutableIntStateOf(-1) // 사진 정가운데의 적위
 }
