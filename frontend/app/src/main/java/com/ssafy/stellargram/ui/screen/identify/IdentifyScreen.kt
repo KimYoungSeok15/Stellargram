@@ -186,15 +186,14 @@ fun IdentifyScreen(navController: NavController) {
                 // TODO: 인식된 별 리스트 표시하기
                 Divider(thickness = 4.dp, color = Purple80)
 
-                val templist = listOf(1, 2, 3,4,5,6)
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
                 ) {
 
-                    itemsIndexed(templist) { index, card ->
-                        IdentifyCard()
-                        if(index!=templist.lastIndex)
+                    itemsIndexed(viewModel.starInfoList) { index, starInfo->
+                        IdentifyCard(starInfo)
+                        if(index!=viewModel.starInfoList.lastIndex)
                             Divider(thickness = 2.dp, color = Purple40)
 
                     }

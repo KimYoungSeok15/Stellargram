@@ -23,7 +23,7 @@ import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.Purple80
 
 @Composable //info:IdentifyStarInfo
-fun IdentifyCard() {
+fun IdentifyCard(info:IdentifyStarInfo) {
 
     Row(
         modifier = Modifier
@@ -38,18 +38,18 @@ fun IdentifyCard() {
             modifier = Modifier.size(24.dp)
         )
         Column(modifier = Modifier.padding(horizontal = 4.dp)) {
-            Text(text = "별 이름")
+            Text(text = info.name?:"이름 없는 별")
             Row {
                 Text(text = "겉보기 등급 : ")
-                Text(text = "4")
+                Text(text = info.mag.toString())
             }
             Row {
                 Text(text = "절대 등급 : ")
-                Text(text = "4")
+                Text(text = info.absmag.toString())
             }
             Row {
                 Text(text = "별자리 구역 : ")
-                Text(text = "어디 별자리")
+                Text(text = info.con)
             }
         }
     }
