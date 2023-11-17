@@ -131,7 +131,8 @@ fun BaseFrame(
                     val items = listOf(
                         Screen.Home,
                         Screen.SkyMap,
-                        Screen.Camera,
+                        Screen.Photo,
+//                        Screen.Camera,
                         Screen.GoogleMap,
                         Screen.MyPage
                     )
