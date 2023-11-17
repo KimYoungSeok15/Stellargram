@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,6 +53,7 @@ import com.ssafy.stellargram.ui.screen.chat.ChatBox
 import com.ssafy.stellargram.ui.screen.chat.TestValue
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.ui.theme.EasyCropTheme
+import com.ssafy.stellargram.ui.theme.Purple40
 import com.ssafy.stellargram.ui.theme.Purple80
 
 
@@ -89,6 +91,7 @@ fun IdentifyScreen(navController: NavController) {
 
         Column(
             modifier = Modifier
+                .weight(0.4f)
                 .padding(vertical = 10.dp)
                 .fillMaxSize()
                 .clip(
@@ -97,7 +100,7 @@ fun IdentifyScreen(navController: NavController) {
                 .border(
                     width = 2.dp, Purple80, shape = RoundedCornerShape(Constant.boxCornerSize.dp)
                 )
-                .weight(0.5f)
+
                 .background(if (selectedImage == null) Color.DarkGray else Color.Unspecified),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -180,36 +183,24 @@ fun IdentifyScreen(navController: NavController) {
                     style = TextStyle(fontSize = Constant.smallText.sp)
                 )
             } else {
-
-                val templist =  listOf(1, 2, 3)
-//                LazyColumn(
-//                    modifier = Modifier
-//                        .weight(1f)
-//                ) {
-//
-//                    itemsIndexed(templist) { index, message ->
-//                        ChatBox(
-//                            isMine = (message.memberId == TestValue.myId),
-//                            imgUrl = message.memberImagePath,
-//                            nickname = message.memberNickName,
-//                            content = message.content,
-//                            unixTimestamp = message.time
-//                        )
-//                        if (messageList.size - 1 == index) LaunchedEffect(key1 = true) {
-//                            if (isAtBottomScroll && isAtTopScroll) viewModel.getMessages()
-//                        }
-//                    }
-//                }
-
-
-
                 // TODO: 인식된 별 리스트 표시하기
-//                IdentifyCard(info = null)
-                Text(
-                    text = "임시",
-                    color = Color.White,
-                    style = TextStyle(fontSize = Constant.smallText.sp)
-                )
+                Divider(thickness = 4.dp, color = Purple80)
+
+                val templist = listOf(1, 2, 3,4,5,6)
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+
+                    itemsIndexed(templist) { index, card ->
+                        IdentifyCard()
+                        if(index!=templist.lastIndex)
+                            Divider(thickness = 2.dp, color = Purple40)
+
+                    }
+                }
+                Divider(thickness = 4.dp, color = Purple80)
+
             }
         }
     }

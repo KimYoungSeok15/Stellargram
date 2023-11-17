@@ -38,7 +38,6 @@ data class IdentifyPhotoInfo (
     var distortion: Double? // 왜곡 정보
 )
 
-// TODO: 백 응답 수정되면 수정할 것
 // 인식된 별 1개 정보
 data class IdentifyStarInfo(
     var absmag: Double, // 절대등급
@@ -47,5 +46,6 @@ data class IdentifyStarInfo(
     var hipid: Int, //hip 리스트의 아이디값
     var mag: Double, // 등급
     var pixelx: Int,
-    var pixely: Int
+    var pixely: Int,
+    var name: String?
 )
