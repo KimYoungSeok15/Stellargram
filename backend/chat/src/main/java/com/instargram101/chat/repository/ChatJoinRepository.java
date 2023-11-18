@@ -27,4 +27,6 @@ public interface ChatJoinRepository extends JpaRepository<ChatJoin, Long> {
     // 채팅방id와 유저id로 일치하는 참여정보 조회 후 채팅방 객체 반환
     @Query("SELECT j.room FROM ChatJoin AS j WHERE j.memberId= :memberId AND j.room.roomId = :roomId")
     Optional<ChatRoom> findByRoomIdAndMemberId(Long roomId,Long memberId);
+
+    List<ChatJoin> findAllByMemberId(Long memberId);
 }
