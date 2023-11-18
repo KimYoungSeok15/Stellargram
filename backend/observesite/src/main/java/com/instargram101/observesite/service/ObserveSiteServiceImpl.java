@@ -33,12 +33,14 @@ public class ObserveSiteServiceImpl implements ObserveSiteService{
         Integer a = Integer.valueOf((int) (lati * 1000.0));
         float longi = longitude.floatValue();
         Integer b = Integer.valueOf((int) (longi * 1000.0));
+        log.info(String.format("%d %d", a, b));
         return a.toString() + "-" + b.toString();
     }
 
     @Override
     public ObserveSite getObserveSite(Float latitude, Float longitude){
         String siteId = genObserveSiteId(latitude, longitude);
+        log.info(siteId);
         return observeSiteRepository.findById(siteId).orElseThrow(() ->
                 new CustomException(ObservesiteErrorCode.Observesite_Not_Found,
                 "There is no observe site that you requested."));
