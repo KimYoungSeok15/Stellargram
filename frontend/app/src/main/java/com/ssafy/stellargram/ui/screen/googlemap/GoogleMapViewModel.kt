@@ -168,7 +168,7 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
 //            val address = getFullAddress(latLng)
             val address = newMarkerTitle
-            val request = ObserveSiteRequest(round(latLng.latitude*1000)/1000.0, round(latLng.longitude*1000)/1000.0, address)
+            val request = ObserveSiteRequest(round(latLng.latitude*10000)/10000.0, round(latLng.longitude*10000)/10000.0, address)
             val response = NetworkModule.provideRetrofitInstanceObserveSite().postObserveSite(request)
             if (response.data != null){
                 newMarkerShowing = false
