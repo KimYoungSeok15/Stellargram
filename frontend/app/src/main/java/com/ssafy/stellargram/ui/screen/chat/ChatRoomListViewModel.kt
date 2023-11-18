@@ -52,9 +52,9 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
             // 응답 온 방 1개에 대해
             for (room in tempRoomList) {
                 // 위도 경도 파싱
-                val radec = room.observeSiteId.split("-")
-                val thisLatitude = radec[0].toDouble()/1000
-                val thisLongitude = radec[1].toDouble()/1000
+                val latilong = room.observeSiteId.split("-")
+                val thisLatitude = latilong[0].toDouble()/1000
+                val thisLongitude = latilong[1].toDouble()/1000
 
                 // 새 방정보 dto에 담기
                 val newRoomInfo = CombinedChatRoom(
