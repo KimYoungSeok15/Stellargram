@@ -25,7 +25,7 @@ data class CombinedChatRoom(
     val roomId: Int,
     val personnel: Int,
     val observeSiteId: String,
-    val siteName: String?,
-    val longitude: Long?,
-    val latitude: Long?
+    var siteName: String?,
+    val longitude: Double?,
+    val latitude: Double?
 )
