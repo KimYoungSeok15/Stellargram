@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
@@ -103,7 +104,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
-        return memberRepository.findMembersByMemberIdInAndActivated(memberIds, true);
+        List<Long> longMemberIds = new ArrayList<>();
+        for (Object value : memberIds) {
+            longMemberIds.add(Long.parseLong(""+value));
+        }
+        return memberRepository.findMembersByMemberIdInAndActivated(longMemberIds, true);
     }
 
     public Member getMemberById(Long memberId) {

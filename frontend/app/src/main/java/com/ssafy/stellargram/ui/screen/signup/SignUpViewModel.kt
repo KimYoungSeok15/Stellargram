@@ -63,7 +63,7 @@ class SignUpViewModel @Inject constructor(
             SignInSubmit(memberSignUpRequest, navController)
         } else {
             dialogMessage = "입력이 올바르지 않습니다."
-            TODO()// dialog 기능 추가후 구현 예정
+            //TO DO - dialog 기능 추가 구현 예정
         }
 
     }
@@ -79,9 +79,15 @@ class SignUpViewModel @Inject constructor(
                     StellargramApplication.prefs.setString("followCount",memberSignUpResponse.data.followCount.toString())
                     StellargramApplication.prefs.setString("followingCount",memberSignUpResponse.data.followingCount.toString())
                     StellargramApplication.prefs.setString("cardCount",memberSignUpResponse.data.cardCount.toString())
-                    navController.navigate(Screen.Home.route)
+                    afterSignIn(navController)
                 }
             }
+        }
+    }
+
+    private fun afterSignIn(navController: NavController){
+        viewModelScope.launch(Dispatchers.Main){
+            navController.navigate(Screen.Home.route)
         }
     }
 
