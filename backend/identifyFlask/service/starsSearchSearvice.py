@@ -47,8 +47,8 @@ def findAllStarsByRaDec(matched_stars, matched_centroids):
         # 검색 결과가 있다면 형식에 맞춰 변환 후 저장
         if result is not None:
             combined_dict = {'id': result[0],'hipid':result[1], 'mag': result[4], 'absmag': result[5], 'con': result[8],
-                             'pixelx': math.trunc(matched_centroids[index][0]),
-                             'pixely': math.trunc(matched_centroids[index][1])}
+                             'pixelx': math.trunc(matched_centroids[index][1]),
+                             'pixely': math.trunc(matched_centroids[index][0])}
             star_found.append(combined_dict)
 
     # # TODO: 테스트
