@@ -1,5 +1,7 @@
 package com.ssafy.stellargram.ui.theme
 
+import androidx.compose.ui.graphics.Color
+
 object Constant {
     // 박스 코너사이즈
     val boxCornerSize: Int = 10
@@ -10,4 +12,7 @@ object Constant {
     val smallText:Int = 17
     val middleText:Int = 20
     val largeText:Int =30
+
+    // 인식된 사진에서 별 칠하는 색상
+    val starPaintColor = Color.Yellow
 }
