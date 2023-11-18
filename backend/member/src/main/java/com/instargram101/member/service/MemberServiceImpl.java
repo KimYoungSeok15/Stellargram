@@ -106,4 +106,10 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findMembersByMemberIdInAndActivated(memberIds, true);
     }
 
+    public Member getMemberById(Long memberId) {
+        return memberRepository.findByMemberIdAndActivated(memberId, true).orElseThrow(
+                () -> new CustomException(MemberErrorCode.Member_Not_Found)
+        );
+    }
+
 }
