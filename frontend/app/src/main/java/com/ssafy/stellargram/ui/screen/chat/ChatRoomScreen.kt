@@ -18,10 +18,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,11 +43,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.ui.theme.Constant
 import com.ssafy.stellargram.model.MessageInfo
+import com.ssafy.stellargram.ui.theme.Purple40
 
-@Preview(showBackground = true)
 @Composable
 fun ChatRoomScreen(
     navController: NavController = rememberNavController(),
@@ -52,6 +56,13 @@ fun ChatRoomScreen(
     personnel: Int? = 0,
     observeSiteId: String? = ""
 ) {
+    // 내 아이디 가져오기
+    val myId = StellargramApplication.prefs.getString("myId", "").toLong()
+
+    // 위도 경도 파싱
+    val latilong = observeSiteId!!.split("-")
+    val thisLatitude = latilong[0].toDouble() / 1000
+    val thisLongitude = latilong[1].toDouble() / 1000
 
     // 채팅 뷰모델 생성
     val viewModel: ChatViewModel = hiltViewModel()
@@ -93,45 +104,44 @@ fun ChatRoomScreen(
     }
 
     // 스크린 컨테이너
-    ScreenContainer(customChild = {
-        // 메세지들
-        LazyColumn(
-            reverseLayout = true,
-            state = scrollState,
-            modifier = Modifier
-                .weight(1f)
-        ) {
+    ScreenContainer(
+        isChatScreen = true,
+        latitude = thisLatitude,
+        longitude = thisLongitude,
+        customChild = {
+            // 메세지들
+            LazyColumn(
+                reverseLayout = true,
+                state = scrollState,
+                modifier = Modifier
+                    .weight(1f)
+            ) {
 
-            itemsIndexed(messageList) { index, message ->
-                ChatBox(
-                    isMine = (message.memberId == TestValue.myId),
-                    imgUrl = message.memberImagePath,
-                    nickname = message.memberNickName,
-                    content = message.content,
-                    unixTimestamp = message.time
-                )
-                if (messageList.size - 1 == index) LaunchedEffect(key1 = true) {
-                    if (isAtBottomScroll && isAtTopScroll) viewModel.getMessages()
+                itemsIndexed(messageList) { index, message ->
+                    ChatBox(
+                        isMine = (message.memberId == myId),
+                        imgUrl = message.memberImagePath,
+                        nickname = message.memberNickName,
+                        content = message.content,
+                        unixTimestamp = message.time
+                    )
+                    if (messageList.size - 1 == index) LaunchedEffect(key1 = true) {
+                        if (isAtBottomScroll && isAtTopScroll) viewModel.getMessages()
+                    }
                 }
             }
-        }
 
-        // 입력 박스
-        MessageInput(viewModel = viewModel, roomId = roomId)
+            // 입력 박스
+            MessageInput(viewModel = viewModel, roomId = roomId)
 
-    })
+        })
 //        // 스크롤 상태 기억
 //        val scrollState = rememberScrollState()
-
-
-    // TODO: 테스트용. 나중에 지울 것
-//        Text(text = "방 번호: " + roomId.toString())
-//        Text(text = "관측소아이디: " + observeSiteId)
-
 
 }
 
 // 이미지 입력 박스
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
 
@@ -142,7 +152,7 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
     var containerModifier: Modifier = Modifier
         .fillMaxWidth()
 //        .height(300.dp)
-        .defaultMinSize(minHeight = 150.dp)
+//        .defaultMinSize(minHeight = 150.dp)
 
 
     // css. 메세지 입력박스 modifier
@@ -173,6 +183,7 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
                 singleLine = false,
                 maxLines = 3,
                 textStyle = TextStyle(fontSize = Constant.middleText.sp, color = Color.Black),
+                colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = Purple40)
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -186,7 +197,9 @@ fun MessageInput(viewModel: ChatViewModel, roomId: Int) {
                     messageContent = ""
                 }, modifier = Modifier.fillMaxHeight()
 //                    .height(intrinsicSize = IntrinsicSize.Max)
-                , shape = RoundedCornerShape(Constant.boxCornerSize)
+                , shape = RoundedCornerShape(Constant.boxCornerSize),
+                containerColor = Purple40,
+                contentColor = Purple40
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.send_violet),

@@ -91,12 +91,12 @@ fun LandingComponent(navController: NavController, modifier: Modifier) {
 //         ) {
 //             Text(text = "채팅방")
 //         }
-        CustomTextButton(
-            text = "별 인식",
-            isBold = true,
-            onClick = { navController.navigate(Screen.Identify.route) },
-            margin = 0.dp
-        )
+//        CustomTextButton(
+//            text = "채팅방 목록",
+//            isBold = true,
+//            onClick = { navController.navigate(route = Screen.ChatRoomList.route) },
+//            margin = 0.dp
+//        )
     }
 }
 
