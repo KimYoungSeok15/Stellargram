@@ -42,6 +42,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IdentifyViewModel @Inject constructor(private val app: Application) : AndroidViewModel(app) {
+    // ---------- 선택된 카드 인덱스 관리 ----------
+    // -2 : 선택안함. 오리진캡쳐, -1 : 전체칠사진, 0이상 : 인식된 별1개 사진
+    var selectedIndex: Int by mutableIntStateOf(-2)
+
     // ---------- 크롭 관련 ----------
     // 크롭 관련 변수
     val imageCropper = ImageCropper()
@@ -76,6 +80,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
                 is CropError -> _cropError.value = result
                 is CropResult.Success -> {
                     _selectedImage.value = result.bitmap
+                    selectedIndex = -2
                 }
             }
         }
@@ -113,6 +118,9 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
 
                 // 실패여부 false로 초기화
                 isFailed = false
+                
+                // 선택 인덱트 -2(선택안함)으로 초기화
+                selectedIndex = -2
 
                 // 파일로 변환
                 var newFile = saveFileFromIBitmap(imageBitmap)
@@ -213,7 +221,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
     val range: Int = 1
 
 
-    fun paintOneStarToNewImage(star:IdentifyStarInfo) {
+    fun paintOneStarToNewImage(star: IdentifyStarInfo) {
         // 선택된 이미지가 없으면 수행하지 않음
         if (selectedImage.value == null) return
 
@@ -223,7 +231,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         // 기존 이미지와 새 이미지
         val originBitmap = selectedImage.value!!.asAndroidBitmap()
         var newBitmap: Bitmap = originBitmap.copy(originBitmap.config, true)
-        
+
         // 이미지 너비 높이
         val widthX = newBitmap.width
         val heightY = newBitmap.height
@@ -232,7 +240,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         val pixels = IntArray(paintSize * paintSize) { starPaintColor.value.toInt() }
 
         // 경계조건
-        if (star.pixelx in 0..widthX && star.pixely in 0 .. heightY) {
+        if (star.pixelx in 0..widthX && star.pixely in 0..heightY) {
             // 음수 시작점 보정
             val startX = if (star.pixelx - range < 0) 0 else star.pixelx
             val startY = if (star.pixely - range < 0) 0 else star.pixely
@@ -248,11 +256,11 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         if (selectedImage.value == null) return
 
         // 인식된 별이 없으면 수행하지 않음
-        if(starInfoList.size==0) return
+        if (starInfoList.size == 0) return
 
         // 찍는 점 범위의 반지름? 찍는 중심점으로부터 얼마나 멀리까지 찍는지
         val paintSize: Int = range * 2 + 1
-        
+
         // 기존 이미지와 새 이미지
         val originBitmap = selectedImage.value!!.asAndroidBitmap()
         val newBitmap = originBitmap.copy(originBitmap.config, true)
@@ -267,7 +275,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         // 인식된 별들에 대해
         for (star in starInfoList) {
             //경계조건
-            if (star.pixelx in 0..widthX && star.pixely in 0 .. heightY) {
+            if (star.pixelx in 0..widthX && star.pixely in 0..heightY) {
                 // 음수 시작점 보정
                 val startX = if (star.pixelx - range < 0) 0 else star.pixelx
                 val startY = if (star.pixely - range < 0) 0 else star.pixely
@@ -279,6 +287,5 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         _paintedAllImage.value = newBitmap.asImageBitmap()
     }
 
-    // ---------- 선택된 카드 인덱스 관리 ----------
-    var selectedIndex: Int by mutableIntStateOf(-1) // 사진 정가운데의 적위
+
 }

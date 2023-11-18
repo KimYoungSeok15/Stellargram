@@ -70,6 +70,8 @@ fun IdentifyScreen(navController: NavController) {
     val cropState = viewModel.imageCropper.cropState
     val loadingStatus = viewModel.imageCropper.loadingStatus
     val selectedImage = viewModel.selectedImage.collectAsState().value
+    val paintedAllImage = viewModel.paintedAllImage.collectAsState().value
+    val paintedOneImage = viewModel.paintedImage.collectAsState().value
     val onPick = { imagePicker.pick() }
 
 
@@ -90,6 +92,7 @@ fun IdentifyScreen(navController: NavController) {
             LoadingDialog(status = loadingStatus)
         }
 
+        // 렌더링 시작
         Column(
             modifier = Modifier
                 .weight(0.4f)
@@ -106,26 +109,62 @@ fun IdentifyScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // 캡쳐된 사진이 있다면
             if (selectedImage != null) {
+                // 사진 박스
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    if (selectedImage.width > selectedImage.height) {
-                        Image(
-                            bitmap = selectedImage,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    } else {
-                        Image(
-                            bitmap = selectedImage,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxHeight()
-                        )
+                    // 선택된 인덱스가 없다면 원본캡쳐 보이기
+                    if (selectedIndex == -2) {
+                        if (selectedImage.width > selectedImage.height) {
+                            Image(
+                                bitmap = selectedImage,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            Image(
+                                bitmap = selectedImage,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxHeight()
+                            )
+                        }
                     }
-                    if (viewModel.isIdentifying) {
+
+                    // 전체 별 보기 선택됐으면
+                    if (selectedIndex == -1) {
+                        // 아직 생성중이라서 그림이 없다면 스피너
+                        if (paintedAllImage == null)
+                            CustomSpinner()
+                        // 그림이 있다면
+                        else
+                            Image(
+                                bitmap = paintedAllImage!!,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxHeight()
+                            )
+                    }
+
+                    // 1개 별 보기 선택됐으면
+                    if (selectedIndex > 0) {
+                        // 아직 생성중이라서 그림이 없다면 스피너
+                        if (paintedOneImage == null)
+                            CustomSpinner()
+                        // 그림이 있다면
+                        else
+                            Image(
+                                bitmap = paintedOneImage!!,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxHeight()
+                            )
+                    }
+
+                    // 인식중이라면 스피너
+                    if (viewModel.isIdentifying)
                         CustomSpinner()
-                    }
                 }
-            } else {
+            }
+            // 캡쳐된 사진이 없다면
+            else {
                 Text("사진을 선택해주세요")
             }
         }
@@ -185,13 +224,18 @@ fun IdentifyScreen(navController: NavController) {
                             index = index,
                             selectedIndex = selectedIndex,
                             onClickCard = {
+                                // 선택된 카드가 아니라면 저장 후 이미지 칠하기
                                 if (index != selectedIndex) {
                                     viewModel.selectedIndex = index
                                     viewModel.paintOneStarToNewImage(starInfo)
-                                } else {
-                                    viewModel.selectedIndex = -1
+                                }
+                                // 이미 선택된 카드라면
+                                else {
+                                    // 선택 안함 상태로 변경
+                                    viewModel.selectedIndex = -2
                                 }
                             })
+                        // 마지막 인덱스가 아니라면 구분선 추가
                         if (index != viewModel.starInfoList.lastIndex) Divider(
                             thickness = 2.dp, color = Purple40
                         )
