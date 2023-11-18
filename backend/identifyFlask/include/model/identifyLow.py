@@ -12,6 +12,7 @@ t3 = tetra3.Tetra3()
 tetraModule = tetra3.Tetra3(load_database='default_database_custom_5_max50')
 # tetraModule = tetra3.Tetra3(load_database='default_database')
 
+tetraModuleDefault = tetra3.Tetra3(load_database='default_database')
 
 def identify_with_tetra_make_image(imageIn):
     # 인식결과 저장할 변수 글로벌 선언
@@ -64,6 +65,10 @@ def identify_with_tetra_no_image(imageIn):
     # 식별
     result = tetraModule.solve_from_image(image=pil_image, return_matches=True)
 
+    # 5등급 모듈로 인식이 안되면 7등급 모듈 실행
+    if result.get("matched_stars") is None:
+        result = tetraModuleDefault.solve_from_image(image=pil_image, return_matches=True)
+
     # 식별 성공해서 이미지가 생성됐다면 결과 매칭 시작
     if result.get("matched_stars") is not None:
         # 인식된 전체 좌표에 대해 찾아서 병합 후 반환
@@ -71,8 +76,7 @@ def identify_with_tetra_no_image(imageIn):
         matched_centroids = result.get('matched_centroids')
         identified_star = findAllStarsByRaDec(matched_stars=matched_stars, matched_centroids=matched_centroids)
 
-    # print(result)
-
+    # 식별된 별이 있다면 응답용 결과에 담기
     if identified_star is not None and len(identified_star) != 0:
         result['matched'] = identified_star
         result.pop("matched_stars")
