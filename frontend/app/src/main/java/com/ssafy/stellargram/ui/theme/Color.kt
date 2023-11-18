@@ -11,5 +11,3 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val Turquoise = Color(0xFF00C9A2)
-
-val starPaintColor = Color(0x00FFFFFF)

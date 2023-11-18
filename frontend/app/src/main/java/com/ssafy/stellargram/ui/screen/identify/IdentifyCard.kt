@@ -34,6 +34,13 @@ fun IdentifyCard(info: IdentifyStarInfo, index: Int, selectedIndex: Int, onClick
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(color = Color.Black),
+            ) {
+                onClickCard()
+            }
+            .background(if (index == selectedIndex) Color.DarkGray else Color.Unspecified)
             .padding(4.dp)
 
     ) {
@@ -43,15 +50,10 @@ fun IdentifyCard(info: IdentifyStarInfo, index: Int, selectedIndex: Int, onClick
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
-        Column(modifier = Modifier
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = Color.Black),
-            ) {
-                onClickCard()
-            }
-            .background(if (index == selectedIndex) Color.DarkGray else Color.Unspecified)
-            .padding(horizontal = 4.dp)
+        Column(
+            modifier = Modifier
+
+                .padding(horizontal = 4.dp)
         ) {
             Text(text = info.name ?: "이름 없는 별")
             Row {

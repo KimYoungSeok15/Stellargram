@@ -2,6 +2,7 @@ package com.ssafy.stellargram.ui.screen.identify
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
@@ -28,7 +29,7 @@ import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.IdentifyStarInfo
 import com.ssafy.stellargram.module.DBModule
-import com.ssafy.stellargram.ui.theme.starPaintColor
+import com.ssafy.stellargram.ui.theme.Constant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -118,7 +119,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
 
                 // 실패여부 false로 초기화
                 isFailed = false
-                
+
                 // 선택 인덱트 -2(선택안함)으로 초기화
                 selectedIndex = -2
 
@@ -158,6 +159,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
                                     var thisName = DBModule.nameMap[data.id]
                                     data.name = thisName
                                 }
+                                paintAllStarToNewImage(privateStarInfoList)
                             }
                         }
                         // 인식이 실패했다면 true 표시
@@ -218,8 +220,8 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
     }
 
     // ---------- 카드 클릭시 별 표시 ----------
-    val range: Int = 1
-
+    val range: Int = 3
+    val starPaintColor = Color.YELLOW
 
     fun paintOneStarToNewImage(star: IdentifyStarInfo) {
         // 선택된 이미지가 없으면 수행하지 않음
@@ -237,7 +239,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         val heightY = newBitmap.height
 
         // 채우는 범위 조각 만들기
-        val pixels = IntArray(paintSize * paintSize) { starPaintColor.value.toInt() }
+        val pixels = IntArray(paintSize * paintSize) { starPaintColor }
 
         // 경계조건
         if (star.pixelx in 0..widthX && star.pixely in 0..heightY) {
@@ -270,7 +272,7 @@ class IdentifyViewModel @Inject constructor(private val app: Application) : Andr
         val heightY = newBitmap.height
 
         // 채우는 범위 조각 만들기
-        val pixels = IntArray(paintSize * paintSize) { starPaintColor.value.toInt() }
+        val pixels = IntArray(paintSize * paintSize) { starPaintColor }
 
         // 인식된 별들에 대해
         for (star in starInfoList) {
