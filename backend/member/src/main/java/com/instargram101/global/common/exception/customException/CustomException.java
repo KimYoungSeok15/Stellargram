@@ -1,6 +1,7 @@
 package com.instargram101.global.common.exception.customException;
 
 import com.instargram101.global.common.exception.errorCode.ErrorCodeInterface;
+import com.instargram101.member.exception.FavoriteErrorCode;
 import lombok.Getter;
 
 @Getter
