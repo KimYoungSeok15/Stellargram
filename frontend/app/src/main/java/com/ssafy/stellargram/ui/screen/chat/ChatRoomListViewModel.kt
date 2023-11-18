@@ -1,31 +1,17 @@
 package com.ssafy.stellargram.ui.screen.chat
 
-import android.util.Log
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.beust.klaxon.Klaxon
-import com.gmail.bishoybasily.stomp.lib.Event
-import com.gmail.bishoybasily.stomp.lib.StompClient
 import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.model.CombinedChatRoom
-import com.ssafy.stellargram.model.MessageForReceive
-import com.ssafy.stellargram.model.MessageInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Response
-import org.json.JSONObject
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,8 +20,7 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
     private val myId = StellargramApplication.prefs.getString("myId", "").toLong()
 
     // 방 갯수
-    private val _roomCount: MutableIntState = mutableIntStateOf(0)
-    val roomCount: Int = _roomCount.value
+    var roomCount: Int by mutableIntStateOf(-2)
 
     // 방 목록
     private val _rooms: MutableList<CombinedChatRoom> = mutableStateListOf()
@@ -50,13 +35,16 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
         // 실패여부 저장변수 리셋
         _isFailed.value=false
 
+        // 방 목록 리셋
+        _rooms.clear()
+
         // 내가 참여한 채팅방 리스트 요청
         val response = NetworkModule.provideRetrofitInstanceChat().getRoomList(myId)
 
         // 응답 성공적으로 왔다면
         if (response?.code == 200) {
             // 방갯수 저장
-            _roomCount.value = response.data.roomCount
+            this.roomCount = response.data.roomCount
 
             // 방 정보 임시저장
             val tempRoomList: List<ChatRoom> = response.data.roomList
