@@ -20,7 +20,9 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.ObserveSite
 import com.ssafy.stellargram.model.ObserveSiteRequest
+import com.ssafy.stellargram.model.SiteInfo
 import com.ssafy.stellargram.util.CalcZoom
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -65,6 +67,8 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
     var newMarkerTitle by mutableStateOf("")
     var newMarkerLatLng by mutableStateOf(LatLng(0.0, 0.0))
 
+    var detailShowingID by mutableStateOf("")
+    var detailMarker = SiteInfo(0.0, 0.0, "", 0, 0)
     fun searchPlaces(query: String) {
         job?.cancel()
         locationAutofill.clear()
@@ -193,6 +197,20 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
                 Log.e("content",e.toString())
             }
 
+        }
+    }
+
+    fun getObserveSiteDetail(latLng: LatLng, markerTag: String){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                val response = NetworkModule.provideRetrofitInstanceSite().getSiteInfo(latitude = latLng.latitude, longitude =  latLng.longitude)
+                if (response.data != null){
+                    detailMarker =  response.data
+                    detailShowingID = markerTag
+                }
+            } catch (e:Exception){
+                Log.e("DETATILMARKER",e.toString())
+            }
         }
     }
 }

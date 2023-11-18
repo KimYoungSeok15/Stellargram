@@ -146,7 +146,7 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
     }
     var mapUiSettings by remember {
         mutableStateOf(
-            MapUiSettings(mapToolbarEnabled = false, myLocationButtonEnabled = false)
+            MapUiSettings(mapToolbarEnabled = false, myLocationButtonEnabled = false, rotationGesturesEnabled = false)
         )
     }
 
@@ -227,17 +227,12 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             onMapClick = { _ -> viewModel.formShowing = false },
             onMapLongClick = { latLng ->
-//                try{
-//                    viewModel.postObserveSite(latLng)
-//                } catch(e: Exception) {
-//                    Log.d("error", e.message?:"")
-//                }
                 viewModel.newMarkerShowing = true
                 viewModel.newMarkerLatLng = latLng
             },
             content = {
                 viewModel.markerList.forEach {
-                    CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap)
+                    CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap, viewModel)
                 }
                 if(viewModel.newMarkerShowing){
                     NewMarker(latLng = viewModel.newMarkerLatLng , viewModel = viewModel , bitmap = bitmap )
@@ -291,74 +286,41 @@ fun Searchbar(viewModel: GoogleMapViewModel){
 }
 
 @Composable
-fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap){
+fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap, viewModel: GoogleMapViewModel){
+    val roundLat = String.format("%.4f",latlng.latitude)
+    val roundLng =  String.format("%.4f",latlng.longitude)
     MarkerInfoWindow(
         title= title,
         state = MarkerState(latlng),
         icon = BitmapDescriptorFactory.fromBitmap(bitmap),
-//        onClick = {false},
-//        onInfoWindowClick = {
-//            Log.d("IMHEREINFO","${it.title}")
-//        }
+        tag = "$roundLat&$roundLng",
+        onClick = { marker ->
+//            Log.d("MARKER",marker.tag.toString())
+            viewModel.getObserveSiteDetail(LatLng(roundLat.toDouble(),roundLng.toDouble()),marker.tag.toString())
+            false
+        }
     ) {
         Box(
             modifier = Modifier
-                .sizeIn(maxWidth = 300.dp)
+                .sizeIn(maxWidth = 200.dp)
                 .background(
                     color = MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(20.dp, 20.dp, 35.dp, 35.dp)
+                    shape = RoundedCornerShape(20.dp)
                 )
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(16.dp,0.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.telescope_svgrepo_com),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .height(40.dp)
-                        .fillMaxWidth(),
-                )
-                var editedTitle by remember { mutableStateOf(title) }
-                OutlinedTextField(
-                    value = editedTitle,
-                    onValueChange = { editedTitle = it },
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth()
-                        .focusable(true)
-                    ,
-                    textStyle = MaterialTheme.typography.headlineSmall.copy(color = MaterialTheme.colorScheme.primary),
-                    label = { Text("Title") }
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    // Confirm changes icon
-                    Icon(
-                        painter = painterResource(id = R.drawable.add),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
-                                // Handle the click event to confirm the changes
-                            }
-                    )
-                }
-
+                Text(text = if(title!="") title else "이름 없음")
                 Text(
                     text = "lat: ${latlng.latitude} \n lng: ${latlng.longitude}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(10.dp)
                         .fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
@@ -370,7 +332,7 @@ fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap){
 fun NewMarker(latLng: LatLng, viewModel: GoogleMapViewModel, bitmap: Bitmap){
     Marker(
         state = MarkerState(position = latLng),
-        icon = BitmapDescriptorFactory.fromBitmap(bitmap),
+//        icon = BitmapDescriptorFactory.fromBitmap(bitmap),
         draggable = true,
         onClick = { marker ->
             viewModel.newMarkerLatLng = marker.position
@@ -412,7 +374,13 @@ fun NewMarkerForm(viewModel: GoogleMapViewModel){
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
                                 .height(40.dp)
-                                .clickable { viewModel.postObserveSite(viewModel.newMarkerLatLng) }
+                                .clickable {
+                                    try {
+                                        viewModel.postObserveSite(viewModel.newMarkerLatLng)
+                                    } catch (e: Exception) {
+                                        Log.d("error", e.message ?: "")
+                                    }
+                                }
                         )
 
                     }
@@ -443,35 +411,67 @@ fun NewMarkerForm(viewModel: GoogleMapViewModel){
 
 @Composable
 fun PointDetail(viewModel: GoogleMapViewModel){
-//    val scaffoldState = rememberBottomSheetScaffoldState()
-//    val coroutineScope = rememberCoroutineScope()
-//    BottomSheetScaffold(
-//        scaffoldState = scaffoldState, sheetContent = {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(250.dp)
-//                    .background(Color.White)
-//            ) {
-//                Text(text = "Empty Bottom Sheet")
-//            }
-//        }, sheetPeekHeight = 48.dp
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize(1f)
-//                .background(Color.LightGray),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center
-//        ) {
-//            Button(onClick = {
-//                coroutineScope.launch {
-////                    if (scaffoldState.bottomSheetState.isCollapsed) scaffoldState.bottomSheetState.expand()
-////                    else scaffoldState.bottomSheetState.collapse()
-//                }
-//            }) {
-//                Text(text = "Toggle bottom sheet")
-//            }
-//        }
-//    }
+    if (viewModel.detailShowingID != ""){
+        LaunchedEffect(key1 = Unit){
+        }
+        Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                    )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(R.drawable.back),
+                            contentDescription = "delete",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(40.dp)
+                                .clickable {
+                                    viewModel.detailShowingID = ""
+                                }
+                        )
+                        Text(text = viewModel.detailMarker.name)
+                        Image(
+                            painter = painterResource(id = R.drawable.chat),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(40.dp)
+                                .clickable {
+                                    try {
+                                        Log.d("MARKER","id : ${viewModel.detailShowingID} chatroom selected")
+                                    } catch (e: Exception) {
+                                        Log.d("error", e.message ?: "")
+                                    }
+                                }
+                        )
+                    }
+                    Text(
+                        text = "reviewCount: ${viewModel.detailMarker.reviewCount}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(10.dp, 20.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = "rating: ${viewModel.detailMarker.ratingSum/viewModel.detailMarker.reviewCount}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(10.dp, 20.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        }
+    }
 }
