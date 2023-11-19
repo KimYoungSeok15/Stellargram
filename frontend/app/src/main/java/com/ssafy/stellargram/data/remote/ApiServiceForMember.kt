@@ -29,6 +29,10 @@ import com.ssafy.stellargram.model.ObserveSiteListResponse
 import com.ssafy.stellargram.model.ObserveSiteRequest
 import com.ssafy.stellargram.model.ObserveSiteResponse
 import com.ssafy.stellargram.model.SiteInfoResponse
+import com.ssafy.stellargram.model.StarDislikeResponse
+import com.ssafy.stellargram.model.StarLikeAllResponse
+import com.ssafy.stellargram.model.StarLikeResponse
+import com.ssafy.stellargram.model.StarLikersCountResponse
 import com.ssafy.stellargram.model.WeatherResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -117,6 +121,29 @@ interface ApiServiceForMember {
     // 멤버id 리스트로 멤버 정보 조회
     @POST("member/member-list")
     suspend fun getMemberListByIds(@Body memberIds: List<Long>): Response<FollowersResponse>
+
+    // 천체 즐겨찾기하기
+    @POST("member/favorite/star/{id}/like")
+    suspend fun favoriteStar(
+        @Path("id") id: Int
+    ): Response<StarLikeResponse>
+
+    // 즐겨찾는 천체 모두 조회
+    @GET("member/favorite/all")
+    suspend fun getAllFavoriteStars(): Response<StarLikeAllResponse>
+
+    // 특정 천체의 좋아하는 유저 수 반환
+    @GET("member/favorite/count/star/{starId}")
+    suspend fun starLikersCount(
+        @Path("starId") starId: Int
+    ): Response<StarLikersCountResponse>
+
+    // 천체 즐겨찾기하기
+    @DELETE("member/favorite/star/{id}/dislike")
+    suspend fun disLikeStar(
+        @Path("id") id: Int
+    ): Response<StarDislikeResponse>
+
 }
 
 interface ApiServiceForCards {
