@@ -289,6 +289,7 @@ fun Searchbar(viewModel: GoogleMapViewModel){
 fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap, viewModel: GoogleMapViewModel){
     val roundLat = String.format("%.5f",latlng.latitude)
     val roundLng =  String.format("%.5f",latlng.longitude)
+    val chatRoomID = String.format("%.3f",latlng.latitude) + String.format("%.3f",latlng.longitude)
     MarkerInfoWindow(
         title= title,
         state = MarkerState(latlng),
@@ -296,7 +297,7 @@ fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap, viewModel: Googl
         tag = "$roundLat-$roundLng",
         onClick = { marker ->
             Log.d("MARKER",marker.tag.toString())
-            viewModel.getObserveSiteDetail(LatLng(roundLat.toDouble(),roundLng.toDouble()),marker.tag.toString())
+            viewModel.getObserveSiteDetail(LatLng(roundLat.toDouble(),roundLng.toDouble()),chatRoomID)
             false
         }
     ) {
