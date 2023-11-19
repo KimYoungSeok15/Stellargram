@@ -171,7 +171,9 @@ fun StarDetailScreen(navController: NavController, id: Int) {
             onDismissRequest = {
                 dialogVisible = false
             },
-            text = { Text(if (likeStarIds.contains(id)) "즐겨찾기 완료" else "즐겨찾기 취소 완료") },
+            text = { Text(text = if (likeStarIds.contains(id)) "즐겨찾기 완료" else "즐겨찾기 취소 완료",
+                        fontSize = 20.sp)
+                   },
             confirmButton = {
                 CustomTextButton(
                     onClick = {
