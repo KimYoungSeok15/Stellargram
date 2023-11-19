@@ -4,18 +4,23 @@ import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.DraggableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
@@ -48,29 +53,43 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.kakao.sdk.user.UserApiClient
 import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.ui.screen.kakao.KakaoViewModel
 import com.ssafy.stellargram.ui.screen.search.MainViewModel
 import com.ssafy.stellargram.util.StarCardRepository
 import java.io.File
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.key
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import com.ssafy.stellargram.ui.common.CustomTextButton
+
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MypageScreen(navController: NavController, id:Long) {
     val viewModel: MypageViewModel = viewModel()
     val tabIndex by viewModel.tabIndex.observeAsState()
-    val userId = id // 현재 유저의 id
+    // 현재 사용자의 Id. 페이지 주인의 Id 아님.
+    val userId = StellargramApplication.prefs.getString("memberId","").toLong()
     var cards by remember { mutableStateOf(viewModel.myCards) }
     var favStars by remember { mutableStateOf(viewModel.favStars) }
     var likeCards by remember { mutableStateOf(viewModel.likeCards) }
-    Log.d("마이페이지", "id: $userId")
+
+    var modalList = viewModel.modalList.value  // 모달에 들어갈 내용
 
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
-        viewModel.getMemberInfo(userId)
-        val followingList = viewModel.getFollowingList(userId)
-        Log.d("검사","$followingList")
-        getResults(viewModel = viewModel, id = userId, followingList = followingList)
+        viewModel.getMemberInfo(id)
+        val following = viewModel.getFollowingList(userId)  // Access followingList from ViewModel
+        viewModel.updateFollowingList(following)
+        getResults(viewModel = viewModel, id = id, followingList = following)
     }
 
 
@@ -117,17 +136,30 @@ fun MypageScreen(navController: NavController, id:Long) {
                             Text(text = "게시물")
                         }
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable (
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ){
+                                viewModel.getModalFollower(id)
+
+                            }
                         ) {
                             Text(
                                 text = it.followCount.toString(),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             )
-                            Text(text = "팔로우")
+                            Text(text = "팔로워")
                         }
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable (
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ){
+                                viewModel.getModalFollowing(id)
+                            }
                         ) {
                             Text(
                                 text = it.followingCount.toString(),
@@ -148,19 +180,98 @@ fun MypageScreen(navController: NavController, id:Long) {
                 }
         }
     }
-}
+    // 모달
+    if (viewModel.isDialogVisible) {
+        AlertDialog(
+            onDismissRequest = {
+                // 닫기 버튼을 클릭하면 Dialog를 닫음
+                viewModel.isDialogVisible = false
+            },
+            title = {
+                Text(viewModel.dialogTitle)
+            },
+            text = {
+                // LazyColumn to display the list of likers
+                LazyColumn {
+                    val followingList = viewModel.followingList.value
+                    items(modalList.size) { index ->
+                        val member = modalList[index]
+                        if (member != null) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                // 회원 정보 표시 (이미지, 닉네임)
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable {
+                                        // 해당 유저 마이페이지로 이동. 단, 현재 페이지일 경우 무효
+                                        val isMyCard = member.memberId == StellargramApplication.prefs.getString("memberId","").toLong()
+                                        if (!isMyCard) {
+                                            navController.navigate(Screen.MyPage.route + "/${member.memberId}")
+                                        }
+                                    }
+                                ) {
+                                    GlideImage(
+                                        model = member.profileImageUrl,
+                                        contentDescription = "Profile Image",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(30.dp) // 이미지 크기
+                                            .clip(CircleShape) // 동그라미 모양으로 잘라주기
+                                    )
+                                    Text(
+                                        text = member.nickname,
+                                        style = TextStyle(fontSize = 20.sp),
+                                        modifier = Modifier
+                                            .padding(start = 8.dp)
+                                            .width(150.dp)
+                                    )
+                                }
+                                // 팔로우 관련 - 내 카드면 팔로우버튼 없고, 남의 카드면 팔로잉 중일 경우 언팔로우가 뜨도록
+                                val isMyCard = member.memberId == StellargramApplication.prefs.getString("memberId","").toLong()
+                                val isFollowing = followingList.contains(member.memberId)
+                                Log.d("마이페이지", "isFollowing: ${member.memberId} $followingList ${isFollowing}")
 
-fun showConfirmationDialog(context: Context, title: String, message: String, onConfirm: () -> Unit) {
-    AlertDialog.Builder(context)
-        .setTitle(title)
-        .setMessage(message)
-        .setPositiveButton("확인") { _, _ ->
-            // "확인" 버튼이 클릭되었을 때 실행되는 람다식
-            onConfirm.invoke()
-        }
-        .setNegativeButton("취소") { dialog, _ ->
-            // "취소" 버튼이 클릭되었을 때 실행되는 람다식 (이 부분은 필요에 따라 수정 가능)
-            dialog.dismiss()
-        }
-        .show()
+                                val followText = buildAnnotatedString {
+                                    if (!isMyCard) {
+                                        withStyle(style = SpanStyle(color = if (isFollowing) Color(0xFFFF4040) else Color(0xFF9DC4FF))) {
+                                            append(if (isFollowing) "언팔로우" else "팔로우")
+                                        }
+                                    }
+                                }
+
+                                if (!isMyCard) {
+                                    ClickableText(
+                                        text = followText,
+                                        style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End),
+                                        onClick = { offset ->
+                                            // 팔로우 또는 언팔로우 이벤트 처리
+                                            viewModel.handleFollowButtonClick(member.memberId, isFollowing)
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.height(0.dp))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+,
+            confirmButton = {
+                // 닫기 버튼
+                CustomTextButton(
+                    onClick = {
+                        viewModel.isDialogVisible = false
+                    },
+                    text = "닫기"
+                )
+            }
+        )
+    }
 }

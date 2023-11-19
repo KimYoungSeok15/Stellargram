@@ -104,6 +104,11 @@ data class MemberSearchRequest(
     val searchNickname: String
 )
 
+data class IdListRequest(
+    @SerializedName("memberIds")
+    val memberIds: List<Long>
+)
+
 data class FollowersResponse(
     val code: String,
     val message: String,

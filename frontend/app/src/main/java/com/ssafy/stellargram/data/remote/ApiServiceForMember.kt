@@ -11,6 +11,7 @@ import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
 import com.ssafy.stellargram.model.FollowersResponse
+import com.ssafy.stellargram.model.IdListRequest
 import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.MessageListResponse
@@ -117,10 +118,8 @@ interface ApiServiceForMember {
         @Body postMemberSearchRequest: MemberSearchRequest
     ): MemberSearchResponse
 
-
     // 멤버id 리스트로 멤버 정보 조회
-    @POST("member/member-list")
-    suspend fun getMemberListByIds(@Body memberIds: List<Long>): Response<FollowersResponse>
+    suspend fun getMemberListByIds(@Body memberIds: IdListRequest): Response<FollowersResponse>
 
     // 천체 즐겨찾기하기
     @POST("member/favorite/star/{id}/like")
@@ -138,7 +137,7 @@ interface ApiServiceForMember {
         @Path("starId") starId: Int
     ): Response<StarLikersCountResponse>
 
-    // 천체 즐겨찾기하기
+    // 천체 즐겨찾기 취소
     @DELETE("member/favorite/star/{id}/dislike")
     suspend fun disLikeStar(
         @Path("id") id: Int
