@@ -200,13 +200,13 @@ class GoogleMapViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun getObserveSiteDetail(latLng: LatLng, markerTag: String){
+    fun getObserveSiteDetail(latLng: LatLng, chatroomId: String){
         viewModelScope.launch(Dispatchers.IO){
             try {
                 val response = NetworkModule.provideRetrofitInstanceSite().getSiteInfo(latitude = latLng.latitude, longitude =  latLng.longitude)
                 if (response.data != null){
                     detailMarker =  response.data
-                    detailShowingID = markerTag
+                    detailShowingID = chatroomId
                 }
             } catch (e:Exception){
                 Log.e("DETATILMARKER",e.toString())

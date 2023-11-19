@@ -19,6 +19,7 @@ class SkyMapViewModel @Inject constructor(
     var screenHeight by mutableFloatStateOf(0f)
     var constellationSight: MutableState<Array<DoubleArray>> = mutableStateOf(arrayOf())
     var horizonSight: MutableState<Array<DoubleArray>> = mutableStateOf(arrayOf())
+    var autoMode by mutableStateOf(false)
     fun setScreenSize(width: Int, height: Int){
         screenWidth = width.toFloat()
         screenHeight = height.toFloat()
