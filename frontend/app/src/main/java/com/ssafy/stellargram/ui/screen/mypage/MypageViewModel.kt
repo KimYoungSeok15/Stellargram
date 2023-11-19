@@ -28,9 +28,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +60,7 @@ import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.ApiServiceForCards
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
+import com.ssafy.stellargram.model.IdListRequest
 import com.ssafy.stellargram.model.Member
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
@@ -73,22 +76,38 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @HiltViewModel
 class MypageViewModel @Inject constructor() : ViewModel() {
+
+    // 현재 페이지 주인의 정보
     private val _memberResults = mutableStateOf<List<Member>>(emptyList())
+    val memberResults: State<List<Member>> get() = _memberResults
+
+    // 현재 사용자의 팔로잉 목록
+    private val _followingList = mutableStateOf<List<Long>>(emptyList())
+    val followingList: State<List<Long>> = _followingList
+
+    // 탭 관련
     private val _tabIndex: MutableLiveData<Int> = MutableLiveData(0)
     val tabs = listOf("게시물", "즐겨찾기", "좋아요")
     val tabIndex: LiveData<Int> = _tabIndex
-    val memberResults: State<List<Member>> get() = _memberResults
     var isSwipeToTheLeft: Boolean = false
     private val draggableState = DraggableState { delta ->
         isSwipeToTheLeft= delta > 0
     }
-
     private val _dragState = MutableLiveData<DraggableState>(draggableState)
     val dragState: LiveData<DraggableState> = _dragState
 
+    // 모달 관련
+    var isDialogVisible by mutableStateOf(false) // 모달이 열려있는지
+    var dialogTitle by mutableStateOf("") // 모달 제목
+    private val _modalList = mutableStateOf<List<Member>>(emptyList())
+    val modalList: State<List<Member>> get() = _modalList
+
+
+    // swipe시 탭 변경
     fun updateTabIndexBasedOnSwipe(delta: Float) {
         if (delta > 0 && _tabIndex.value!! > 0) {
             // Swipe to the right
@@ -99,13 +118,12 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-
-    // Add these methods for managing tabs
+    // 실제 탭을 변경하는 함수
     fun updateTabIndex(index: Int) {
         _tabIndex.value = index
     }
 
-    // API 호출을 트리거하고 결과를 업데이트하는 함수
+    // 현재 페이지 주인 정보 가져오기
     fun getMemberInfo(id: Long) {
         viewModelScope.launch {
             _memberResults.value = try {
@@ -139,7 +157,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
-    // 사용자가 팔로우 하는 사람들의 목록을 가져온다. 보고있는 페이지의 주인이 아니다.
+    // 사용자가 팔로우 하는 사람들의 목록을 가져온다.
     suspend fun getFollowingList(id: Long): List<Long> {
         return try {
             val response = NetworkModule.provideRetrofitInstance().getFollowingList(memberId = id)
@@ -163,7 +181,91 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
 
     }
+    // 내가 팔로우 하는 사람들의 목록을 업데이트
+    fun updateFollowingList(list: List<Long>) {
+        _followingList.value = list
+    }
 
+    // 페이지 주인이 팔로우 하는 사람들의 목록을 가져온다.
+    fun getModalFollowing(id: Long) {
+        viewModelScope.launch {
+            try {
+                val response =
+                    NetworkModule.provideRetrofitInstance().getFollowingList(memberId = id)
+
+                if (response.isSuccessful) {
+                    _modalList.value = response?.body()!!.data.members
+                    dialogTitle = "팔로잉"
+                    isDialogVisible = true
+                } else {
+                    Log.e("마이페이지", "팔로잉 목록 조회 실패: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("마이페이지", "팔로잉 목록 조회 중 예외 발생: ${e.message}")
+            }
+        }
+    }
+
+    // 사용자를 팔로잉 하는 사람들의 목록을 가져온다.
+    fun getModalFollower(id: Long) {
+        viewModelScope.launch {
+            try {
+                val response =
+                    NetworkModule.provideRetrofitInstance().getFollowerList(memberId = id)
+
+                if (response.isSuccessful) {
+                    _modalList.value = response?.body()!!.data.members
+                    dialogTitle = "팔로워"
+                    isDialogVisible = true
+                } else {
+                    Log.e("마이페이지", "팔로워 목록 조회 실패: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("마이페이지", "팔로워 목록 조회 중 예외 발생: ${e.message}")
+            }
+        }
+    }
+
+    // 해당 카드를 좋아요한 멤버 목록을 가져오는 API 호출
+    fun getLikersList(cardId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.provideRetrofitCards().getCardLikers(cardId = cardId)
+
+                if (response.isSuccessful) {
+                    val likersResponse = response.body()
+                    val memberIds = likersResponse!!.data
+                    val likersDetails = getMemberListByIds(memberIds)
+                    _modalList.value = likersDetails
+                    dialogTitle = "좋아요"
+                    isDialogVisible = true
+                } else {
+                    // API 에러 응답을 처리합니다.
+                }
+            } catch (e: Exception) {
+                // 예외를 처리합니다 (예: 네트워크 오류).
+            }
+        }
+    }
+
+    // memberId 목록을 받아 해당 유저들의 상세 정보를 가져오는 API 호출
+    private suspend fun getMemberListByIds(memberIds: List<Long>): List<Member> {
+        return try {
+            val idListRequest = IdListRequest(memberIds = memberIds)
+            val response = NetworkModule.provideRetrofitInstance().getMemberListByIds(idListRequest)
+            if (response.isSuccessful) {
+                val membersResponse = response.body()
+                membersResponse?.data?.members ?: emptyList()
+            } else {
+                // API 에러 응답을 처리합니다.
+                emptyList()
+            }
+        } catch (e: Exception) {
+            // 예외를 처리합니다 (예: 네트워크 오류).
+            Log.e("마이페이지", "Error Response Body: $e")
+            emptyList()
+        }
+    }
 
     // 팔로우 또는 언팔로우 클릭시 실행하는 부분
     fun handleFollowButtonClick(memberId: Long, isFollowing: Boolean) {
@@ -542,22 +644,31 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                 Image(
                     painter = likeIcon,
                     contentDescription = null, // 이미지 설명
-                    modifier = Modifier.size(24.dp).focusable(false)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-                            viewModel.handleLikeButtonClick(cardId = card.cardId, isLiked = card.amILikeThis)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .focusable(false)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            viewModel.handleLikeButtonClick(
+                                cardId = card.cardId,
+                                isLiked = card.amILikeThis
+                            )
                         }
                 )
-                Text(
-                    text = "좋아요 ${card.likeCount}",
-                    style = TextStyle(fontSize = 20.sp),
-                    modifier = Modifier.padding(start = 8.dp)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-//                            viewModel.handleLikersButtonClick(cardId = card.cardId)
+                ClickableText(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color.White)) {
+                            append("좋아요 ${card.likeCount}")
                         }
+                    },
+                    style = TextStyle(fontSize = 20.sp),
+                    modifier = Modifier.padding(start = 8.dp),
+                    onClick = { offset ->
+                        // 클릭 시 좋아요 멤버 목록 조회
+                        viewModel.getLikersList(cardId = card.cardId)
+                    }
                 )
             }
 
@@ -599,10 +710,13 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
                     contentScale = ContentScale.FillWidth
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp, 4.dp)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 4.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
                             // TODO: 실행할 함수 여기서 호출.
                         },
                     horizontalArrangement = Arrangement.Start
@@ -746,17 +860,30 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                 Image(
                     painter = likeIcon,
                     contentDescription = null, // 이미지 설명
-                    modifier = Modifier.size(24.dp)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-                            viewModel.handleLikeButtonClick(cardId = card.cardId, isLiked = card.amILikeThis)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            viewModel.handleLikeButtonClick(
+                                cardId = card.cardId,
+                                isLiked = card.amILikeThis
+                            )
                         }
                 )
-                Text(
-                    text = "좋아요 ${card.likeCount}",
+                ClickableText(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color.White)) {
+                            append("좋아요 ${card.likeCount}")
+                        }
+                    },
                     style = TextStyle(fontSize = 20.sp),
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
+                    onClick = { offset ->
+                        // 클릭 시 좋아요 멤버 목록 조회
+                        viewModel.getLikersList(cardId = card.cardId)
+                    }
                 )
             }
 

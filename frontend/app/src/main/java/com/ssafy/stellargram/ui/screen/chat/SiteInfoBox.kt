@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,11 +33,10 @@ fun SiteInfoBox(
     // 관측소 뷰모델 생성
     val viewModel: SiteViewModel = hiltViewModel()
 
-    // TODO: 임시 주석처리. 추후 더미데이터 생성되면 활성화 시킬 것
     // 관측소 데이터 받아오기
-//    LaunchedEffect(key1 = true) {
-//        viewModel.getSiteInfo(latitude, longitude)
-//    }
+    LaunchedEffect(key1 = true) {
+        viewModel.getSiteInfo(latitude, longitude)
+    }
 
     // 별점 계산
     var rating: Float =

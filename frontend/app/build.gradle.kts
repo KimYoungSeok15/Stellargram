@@ -211,6 +211,10 @@ dependencies {
     // unixTimestamp 포매팅 라이브러리
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
 
+
+    // Dependency implementation for sensor with compose
+    implementation("dev.ricknout.composesensors:composesensors:0.2.0")
+
     // rating 컴포넌트 라이브러리
     implementation ("com.github.a914-gowtham:compose-ratingbar:1.3.4")
 
@@ -228,6 +232,7 @@ dependencies {
 
     //WindowManager
     implementation("androidx.window:window:1.0.0-alpha09")
+
 
 }
 

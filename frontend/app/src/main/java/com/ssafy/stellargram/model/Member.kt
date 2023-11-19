@@ -104,6 +104,11 @@ data class MemberSearchRequest(
     val searchNickname: String
 )
 
+data class IdListRequest(
+    @SerializedName("memberIds")
+    val memberIds: List<Long>
+)
+
 data class FollowersResponse(
     val code: String,
     val message: String,
@@ -124,4 +129,32 @@ data class MemberId(
     val memberId: Long
 )
 
+data class StarLikeResponse(
+    val code: String,
+    val message: String,
+    val data: LikeData
+)
 
+data class LikeData(
+    val favoriteId: Int,
+    val liker: Member,
+    val starId: Int,
+)
+
+data class StarLikeAllResponse(
+    val code: String,
+    val message: String,
+    val data: List<LikeData>
+)
+
+data class StarLikersCountResponse(
+    val code: String,
+    val message: String,
+    val data: Int
+)
+
+data class StarDislikeResponse(
+    val code: String,
+    val message: String,
+    val data: String // true 또는 "member already dislikes star"가 들어올 수 있음
+)
