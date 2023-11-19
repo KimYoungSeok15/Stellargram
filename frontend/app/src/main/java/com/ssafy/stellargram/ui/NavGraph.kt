@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ssafy.stellargram.ui.screen.base.BaseFrame
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
+import com.ssafy.stellargram.ui.screen.cameranew.CameraNewScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
@@ -120,6 +121,9 @@ fun NavGraph(
         }
         composable(route = Screen.MakeCard.route){
             MakeCardScreen(navController = navController)
+        }
+        composable(route = Screen.CameraNew.route){
+            CameraNewScreen(navController = navController)
         }
     }
 }
