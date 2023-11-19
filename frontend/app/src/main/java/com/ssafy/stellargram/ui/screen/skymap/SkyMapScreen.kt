@@ -62,10 +62,9 @@ import kotlin.math.sqrt
 @SuppressLint("MissingPermission", "MutableCollectionMutableState")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SkyMapScreen(navController : NavController){
+fun SkyMapScreen(navController : NavController,viewModel: SkyMapViewModel){
 
 
-    val viewModel : SkyMapViewModel = viewModel()
     val temperature = Temperature()
 //    val constellationLine: ConstellationLine = ConstellationLine()
     val context = LocalContext.current
@@ -155,10 +154,12 @@ fun SkyMapScreen(navController : NavController){
     DisposableEffect(context) {
         orientation.startListening(object : Orientation.Listener {
             override fun onOrientationChanged(pitch: Float, roll: Float, yaw: Float) {
-                orientationValues = Triple(pitch, roll, yaw)
-                theta = -yaw.toDouble()
-                phi = pitch.toDouble()
+                if (viewModel.autoMode){
+                    orientationValues = Triple(pitch, roll, yaw)
+                    theta = -yaw.toDouble()
+                    phi = pitch.toDouble()
 //                canvasRotate = roll
+                }
             }
         })
         onDispose {
