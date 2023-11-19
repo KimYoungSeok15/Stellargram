@@ -14,7 +14,7 @@ interface CameraXNew {
     fun getPreviewView() : PreviewView
     fun getFacingState() : StateFlow<Int>
     fun setIso(sensibility:Int)
-    fun setExposureTime(exposureTime:Int)
+    fun setExposureTime(exposureTime:Long)
     fun setClear()
 
 }
