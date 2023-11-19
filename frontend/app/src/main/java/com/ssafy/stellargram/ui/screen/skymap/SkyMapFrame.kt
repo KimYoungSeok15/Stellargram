@@ -26,11 +26,13 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.R
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +43,7 @@ fun SkyMapFrame(
     content: @Composable BoxScope.() -> Unit
 )
 {
+    val viewModel : SkyMapViewModel = viewModel()
     var expandedSetting by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
@@ -69,17 +72,20 @@ fun SkyMapFrame(
                             // Add menu items here
 
                             DropdownMenuItem(
-                                onClick = { /* Handle item click */ },
-                                text= {
-                                    Text(text = "Item 1")
-                                }
+                                onClick = { viewModel.autoMode = !viewModel.autoMode },
+                                text= { Text("AutoMode",
+                                    color=
+                                    if (viewModel.autoMode)
+                                        Color(0xFF2196F3)
+                                    else Color(0xFF673AB7)
+                                )},
                             )
-                            DropdownMenuItem(
-                                onClick = { /* Handle item click */ },
-                                text= {
-                                    Text(text = "Item 2")
-                                }
-                            )
+//                            DropdownMenuItem(
+//                                onClick = { /* Handle item click */ },
+//                                text= {
+//                                    Text(text = "Item 2")
+//                                }
+//                            )
 
                             // Add more items as needed
                         }
@@ -125,7 +131,7 @@ fun SkyMapFrame(
         ) }
     ) {
         Box(modifier = Modifier.padding(it)){
-            content()
+            SkyMapScreen(navController,viewModel)
         }
 
     }

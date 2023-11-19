@@ -65,7 +65,6 @@ fun NavGraph(
 
         composable(route = Screen.SkyMap.route){
             SkyMapFrame(navController, screen = Screen.SkyMap) {
-                SkyMapScreen(navController = navController)
             }
         }
         composable(route = Screen.Camera.route) {
