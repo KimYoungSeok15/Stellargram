@@ -287,15 +287,15 @@ fun Searchbar(viewModel: GoogleMapViewModel){
 
 @Composable
 fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap, viewModel: GoogleMapViewModel){
-    val roundLat = String.format("%.4f",latlng.latitude)
-    val roundLng =  String.format("%.4f",latlng.longitude)
+    val roundLat = String.format("%.5f",latlng.latitude)
+    val roundLng =  String.format("%.5f",latlng.longitude)
     MarkerInfoWindow(
         title= title,
         state = MarkerState(latlng),
         icon = BitmapDescriptorFactory.fromBitmap(bitmap),
-        tag = "$roundLat&$roundLng",
+        tag = "$roundLat-$roundLng",
         onClick = { marker ->
-//            Log.d("MARKER",marker.tag.toString())
+            Log.d("MARKER",marker.tag.toString())
             viewModel.getObserveSiteDetail(LatLng(roundLat.toDouble(),roundLng.toDouble()),marker.tag.toString())
             false
         }
@@ -412,8 +412,6 @@ fun NewMarkerForm(viewModel: GoogleMapViewModel){
 @Composable
 fun PointDetail(viewModel: GoogleMapViewModel){
     if (viewModel.detailShowingID != ""){
-        LaunchedEffect(key1 = Unit){
-        }
         Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -436,7 +434,7 @@ fun PointDetail(viewModel: GoogleMapViewModel){
                                     viewModel.detailShowingID = ""
                                 }
                         )
-                        Text(text = viewModel.detailMarker.name)
+                        Text(text = if (viewModel.detailMarker.name != "") viewModel.detailMarker.name else "이름 없음" )
                         Image(
                             painter = painterResource(id = R.drawable.chat),
                             contentDescription = null,
@@ -445,7 +443,10 @@ fun PointDetail(viewModel: GoogleMapViewModel){
                                 .height(40.dp)
                                 .clickable {
                                     try {
-                                        Log.d("MARKER","id : ${viewModel.detailShowingID} chatroom selected")
+                                        Log.d(
+                                            "MARKER",
+                                            "id : ${viewModel.detailShowingID} chatroom selected"
+                                        )
                                     } catch (e: Exception) {
                                         Log.d("error", e.message ?: "")
                                     }
@@ -453,7 +454,7 @@ fun PointDetail(viewModel: GoogleMapViewModel){
                         )
                     }
                     Text(
-                        text = "reviewCount: ${viewModel.detailMarker.reviewCount}",
+                        text = "리뷰 수: ${viewModel.detailMarker.reviewCount}",
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .padding(10.dp, 20.dp)
@@ -462,7 +463,7 @@ fun PointDetail(viewModel: GoogleMapViewModel){
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Text(
-                        text = "rating: ${viewModel.detailMarker.ratingSum/viewModel.detailMarker.reviewCount}",
+                        text = "관측지 평점: ${if(viewModel.detailMarker.reviewCount != 0) viewModel.detailMarker.ratingSum/viewModel.detailMarker.reviewCount else 0}",
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .padding(10.dp, 20.dp)

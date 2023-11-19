@@ -96,7 +96,7 @@ fun BaseFrame(
                     val iconResource = when (screen) {
                         is Screen.Home -> R.drawable.search
                         is Screen.SkyMap -> R.drawable.search
-                        is Screen.GoogleMap -> R.drawable.add
+//                        is Screen.GoogleMap -> R.drawable.add
                         is Screen.MyPage -> R.drawable.chat1
                         else -> null
                     }
