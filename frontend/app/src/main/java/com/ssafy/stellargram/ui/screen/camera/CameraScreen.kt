@@ -147,7 +147,7 @@ fun GifImage(navController: NavController, selectedImageUri: Uri?, onImageSelect
                     DisplaySelectedimage(selectedImageUri!!)
                     Button(
                         onClick = {
-                            navController.navigate(Screen.Camera.route)
+//                            navController.navigate(Screen.Camera.route)
                         }
                     ) {
                         Text(text = "저장하기")

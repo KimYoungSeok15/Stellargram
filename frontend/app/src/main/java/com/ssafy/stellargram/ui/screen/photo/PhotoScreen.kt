@@ -47,7 +47,7 @@ fun MoveButton(navController: NavController){
         modifier = modifier
     ) {
         Box(
-            modifier = Modifier
+            modifier = Modifier.weight(1f)
                 .padding(10.dp)
                 .width(250.dp)
                 .height(150.dp)
@@ -57,7 +57,7 @@ fun MoveButton(navController: NavController){
                 .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
                 .background(Color.LightGray)
                 .clickable {
-                    navController.navigate("camera")
+                    navController.navigate("camera1")
                 }
         ) {
             Column(
@@ -71,7 +71,6 @@ fun MoveButton(navController: NavController){
                     contentDescription = "촬영하기",
                     modifier = Modifier
                         .size(100.dp)
-                        .clickable { navController.navigate("camera") }
                 )
                 Text(
                     text = "촬영하기",
@@ -81,7 +80,7 @@ fun MoveButton(navController: NavController){
             }
         }
         Box(
-            modifier = Modifier
+            modifier = Modifier.weight(1f)
                 .padding(10.dp)
                 .width(250.dp)
                 .height(150.dp)
@@ -105,7 +104,6 @@ fun MoveButton(navController: NavController){
                     contentDescription = "카드 만들기",
                     modifier = Modifier
                         .size(100.dp)
-                        .clickable { navController.navigate("makecard") }
 
                 )
                 Text(
@@ -116,7 +114,7 @@ fun MoveButton(navController: NavController){
             }
         }
         Box(
-            modifier = Modifier
+            modifier = Modifier.weight(1f)
                 .padding(10.dp)
                 .width(250.dp)
                 .height(150.dp)
@@ -140,7 +138,6 @@ fun MoveButton(navController: NavController){
                     contentDescription = "사진 인식하기",
                     modifier = Modifier
                         .size(100.dp)
-                        .clickable { navController.navigate("identify") }
                 )
                 Text(
                     text = "사진 인식하기",
