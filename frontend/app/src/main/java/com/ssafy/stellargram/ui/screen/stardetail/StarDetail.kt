@@ -106,7 +106,10 @@ fun StarDetailScreen(navController: NavController, id: Int) {
             }
         }
         else{
-            //TODO: id에 해당하는 데이터 없을 때 data not found page를 띄워주세요!
+            item {
+                //TODO: id에 해당하는 데이터 없을 때 data not found page를 띄워주세요!
+                Text(text = "해당 별에 대한 정보가 없습니다!")
+            }
         }
     }
 }

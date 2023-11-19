@@ -297,7 +297,7 @@ fun SkyMapScreen(navController : NavController){
             if (clicked) {
                 ClickableText(
                     text =
-                    AnnotatedString(nameMap[clickedIndex].toString()),
+                        AnnotatedString(nameMap[clickedIndex].toString()),
                     style = TextStyle(color = Color.White,
                         textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxWidth(),
