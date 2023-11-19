@@ -60,46 +60,46 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
             painterResource(id = R.drawable.stellargram_1_),
             contentDescription = "LOGO",
             modifier = Modifier.size(200.dp)
-
         )
         Image(
             painter =
             painterResource(id = R.drawable.kakao_login_large_narrow),
-            contentDescription = null,
+            contentDescription = "LOGIN",
             modifier = Modifier
                 .clickable { navController.navigate("kakao") }
         )
 
-        Button(
-            onClick = {
-                navController.navigate(Screen.SkyMap.route)
-            },
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = "move to sphere")
-        }
+//         Button(
+//             onClick = {
+//                 navController.navigate(Screen.SkyMap.route)
+//             },
+//             modifier = Modifier
+//                 .padding(16.dp)
+//         ) {
+//             Text(text = "move to sphere")
+//         }
 
-        // TODO: 채팅방 임시 연결버튼. 나중에 지우기
-        Button(
-            onClick = {
-                navController.navigate(Screen.ChatRoom.route)
-            },
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = "채팅방")
-        }
-        // TODO: 채팅방목록 임시 연결버튼. 나중에 지우기
-        Button(
-            onClick = {
-                navController.navigate(Screen.ChatRoomList.route)
-            },
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = "채팅방목록")
-        }
+//         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
+//         Button(
+//             onClick = {
+// //                navController.navigate(Screen.ChatRoom.route)
+//                 navController.navigate(route = Screen.ChatRoom.route + "/1/2/testsite")
+//             },
+//             modifier = Modifier
+//                 .padding(16.dp)
+//         ) {
+//             Text(text = "채팅방")
+//         }
+
+//         Button(
+//             onClick = {
+//                 navController.navigate(Screen.Camera.route)
+//             },
+//             modifier = Modifier
+//                 .padding(16.dp)
+//         ) {
+//             Text(text = "카메라")
+//         }
     }
 }
 

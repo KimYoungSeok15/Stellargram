@@ -5,6 +5,7 @@ import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.exception.MemberErrorCode;
+import com.instargram101.member.messagequeue.KafkaProducer;
 import com.instargram101.member.repoository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
@@ -24,7 +26,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final S3UploadService s3UploadService;
     private final CardServiceClient cardServiceClient;
-
+    private final KafkaProducer kafkaProducer;
 
 
     public Boolean checkMember(Long memberId) {
@@ -72,6 +74,9 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.Member_Not_Found));
         member.setActivated(false);
         memberRepository.save(member);
+
+        kafkaProducer.send("test-topic", member);
+
         return true;
     }
 
@@ -99,7 +104,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public List<Member> getMembersByMemberIds(List<Long> memberIds) {
-        return memberRepository.findMembersByMemberIdInAndActivated(memberIds, true);
+        List<Long> longMemberIds = new ArrayList<>();
+        for (Object value : memberIds) {
+            longMemberIds.add(Long.parseLong(""+value));
+        }
+        return memberRepository.findMembersByMemberIdInAndActivated(longMemberIds, true);
     }
+
+
 
 }
