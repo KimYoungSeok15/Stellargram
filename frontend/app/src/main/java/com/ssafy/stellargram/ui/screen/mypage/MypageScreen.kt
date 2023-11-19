@@ -89,12 +89,18 @@ fun MypageScreen(navController: NavController, id:Long) {
 
     var modalList = viewModel.modalList.value  // 모달에 들어갈 내용
     var isDialogOpen = baseViewModel.isDialogOpen // 프로필 수정 모달이 열려있는지
+    var dialogVisible = viewModel.isActualDialogVisible
+    var isLikeStar = viewModel.isLikeStar
+
+
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
         viewModel.getMemberInfo(id)
         val following = viewModel.getFollowingList(userId)  // Access followingList from ViewModel
         viewModel.updateFollowingList(following)
         getResults(viewModel = viewModel, id = id, followingList = following)
+        val favoriteStars = viewModel.getFavoriteStars()
+        viewModel.updateLikeStarIds(favoriteStars)
     }
 
 
@@ -275,6 +281,25 @@ fun MypageScreen(navController: NavController, id:Long) {
                         viewModel.isDialogVisible = false
                     },
                     text = "닫기"
+                )
+            }
+        )
+    }
+    // 즐겨찾기 완료 모달
+    if (dialogVisible) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = {
+                dialogVisible = false
+            },
+            text = { Text(text = if (isLikeStar.value) "즐겨찾기 취소 완료" else "즐겨찾기 완료",
+                fontSize = 20.sp)
+            },
+            confirmButton = {
+                CustomTextButton(
+                    onClick = {
+                        viewModel.isActualDialogVisible = false
+                    },
+                    text = "확인"
                 )
             }
         )
