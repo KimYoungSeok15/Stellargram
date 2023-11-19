@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -60,6 +61,7 @@ import com.ssafy.stellargram.ui.screen.search.MainViewModel
 import com.ssafy.stellargram.util.StarCardRepository
 import java.io.File
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.key
@@ -68,13 +70,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.window.Dialog
 import com.ssafy.stellargram.ui.common.CustomTextButton
+import com.ssafy.stellargram.ui.screen.base.BaseViewModel
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MypageScreen(navController: NavController, id:Long) {
     val viewModel: MypageViewModel = viewModel()
+    val baseViewModel: BaseViewModel = viewModel()
     val tabIndex by viewModel.tabIndex.observeAsState()
     // 현재 사용자의 Id. 페이지 주인의 Id 아님.
     val userId = StellargramApplication.prefs.getString("memberId","").toLong()
@@ -83,7 +88,7 @@ fun MypageScreen(navController: NavController, id:Long) {
     var likeCards by remember { mutableStateOf(viewModel.likeCards) }
 
     var modalList = viewModel.modalList.value  // 모달에 들어갈 내용
-
+    var isDialogOpen = baseViewModel.isDialogOpen // 프로필 수정 모달이 열려있는지
     // LaunchedEffect를 사용하여 API 요청 트리거
     LaunchedEffect(true) {
         viewModel.getMemberInfo(id)
@@ -180,7 +185,7 @@ fun MypageScreen(navController: NavController, id:Long) {
                 }
         }
     }
-    // 모달
+    // 모달 (좋아요 or 팔로워 or 팔로잉)
     if (viewModel.isDialogVisible) {
         AlertDialog(
             onDismissRequest = {
@@ -274,4 +279,59 @@ fun MypageScreen(navController: NavController, id:Long) {
             }
         )
     }
+//    // 프로필수정 모달
+//    if (isDialogOpen) {
+//        Log.d("프로필수정","11111")
+//        val memberInfo = viewModel.memberResults.value
+//        // Show the dialog
+//        Dialog(onDismissRequest = { baseViewModel.closeProfileModificationDialog() }) {
+//            Card(
+//                modifier = Modifier
+//                    .height(375.dp)
+//                    .padding(16.dp),
+//                shape = RoundedCornerShape(16.dp),
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxSize(),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                ) {
+//                    Text(
+//                        text = "프로필수정",
+//                        modifier = Modifier.padding(16.dp),
+//                    )
+//                    GlideImage(
+//                        model = memberInfo.firstOrNull()?.profileImageUrl,
+//                        contentDescription = "프로필사진",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .size(100.dp) // 이미지 크기
+//                            .clip(CircleShape), // 동그라미 모양으로 잘라주기
+//                    )
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.Center,
+//                    ) {
+//                        TextButton(
+//                            onClick = { baseViewModel.closeProfileModificationDialog() },
+//                            modifier = Modifier.padding(8.dp),
+//                        ) {
+//                            Text("확인")
+//                        }
+//                        TextButton(
+//                            onClick = { baseViewModel.closeProfileModificationDialog() },
+//                            modifier = Modifier.padding(8.dp),
+//                        ) {
+//                            Text("취소")
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+
 }
+
+
