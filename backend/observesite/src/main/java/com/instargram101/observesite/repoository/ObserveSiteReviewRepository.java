@@ -13,4 +13,6 @@ public interface ObserveSiteReviewRepository extends JpaRepository<ObserveSiteRe
 
     //해당 관측지의 모든 리뷰 리스트 얻기
     List<ObserveSiteReview> findAllByObserveSite(ObserveSite observeSite);
+
+    List<ObserveSiteReview> findAllByMemberId(Long memberId);
 }
