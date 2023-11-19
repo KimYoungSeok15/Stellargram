@@ -30,8 +30,8 @@ fun StarDetailScreen(navController: NavController, id: Int) {
     val starViewModel: StarDetailViewModel = viewModel()
     var star = DBModule.starMap[id]
     Log.d("별","$star")
-    val ab = DBModule.starInfo[id]
-    Log.d("별","$ab")
+    val info = DBModule.starInfo[id]
+    Log.d("별","$id, $info")
 
 //    // 뷰모델을 초기화하고 데이터를 가져오는 블록
 //    LaunchedEffect(true) {
@@ -42,7 +42,22 @@ fun StarDetailScreen(navController: NavController, id: Int) {
 //        // 가져온 데이터를 UI에 업데이트
 //        starDetails = fetchedStarDetails.firstOrNull()
 //    }
-
+    val imageUrl: String
+    val description: String
+    when (id) {
+        32263 -> {
+            imageUrl = "https://www.astronomy.com/wp-content/uploads/sites/2/2023/03/ASYSK1221_03.jpg?fit=600%2C771"
+            description = "시리우스(Sirius)는 큰개자리 알파별(α Canis Majoris, α CMa)로, 밤 하늘에서 가장 밝은 별이다. 우리말로는 천랑성(天狼星)이라고 한다. 알파 센타우리와 함께 일반적으로 가장 잘 알려진 항성이다. 밤 하늘에서 가장 밝은 별이기 때문에 고대 이집트 시대부터 중요한 관찰 대상이었다. 특히 고대 이집트 문명에서는 해가 뜨기 전 새벽 시리우스가 동쪽하늘에서 떠오르는 시기에 나일강이 범람한다는 관계에서 알 수 있다."
+        }
+        11734 -> {
+            imageUrl = "https://mblogthumb-phinf.pstatic.net/MjAxNzAyMjRfMjcy/MDAxNDg3OTEwMzM4MDg4.D3qbWLYlbLUrjJEl8r6-feFuGbfoKdhI0GudrjjHkqUg.rE-8LqrXLQ5AOfw6SULN3owzEWBSK9UHuTaAIYio_acg.JPEG.mozmov/Polaris-01w.jpg?type=w800"
+            description = "폴라리스(Polaris)는 작은곰자리에서 가장 밝은 별(알파성)로, 현재의 북극성이기도 하다. 서기 3000년 경 이후에는 북극성에서 벗어난다. 하나의 별처럼 보이지만 사실은 다중성으로, 초거성 폴라리스 Aa가 다른 별들을 거느리고 있다."
+        }
+        else -> {
+            imageUrl = "https://image.librewiki.net/c/c5/Vega.jpg"
+            description = ""
+        }
+    }
     // LazyColumn으로 변경
     LazyColumn(
         modifier = Modifier
@@ -54,7 +69,7 @@ fun StarDetailScreen(navController: NavController, id: Int) {
             item {
                 Text(text = "${DBModule.nameMap[id]}", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 GlideImage(
-                    model = "https://image.librewiki.net/c/c5/Vega.jpg",
+                    model = imageUrl,
                     contentDescription = "설명",
                     modifier = Modifier.padding(0.dp, 20.dp),
                     contentScale = ContentScale.FillWidth
@@ -100,7 +115,7 @@ fun StarDetailScreen(navController: NavController, id: Int) {
             item {
                 // 설명
                 Text(
-                    text = "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다. ",
+                    text = description,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
             }
