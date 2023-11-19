@@ -184,17 +184,22 @@ dependencies {
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
 
-        //카메라X 사용
-        val camerax_version = "1.1.0-beta01"
-        implementation ("androidx.camera:camera-core:${camerax_version}")
-        implementation ("androidx.camera:camera-camera2:${camerax_version}")
-        implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
+    //카메라X 사용
+    val camerax_version = "1.1.0-beta01"
+    implementation ("androidx.camera:camera-core:${camerax_version}")
+    implementation ("androidx.camera:camera-camera2:${camerax_version}")
+    implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
 
-        implementation ("androidx.camera:camera-view:${camerax_version}")
-        implementation ("androidx.camera:camera-extensions:${camerax_version}")
+    implementation ("androidx.camera:camera-view:${camerax_version}")
+    implementation ("androidx.camera:camera-extensions:${camerax_version}")
 
-        implementation ("androidx.camera:camera-camera2:1.1.0-beta01")
-        implementation ("androidx.camera:camera-core:1.1.0-beta01")
+    implementation ("androidx.camera:camera-camera2:1.1.0-beta01")
+    implementation ("androidx.camera:camera-core:1.1.0-beta01")
+
+    val compose_version = "1.0.5"
+
+    implementation ("androidx.compose.ui:ui:$compose_version")
+    implementation ("androidx.compose.material3:material3:$compose_version")
 
 
     // STOMP 사용을 위한 라이브러리
