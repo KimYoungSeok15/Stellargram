@@ -3,9 +3,7 @@ package com.instargram101.member.api;
 import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.member.dto.request.SignMemberRequestDto;
 import com.instargram101.member.dto.request.findMemberListRequestDto;
-import com.instargram101.member.dto.response.MemberIdResponse;
-import com.instargram101.member.dto.response.MemberListResponse;
-import com.instargram101.member.dto.response.StatusResponse;
+import com.instargram101.member.dto.response.*;
 import com.instargram101.member.entity.Member;
 import com.instargram101.member.service.FollowService;
 import com.instargram101.member.service.MemberService;
@@ -57,8 +55,9 @@ public class MemberController {
     }
 
     @GetMapping("/others/{memberId}")
-    public ResponseEntity<CommonApiResponse<Member>> searchByMemberIdOthers(@PathVariable Long memberId) {
-        return ResponseEntity.ok(CommonApiResponse.OK(memberServiceImpl.searchMember(memberId)));
+    public ResponseEntity<CommonApiResponse<FindMemberResponseDto>> searchByMemberIdOthers(@RequestHeader("myId") Long myId, @PathVariable Long memberId) {
+        FindMemberResponseDto response = followServiceImpl.findFollow(myId, memberId);
+        return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
     @PatchMapping("/nickname")
@@ -110,9 +109,10 @@ public class MemberController {
     }
 
     @PostMapping("/nickname/search")
-    public ResponseEntity<CommonApiResponse<MemberListResponse>> searchMembersByNickname(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<CommonApiResponse<FindMemberListResponse>> searchMembersByNickname(@RequestHeader("myId") Long myId, @RequestBody Map<String, Object> request) {
         var searchNickname = (String) request.get("searchNickname");
-        MemberListResponse response = MemberListResponse.builder().members(memberServiceImpl.searchMembersByNickname(searchNickname)).build();
+        var memberList = memberServiceImpl.searchMembersByNickname(searchNickname);
+        FindMemberListResponse response = FindMemberListResponse.builder().members(followServiceImpl.findMembers(myId, memberList)).build();
         return ResponseEntity.ok(CommonApiResponse.OK(response));
     }
 
