@@ -361,7 +361,8 @@ fun ArticleUI(cardsState: MutableState<List<Card>>, navController: NavController
             GlideImage(
                 model = card.imageUrl,
                 contentDescription = "Card Image",
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillWidth,
             )
 
             // 좋아요 아이콘 및 텍스트

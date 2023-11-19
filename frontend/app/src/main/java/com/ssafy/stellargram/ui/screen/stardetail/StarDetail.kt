@@ -30,6 +30,8 @@ fun StarDetailScreen(navController: NavController, id: Int) {
     val starViewModel: StarDetailViewModel = viewModel()
     var star = DBModule.starMap[id]
     Log.d("별","$star")
+    val ab = DBModule.starInfo[id]
+    Log.d("별","$ab")
 
 //    // 뷰모델을 초기화하고 데이터를 가져오는 블록
 //    LaunchedEffect(true) {
