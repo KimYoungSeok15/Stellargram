@@ -72,10 +72,10 @@ fun GifImage(navController: NavController, selectedImageUri: Uri?, onImageSelect
         Box(
             modifier = Modifier
                 .padding(16.dp)
+                .border(width = 1.dp, Color.White, shape = RoundedCornerShape(20.dp))
                 .background(Color.White)
                 .width(400.dp)
                 .height(300.dp)
-                .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
                 .clickable {
                     val intent = Intent(context, CameraActivity::class.java)
                     context.startActivity(intent)

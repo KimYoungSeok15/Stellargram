@@ -11,6 +11,7 @@ import com.ssafy.stellargram.model.CardsResponse
 import com.ssafy.stellargram.model.CursorResponse
 import com.ssafy.stellargram.model.FollowCancelResponse
 import com.ssafy.stellargram.model.FollowersResponse
+import com.ssafy.stellargram.model.IdListRequest
 import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.MessageListResponse
@@ -116,7 +117,7 @@ interface ApiServiceForMember {
 
     // 멤버id 리스트로 멤버 정보 조회
     @POST("member/member-list")
-    suspend fun getMemberListByIds(@Body memberIds: List<Long>): Response<FollowersResponse>
+    suspend fun getMemberListByIds(@Body memberIds: IdListRequest): Response<FollowersResponse>
 }
 
 interface ApiServiceForCards {
