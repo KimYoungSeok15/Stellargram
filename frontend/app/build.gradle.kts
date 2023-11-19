@@ -185,7 +185,7 @@ dependencies {
 
 
     //카메라X 사용
-    val camerax_version = "1.1.0-beta01"
+    val camerax_version = "1.4.0-alpha02"
     implementation ("androidx.camera:camera-core:${camerax_version}")
     implementation ("androidx.camera:camera-camera2:${camerax_version}")
     implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
@@ -193,8 +193,8 @@ dependencies {
     implementation ("androidx.camera:camera-view:${camerax_version}")
     implementation ("androidx.camera:camera-extensions:${camerax_version}")
 
-    implementation ("androidx.camera:camera-camera2:1.1.0-beta01")
-    implementation ("androidx.camera:camera-core:1.1.0-beta01")
+//    implementation ("androidx.camera:camera-camera2:1.1.0-beta01")
+//    implementation ("androidx.camera:camera-core:1.1.0-beta01")
 
     val compose_version = "1.0.5"
 
