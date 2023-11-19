@@ -25,10 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.theme.Constant
+import com.ssafy.stellargram.ui.theme.Purple80
 
 
 @Composable
-fun PhotoScreen (navController: NavController) {
+fun PhotoScreen(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -39,112 +40,130 @@ fun PhotoScreen (navController: NavController) {
 }
 
 @Composable
-fun MoveButton(navController: NavController){
+fun MoveButton(navController: NavController) {
     val modifier = Modifier
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier
-    ) {
-        Box(
-            modifier = Modifier.weight(1f)
-                .padding(10.dp)
-                .width(250.dp)
-                .height(150.dp)
-                .clip(
-                    RoundedCornerShape(Constant.boxCornerSize.dp)
-                )
-                .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
-                .background(Color.LightGray)
-                .clickable {
-                    navController.navigate("camera1")
-                }
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter =
-                    painterResource(id = R.drawable.cameraicon),
-                    contentDescription = "촬영하기",
-                    modifier = Modifier
-                        .size(100.dp)
-                )
-                Text(
-                    text = "촬영하기",
-                    fontSize = 24.sp,
-                    color = Color.White,
-                )
-            }
-        }
-        Box(
-            modifier = Modifier.weight(1f)
-                .padding(10.dp)
-                .width(250.dp)
-                .height(150.dp)
-                .clip(
-                    RoundedCornerShape(Constant.boxCornerSize.dp)
-                )
-                .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
-                .background(Color.LightGray)
-                .clickable {
-                    navController.navigate("makecard")
-                }
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter =
-                    painterResource(id = R.drawable.writing),
-                    contentDescription = "카드 만들기",
-                    modifier = Modifier
-                        .size(100.dp)
 
-                )
-                Text(
-                    text = "카드 만들기",
-                    fontSize = 24.sp,
-                    color = Color.White,
-                )
-            }
-        }
-        Box(
-            modifier = Modifier.weight(1f)
-                .padding(10.dp)
-                .width(250.dp)
-                .height(150.dp)
-                .clip(
-                    RoundedCornerShape(Constant.boxCornerSize.dp)
-                )
-                .border(width = 1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
-                .background(Color.LightGray)
-                .clickable {
-                    navController.navigate("identify")
-                }
+    val boxModifier =
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = modifier
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            Box(
+                modifier =  Modifier
+                    .weight(1f)
+                    .padding(10.dp)
+                    .width(250.dp)
+                    .height(150.dp)
+                    .clip(
+                        RoundedCornerShape(Constant.boxCornerSize.dp)
+                    )
+                    .border(
+                        width = 2.dp,
+                        Purple80,
+                        shape = RoundedCornerShape(Constant.boxCornerSize.dp)
+                    )
+                    .background(Color.DarkGray)
+                    .clickable {
+                        navController.navigate("cameranew")
+                    }
             ) {
-                Image(
-                    painter =
-                    painterResource(id = R.drawable.identify),
-                    contentDescription = "사진 인식하기",
-                    modifier = Modifier
-                        .size(100.dp)
-                )
-                Text(
-                    text = "사진 인식하기",
-                    fontSize = 24.sp,
-                    color = Color.White,
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter =
+                        painterResource(id = R.drawable.cameraicon),
+                        contentDescription = "촬영하기",
+                        modifier = Modifier
+                            .size(70.dp)
+                    )
+                    Text(
+                        text = "촬영하기",
+                        fontSize = 24.sp,
+                        color = Color.White,
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(10.dp)
+                    .width(250.dp)
+                    .height(150.dp)
+                    .clip(
+                        RoundedCornerShape(Constant.boxCornerSize.dp)
+                    )
+                    .border(
+                        width = 2.dp,
+                        Purple80,
+                        shape = RoundedCornerShape(Constant.boxCornerSize.dp)
+                    )
+                    .background(Color.DarkGray)
+                    .clickable {
+                        navController.navigate("makecard")
+                    }
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter =
+                        painterResource(id = R.drawable.writing),
+                        contentDescription = "카드 만들기",
+                        modifier = Modifier
+                            .size(70.dp)
+
+                    )
+                    Text(
+                        text = "카드 만들기",
+                        fontSize = 24.sp,
+                        color = Color.White,
+                    )
+                }
+            }
+            Box(
+                modifier =  Modifier
+                    .weight(1f)
+                    .padding(10.dp)
+                    .width(250.dp)
+                    .height(150.dp)
+                    .clip(
+                        RoundedCornerShape(Constant.boxCornerSize.dp)
+                    )
+                    .border(
+                        width = 2.dp,
+                        Purple80,
+                        shape = RoundedCornerShape(Constant.boxCornerSize.dp)
+                    )
+                    .background(Color.DarkGray)
+                    .clickable {
+                        navController.navigate("identify")
+                    }
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter =
+                        painterResource(id = R.drawable.identify),
+                        contentDescription = "사진 인식하기",
+                        modifier = Modifier
+                            .size(70.dp)
+                    )
+                    Text(
+                        text = "사진 인식하기",
+                        fontSize = 24.sp,
+                        color = Color.White,
+                    )
+                }
             }
         }
-    }
 }
