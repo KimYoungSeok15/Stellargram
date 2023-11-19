@@ -4,6 +4,7 @@ import com.instargram101.global.common.response.CommonApiResponse;
 import com.instargram101.observesite.business.ObservesiteBusiness;
 import com.instargram101.observesite.dto.request.ObserveSiteInfoRequestDto;
 import com.instargram101.observesite.dto.response.SampleResponseDto;
+import com.instargram101.observesite.repoository.ObserveSiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class ObservesiteController {
 
     private final ObservesiteBusiness observeSiteBusiness;
+    private final ObserveSiteRepository observeSiteRepository;
 
     @GetMapping("test")
     public ResponseEntity<CommonApiResponse> sampleController(){ //ResponseEntity로 안 감싸줘도 됨.
@@ -26,6 +28,12 @@ public class ObservesiteController {
         //var response = CommonApiResponse.OK(data); // 기본 message "ok" 출력.
         var response = CommonApiResponse.OK("sample message", data); //넣고 싶은 데이터를 넣으면 된다.
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("{observeSiteId}")
+    public ResponseEntity<CommonApiResponse> getObserveSiteById(@PathVariable String observeSiteId){
+        var observeSite = observeSiteRepository.findById(observeSiteId);
+        return ResponseEntity.ok(CommonApiResponse.OK(observeSite));
     }
 
     @PostMapping("")
