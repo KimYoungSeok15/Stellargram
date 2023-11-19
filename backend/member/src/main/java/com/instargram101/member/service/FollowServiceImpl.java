@@ -64,8 +64,8 @@ public class FollowServiceImpl implements FollowService {
         Member followingInfo = memberRepository.findByMemberIdAndActivated(followee, true)
                 .orElseThrow(() -> new CustomException(FollowErrorCode.FOLLOWEE_Not_Found));
         if(myInfo.getMemberId() != followingInfo.getMemberId()) {
-            Optional<Optional<Follow>> prefollow = Optional.ofNullable(followRepository.findByFollowerIdAndFolloweeId(myInfo.getMemberId(), followingInfo.getMemberId()));
-            if(prefollow == null) {
+            Optional<Follow> prefollow = followRepository.findByFollowerIdAndFolloweeId(myInfo.getMemberId(), followingInfo.getMemberId());
+            if(prefollow.isEmpty()) {
                 followRepository.save(Follow.builder().followee(followingInfo).follower(myInfo).build());
                 setFollowingCount(myInfo, 1);
                 setFollowCount(followingInfo, 1);
