@@ -7,11 +7,14 @@ import android.hardware.camera2.CaptureRequest
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.ViewGroup
+import androidx.window.WindowManager
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.Camera2CameraControl
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.camera2.interop.CaptureRequestOptions
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -20,6 +23,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.view.PreviewView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
@@ -31,10 +35,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import java.lang.Integer.max
+import java.lang.Integer.min
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.abs
 
 @OptIn(ExperimentalCamera2Interop::class)
 class CameraXImpl : CameraXNew {
@@ -56,9 +63,24 @@ class CameraXImpl : CameraXNew {
     @OptIn(ExperimentalCamera2Interop::class)
     override fun initialize(context: Context) {
         previewView = PreviewView(context)
+        previewView.scaleType = PreviewView.ScaleType.FIT_CENTER
+        previewView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        val windowManager = WindowManager(context)
+
+        // Get screen metrics used to setup camera for full screen resolution
+        val metrics = windowManager.getCurrentWindowMetrics().bounds
+        Log.d("스크린 metrics", "Screen metrics: ${metrics.width()} x ${metrics.height()}")
+
+        val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
+
+
 
         preview =
-            Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
+            Preview.Builder()
+                .build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
 
         cameraProvider = ProcessCameraProvider.getInstance(context)
         provider = cameraProvider.get()
@@ -79,6 +101,11 @@ class CameraXImpl : CameraXNew {
 
         cameraProvider.addListener({
             CoroutineScope(Dispatchers.Main).launch {
+//                if (camera != null) {
+//                    // Must remove observers from the previous camera instance
+//                    camera!!.cameraInfo.cameraState.removeObservers(lifecycleOwner)
+//                }
+
                 camera = provider.bindToLifecycle(
                     lifecycleOwner,
                     cameraSelector,
@@ -180,3 +207,19 @@ class CameraXImpl : CameraXNew {
         camera2control.clearCaptureRequestOptions()
     }
 }
+
+private fun aspectRatio(width: Int, height: Int): Int {
+    val previewRatio = max(width, height).toDouble() / min(width, height)
+    if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
+        return AspectRatio.RATIO_4_3
+    }
+    return AspectRatio.RATIO_16_9
+
+
+}
+
+private const val TAG = "CameraXBasic"
+private const val FILENAME = "yyyy-MM-dd-HH-mm-ss-SSS"
+private const val PHOTO_TYPE = "image/jpeg"
+private const val RATIO_4_3_VALUE = 4.0 / 3.0
+private const val RATIO_16_9_VALUE = 16.0 / 9.0

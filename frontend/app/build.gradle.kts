@@ -226,6 +226,9 @@ dependencies {
     // 이미지 크로퍼 라이브러리
     implementation("io.github.mr0xf00:easycrop:0.1.1")
 
+    //WindowManager
+    implementation("androidx.window:window:1.0.0-alpha09")
+
 }
 
 // Dependency injection with Hilt

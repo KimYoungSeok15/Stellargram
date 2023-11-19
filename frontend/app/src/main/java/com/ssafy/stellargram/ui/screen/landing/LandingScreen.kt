@@ -93,12 +93,12 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
 
          Button(
              onClick = {
-                 navController.navigate(Screen.Camera.route)
+                 navController.navigate(Screen.CameraNew.route)
              },
              modifier = Modifier
                  .padding(16.dp)
          ) {
-             Text(text = "카메라")
+             Text(text = "새 카메라")
          }
     }
 }
