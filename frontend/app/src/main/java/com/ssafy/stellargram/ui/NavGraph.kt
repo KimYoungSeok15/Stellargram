@@ -74,8 +74,8 @@ fun NavGraph(
 //                CameraScreen(navController = navController)
 //            }
 //        }
-        composable(route = Screen.Camera.route) {
-            BaseFrame(navController, screen = Screen.Camera) {
+        composable(route = Screen.Camera1.route) {
+            BaseFrame(navController, screen = Screen.Camera1) {
                 Camera1Screen(navController = navController)
             }
         }

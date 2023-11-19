@@ -104,7 +104,8 @@ fun SkyMapFrame(
                 val items = listOf(
                     Screen.Home,
                     Screen.SkyMap,
-                    Screen.Camera,
+//                    Screen.Camera,
+                    Screen.Photo,
                     Screen.GoogleMap,
                     Screen.MyPage
                 )
