@@ -1,6 +1,9 @@
 package com.ssafy.stellargram.ui.screen.stardetail
 
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,12 +12,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,26 +33,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.ssafy.stellargram.R
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.module.DBModule
+import com.ssafy.stellargram.ui.common.CustomTextButton
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun StarDetailScreen(navController: NavController, id: Int) {
     val starViewModel: StarDetailViewModel = viewModel()
     var star = DBModule.starMap[id]
-    Log.d("별","$star")
-    val info = DBModule.starInfo[id]
-    Log.d("별","$id, $info")
+    val myId = StellargramApplication.prefs.getString("memberId","").toLong()
+    var dialogVisible by remember { mutableStateOf(false) }
 
-//    // 뷰모델을 초기화하고 데이터를 가져오는 블록
-//    LaunchedEffect(true) {
-//        // 비동기 작업을 수행하여 별자리 세부 정보를 가져옵니다.
-//        val fetchedStarDetails = withContext(Dispatchers.IO) {
-//            starViewModel.getStarResults(name)
-//        }
-//        // 가져온 데이터를 UI에 업데이트
-//        starDetails = fetchedStarDetails.firstOrNull()
-//    }
     val imageUrl: String
     val description: String
     when (id) {
@@ -58,6 +62,12 @@ fun StarDetailScreen(navController: NavController, id: Int) {
             description = ""
         }
     }
+    val likeStarIds = starViewModel.likeStarIds
+    LaunchedEffect(Unit) {
+        val favoriteStars = starViewModel.getFavoriteStars()
+        starViewModel.updateLikeStarIds(favoriteStars)
+    }
+
     // LazyColumn으로 변경
     LazyColumn(
         modifier = Modifier
@@ -74,6 +84,35 @@ fun StarDetailScreen(navController: NavController, id: Int) {
                     modifier = Modifier.padding(0.dp, 20.dp),
                     contentScale = ContentScale.FillWidth
                 )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 4.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            if (likeStarIds.contains(id)) {
+                                starViewModel.unfavoriteStar(id)
+                                dialogVisible = true
+                            } else {
+                                starViewModel.favoriteStar(id)
+                                dialogVisible = true
+                            }
+                        },
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Image(
+                        painter = if (likeStarIds.contains(id)) painterResource(R.drawable.like) else painterResource(R.drawable.unfilledstar),
+                        contentDescription = null, // 이미지 설명
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = if (likeStarIds.contains(id)) "즐겨찾기 취소" else "즐겨찾기",
+                        style = TextStyle(fontSize = 20.sp),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
 
             // 최상위 Row 추가
@@ -126,5 +165,21 @@ fun StarDetailScreen(navController: NavController, id: Int) {
                 Text(text = "해당 별에 대한 정보가 없습니다!")
             }
         }
+    }
+    if (dialogVisible) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = {
+                dialogVisible = false
+            },
+            text = { Text(if (likeStarIds.contains(id)) "즐겨찾기 완료" else "즐겨찾기 취소 완료") },
+            confirmButton = {
+                CustomTextButton(
+                    onClick = {
+                        dialogVisible = false
+                    },
+                    text = "확인"
+                )
+            }
+        )
     }
 }
