@@ -201,6 +201,14 @@ dependencies {
     implementation ("androidx.compose.ui:ui:$compose_version")
     implementation ("androidx.compose.material3:material3:$compose_version")
 
+    implementation ("androidx.activity:activity-compose:1.4.0")
+    implementation ("androidx.compose.foundation:foundation:1.0.5")
+    implementation ("androidx.compose.material:material:1.0.5")
+    implementation ("androidx.compose.ui:ui-tooling:1.0.5")
+    implementation ("androidx.camera:camera-camera2:1.1.0")
+    implementation ("androidx.camera:camera-lifecycle:1.1.0")
+    implementation ("androidx.camera:camera-view:1.0.0-beta24")
+
 
     // STOMP 사용을 위한 라이브러리
     implementation("com.github.bishoybasily:stomp:2.0.5")
