@@ -119,6 +119,7 @@ interface ApiServiceForMember {
     ): MemberSearchResponse
 
     // 멤버id 리스트로 멤버 정보 조회
+    @POST("member/member-list")
     suspend fun getMemberListByIds(@Body memberIds: IdListRequest): Response<FollowersResponse>
 
     // 천체 즐겨찾기하기
