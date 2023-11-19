@@ -3,6 +3,7 @@ package com.ssafy.stellargram.ui.screen.skymap
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,6 +37,8 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,8 +46,11 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.LocationServices
+import com.ssafy.stellargram.data.db.entity.Star
 import com.ssafy.stellargram.module.DBModule
+import com.ssafy.stellargram.module.DBModule.starMap
 import com.ssafy.stellargram.module.ScreenModule
+import com.ssafy.stellargram.ui.Screen
 import com.ssafy.stellargram.util.Temperature
 import kotlinx.coroutines.delay
 import kotlin.math.ln
@@ -99,6 +106,7 @@ fun SkyMapScreen(navController : NavController){
     var screenHeight by remember{mutableIntStateOf(0)}
     var starArray: Array<DoubleArray> by remember{ mutableStateOf(arrayOf()) }
     var nameMap: HashMap<Int, String> by remember{ mutableStateOf(hashMapOf()) }
+    var starMap: HashMap<Int, Star> by remember{ mutableStateOf(hashMapOf()) }
     var starSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
     var starInfo: HashMap<Int, Int> by remember{ mutableStateOf(hashMapOf())}
     var constSight: Array<DoubleArray> by remember{ mutableStateOf(arrayOf())}
@@ -115,6 +123,7 @@ fun SkyMapScreen(navController : NavController){
         while(starArray.isEmpty() || starInfo.isEmpty() || screenHeight == 0 || screenWidth == 0){
             starArray = DBModule.gettingStarArray()
             nameMap = DBModule.gettingNameMap()
+            starMap = DBModule.gettingStarMap()
             screenHeight = ScreenModule.gettingHeight()
             screenWidth = ScreenModule.gettingWidth()
             starInfo = DBModule.gettingStarInfo()
@@ -281,11 +290,23 @@ fun SkyMapScreen(navController : NavController){
 //            Text(text = "${orientationValues.second}")
 //            Text(text = "${orientationValues.third}")
 //            Text(text="$latitude , $longitude")
-
-            if(clicked) Text("${nameMap[clickedIndex]}",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = Color.White)
+//            Log.d("123", "clickedIndex: ${clickedIndex}")
+//            Log.d("123", "nameMap: ${nameMap[clickedIndex]}")
+//            Log.d("123", "starInfo: ${starInfo[clickedIndex]}")
+//            Log.d("123", "starMap: ${starMap[clickedIndex]}")
+            if (clicked) {
+                ClickableText(
+                    text =
+                        AnnotatedString(nameMap[clickedIndex].toString()),
+                    style = TextStyle(color = Color.White,
+                        textAlign = TextAlign.Center),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        // Navigate to the StarDetail screen
+                        navController.navigate(route = "${Screen.StarDetail.route}/${starMap[clickedIndex]!!.id}")
+                    }
+                )
+            }
 //            Slider(
 //                value = zoom,
 //                onValueChange = {
