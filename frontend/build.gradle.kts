@@ -5,3 +5,4 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.44" apply false // Dependency injection with Hilt
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false // for use secret key
 }
+

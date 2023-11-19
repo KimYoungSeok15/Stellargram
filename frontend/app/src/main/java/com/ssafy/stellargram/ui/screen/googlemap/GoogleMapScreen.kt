@@ -182,21 +182,28 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
 //    }
 //    var lat by remember { mutableStateOf("")}
 //    var lng by remember { mutableStateOf("")}
+
+
     LaunchedEffect(key1 = cameraPositionState.isMoving){
         if (!cameraPositionState.isMoving) {
             // it will be done only when the map stops moving.
             val cameraPosition = cameraPositionState.position.target
             viewModel.getAddress(cameraPosition)
+            try{
+                Log.d("content", "get inside")
+                viewModel.getObserveSiteLists()
+            } catch(e: Exception){
+                Log.d("error", "Cannot get observe site lists.")
+            }
         }
     }
 
     LaunchedEffect(key1 = viewModel.currentLatLong ){
-        val zoomLevel = cameraPositionState.position.zoom
-        val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, zoomLevel)
+        viewModel.zoomLevel = cameraPositionState.position.zoom
+        val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, viewModel.zoomLevel)
         cameraPositionState.move(update)
     }
 
-    val markerList = remember { mutableStateListOf<Pair<LatLng, String>>() }
     val bitmap = AppCompatResources.getDrawable(context,R.drawable.telescope_svgrepo_com)!!.toBitmap(100,100)
     Box(Modifier.fillMaxWidth()) {
         GoogleMap(
@@ -206,10 +213,17 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             cameraPositionState = cameraPositionState,
             modifier = Modifier.fillMaxSize(),
             onMapLongClick = { latLng ->
-                markerList.add(Pair(latLng,viewModel.getFullAddress(latLng))) },
+                    try{
+                    viewModel.postObserveSite(latLng)
+                    viewModel.getObserveSiteLists()
+//                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
+                } catch(e: Exception) {
+                    Log.d("error", e.message?:"")
+                }
+            },
             content = {
-                markerList.forEach {
-                    CustomMarker(latlng = it.first, title = it.second, bitmap = bitmap)
+                viewModel.markerList.forEach {
+                    CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap)
                 }
             }
         )
@@ -249,7 +263,7 @@ fun Searchbar(viewModel: GoogleMapViewModel){
             onValueChange = {
                 viewModel.textIpt = it
                 viewModel.searchPlaces(it)
-                            },
+            },
             singleLine = true,
             keyboardActions = KeyboardActions(onDone = {Log.d("ENTER_KEY_ACTION",viewModel.address)}),
             modifier = Modifier
