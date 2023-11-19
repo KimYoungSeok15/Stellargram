@@ -44,8 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.viewinterop.AndroidView
 import android.app.Application
 
-
-
 private const val REQUEST_CAMERA_PERMISSION = 200
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -84,7 +82,7 @@ class CameraActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                CameraControlScreen()
+                createCaptureSession()
             }
         }
 
@@ -96,103 +94,6 @@ class CameraActivity : ComponentActivity() {
         }
 
         openCamera()
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @Composable
-    fun CameraControlScreen() {
-        var capturedImage by remember { mutableStateOf<Uri?>(null) }
-        val scaffoldState = rememberScaffoldState()
-        val scope = rememberCoroutineScope()
-
-        DisposableEffect(this) {
-            onDispose {
-                capturedImage = null
-            }
-        }
-
-        Scaffold(
-            scaffoldState = scaffoldState,
-            topBar = {
-                TopAppBar(
-                    title = { Text("Camera Control") },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                scope.launch {
-                                    scaffoldState.drawerState.open()
-                                }
-                            }
-                        ) {
-                            Text(text = "Setting")
-                        }
-                    }
-                )
-            },
-            content = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black)
-                        .padding(16.dp)
-                ) {
-
-                    AndroidView(
-                        factory = { context ->
-                            SurfaceView(context).apply {
-                                holder.addCallback(object : SurfaceHolder.Callback {
-                                    override fun surfaceCreated(holder: SurfaceHolder) {
-                                        startPreview(holder.surface)
-                                    }
-
-                                    override fun surfaceChanged(
-                                        holder: SurfaceHolder,
-                                        format: Int,
-                                        width: Int,
-                                        height: Int
-                                    ) {
-                                    }
-
-                                    override fun surfaceDestroyed(holder: SurfaceHolder) {
-                                        closeCamera()
-                                    }
-                                })
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    )
-
-                    FloatingActionButton(
-                        onClick = {
-                            startCapture()
-                            capturedImage?.let { uri ->
-                                takePicture.launch(uri)
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .size(56.dp)
-                            .background(MaterialTheme.colorScheme.primary),
-                        content = {
-                            Text(text = "camera")
-                        }
-                    )
-                }
-
-                modifier = Modifier.CameraSettingsDrawer(
-                    onIsoChanged = { isoValue ->
-                        Log.d("CameraActivity", "ISO 변경: $isoValue")
-                    },
-                    onWhiteBalanceChanged = { whiteBalanceValue ->
-                        Log.d("CameraActivity", "화이트 밸런스 변경: $whiteBalanceValue")
-                    },
-                    onShutterSpeedChanged = { shutterSpeedValue ->
-                        Log.d("CameraActivity", "셔터 스피드 변경: $shutterSpeedValue")
-                    }
-                )
-            }
-        )
     }
 
     private fun openCamera() {
@@ -243,6 +144,7 @@ class CameraActivity : ComponentActivity() {
                 buffer.get(bytes)
                 saveImage(bytes)
                 image.close()
+                closeCamera()
             },
             backgroundHandler
         )
@@ -252,12 +154,16 @@ class CameraActivity : ComponentActivity() {
                 override fun onConfigured(session: CameraCaptureSession) {
                     cameraCaptureSession = session
                     startPreview()
+                    startCapture()
                 }
 
                 override fun onConfigureFailed(session: CameraCaptureSession) {
                     Log.e(TAG, "카메라 캡처 세션 구성 실패")
-                } }, null)
+                }
+            }, null)
     }
+
+
 
     private fun startPreview() {
         captureRequestBuilder =
@@ -278,28 +184,32 @@ class CameraActivity : ComponentActivity() {
             cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
 
         captureRequestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 400)
-
-        // Set White Balance value (Assuming COLOR_CORRECTION_MODE and COLOR_CORRECTION_GAINS are the keys for White Balance)
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_OFF)
-        captureRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE, CameraMetadata.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX)
+        captureRequestBuilder.set(
+            CaptureRequest.COLOR_CORRECTION_MODE,
+            CameraMetadata.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX
+        )
         captureRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_GAINS, RATIONAL_WHITE_BALANCE_7600K)
-
-        captureRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, 15000000000L) // 15s
+        captureRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, 15000000000L)
 
         captureRequestBuilder.addTarget(imageReader.surface)
 
         val file = File(externalMediaDirs.first(), "${System.currentTimeMillis()}.jpg")
         val imageCaptureUri = Uri.fromFile(file)
+
+        saveImage(imageCaptureUri)
+
         (application as CameraApplication).capturedImageUri = imageCaptureUri
         captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, 0)
         captureRequestBuilder.addTarget(SurfaceHolder(holder))
 
         cameraCaptureSession.capture(
             captureRequestBuilder.build(),
-            null,
+            CameraCaptureSession.CaptureCallback(),
             backgroundHandler
         )
     }
+
 
 
     private fun closeCamera() {
@@ -347,6 +257,7 @@ class CameraActivity : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun Modifier.CameraSettingsDrawer(
     onIsoChanged: (Int) -> Unit,
