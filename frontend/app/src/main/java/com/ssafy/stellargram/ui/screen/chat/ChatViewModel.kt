@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.beust.klaxon.Klaxon
 import com.gmail.bishoybasily.stomp.lib.Event
 import com.gmail.bishoybasily.stomp.lib.StompClient
+import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.ChatRoom
 import com.ssafy.stellargram.model.MessageForReceive
@@ -21,6 +22,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor() : ViewModel() {
+    // 내 아이디 가져오기
+    private val myId = StellargramApplication.prefs.getString("myId", "").toLong()
+
+
     val initRoomId: Int = -1
     val initPersonnel = 0
     val initSiteId = "initSite"
@@ -73,7 +78,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         if (roomId != initRoomId) {
 
             val response = NetworkModule.provideRetrofitInstanceChat()
-                .getPrevChats(myId = TestValue.myId, chatRoomId = roomId, cursor = nextCursor)
+                .getPrevChats(myId = myId, chatRoomId = roomId, cursor = nextCursor)
             if (response?.code == 200) {
                 Log.d("getMessages response", response.data.messageList.toString())
                 privateMessages.addAll(response.data.messageList.reversed())
@@ -94,7 +99,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
             if (roomId != initRoomId) {
 
                 val response = NetworkModule.provideRetrofitInstanceChat()
-                    .getPrevChats(myId = TestValue.myId, chatRoomId = roomId, cursor = nextCursor)
+                    .getPrevChats(myId = myId, chatRoomId = roomId, cursor = nextCursor)
                 if (response?.code == 200) {
                     Log.d("getMessages response", response.data.messageList.toString())
                     privateMessages.addAll(response.data.messageList.reversed())
@@ -190,7 +195,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     fun publishToChannel(roomId: Int, messageContent: String) {
         val newMessage = JSONObject()
 
-        newMessage.put("memberId", TestValue.myId.toLong())
+        newMessage.put("memberId", myId)
         newMessage.put("unixTimestamp", System.currentTimeMillis())
         newMessage.put("content", messageContent)
         Log.d("publish try", newMessage.toString())
