@@ -10,7 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ssafy.stellargram.ui.screen.base.BaseFrame
+import com.ssafy.stellargram.ui.screen.camera.Camera1Screen
 import com.ssafy.stellargram.ui.screen.camera.CameraScreen
+import com.ssafy.stellargram.ui.screen.cameranew.CameraNewScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomListScreen
 import com.ssafy.stellargram.ui.screen.chat.ChatRoomScreen
 import com.ssafy.stellargram.ui.screen.googlemap.GoogleMapScreen
@@ -20,6 +22,7 @@ import com.ssafy.stellargram.ui.screen.kakao.KakaoScreen
 import com.ssafy.stellargram.ui.screen.landing.LandingScreen
 import com.ssafy.stellargram.ui.screen.makecard.MakeCardScreen
 import com.ssafy.stellargram.ui.screen.mypage.MypageScreen
+import com.ssafy.stellargram.ui.screen.photo.PhotoScreen
 import com.ssafy.stellargram.ui.screen.search.SearchScreen
 import com.ssafy.stellargram.ui.screen.signup.SignUpScreen
 import com.ssafy.stellargram.ui.screen.skymap.SkyMapFrame
@@ -65,12 +68,21 @@ fun NavGraph(
 
         composable(route = Screen.SkyMap.route){
             SkyMapFrame(navController, screen = Screen.SkyMap) {
-                SkyMapScreen(navController = navController)
             }
         }
-        composable(route = Screen.Camera.route) {
-            BaseFrame(navController, screen = Screen.Camera) {
-                CameraScreen(navController = navController)
+//        composable(route = Screen.Camera.route) {
+//            BaseFrame(navController, screen = Screen.Camera) {
+//                CameraScreen(navController = navController)
+//            }
+//        }
+        composable(route = Screen.Camera1.route) {
+            BaseFrame(navController, screen = Screen.Camera1) {
+                Camera1Screen(navController = navController)
+            }
+        }
+        composable(route = Screen.Photo.route) {
+            BaseFrame(navController, screen = Screen.Photo) {
+                PhotoScreen(navController = navController)
             }
         }
         composable(route = Screen.GoogleMap.route) {
@@ -121,6 +133,9 @@ fun NavGraph(
         }
         composable(route = Screen.MakeCard.route){
             MakeCardScreen(navController = navController)
+        }
+        composable(route = Screen.CameraNew.route){
+            CameraNewScreen(navController = navController)
         }
     }
 }

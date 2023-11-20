@@ -87,7 +87,7 @@ public class StarcardServiceImpl implements StarcardService {
 
         Starcard starcard = starcardRepository.findById(cardId)
                 .orElseThrow(()-> new CustomException((StarcardErrorCode.Starcard_Not_Found)));
-        if(starcard.getMemberId() != myId) {
+        if(!starcard.getMemberId().equals(myId)) {
             throw new CustomException(StarcardErrorCode.Starcard_Forbidden);
         }
         starcardRepository.deleteById(cardId);
@@ -129,7 +129,12 @@ public class StarcardServiceImpl implements StarcardService {
     public String likeCard(Long myId, Long cardId) {
         AtomicReference<Boolean> notPresent = new AtomicReference<>(false);
         starcardLikeRepository.findByMemberIdAndCardId(myId, cardId).ifPresentOrElse(
-                starcardLikeRepository::delete,
+                starcardLike -> {
+                    starcardLikeRepository.delete(starcardLike);
+                    Starcard starcard = starcardRepository.findById(cardId).get();
+                    starcard.setLikeCount(starcard.getLikeCount()-1);
+                    starcardRepository.save(starcard);
+                },
                 () ->{
                     notPresent.set(true);
                     Starcard starcard = starcardRepository.findById(cardId).orElseThrow(
@@ -140,6 +145,8 @@ public class StarcardServiceImpl implements StarcardService {
                             .card(starcard)
                             .build();
 
+                    starcard.setLikeCount(starcard.getLikeCount()+1);
+                    starcardRepository.save(starcard);
                     starcardLikeRepository.save(starcardLike);
                 }
         );

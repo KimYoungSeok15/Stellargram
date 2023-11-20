@@ -33,23 +33,24 @@ import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.ui.Screen
+import com.ssafy.stellargram.ui.common.CustomTextButton
 import java.io.File
 
 @Composable
 @androidx.media3.common.util.UnstableApi
-fun LandingScreen(navController: NavController){
+fun LandingScreen(navController: NavController) {
     Column(
         modifier = Modifier
-    ){
-        Box(contentAlignment = Alignment.Center){
+    ) {
+        Box(contentAlignment = Alignment.Center) {
             MediaDevice(Modifier.zIndex(0f))
-            LandingComponent(navController,Modifier.zIndex(1f))
+            LandingComponent(navController, Modifier.zIndex(1f))
         }
     }
 }
 
 @Composable
-fun LandingComponent(navController: NavController, modifier: Modifier){
+fun LandingComponent(navController: NavController, modifier: Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -69,17 +70,8 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
                 .clickable { navController.navigate("kakao") }
         )
 
-//         Button(
-//             onClick = {
-//                 navController.navigate(Screen.SkyMap.route)
-//             },
-//             modifier = Modifier
-//                 .padding(16.dp)
-//         ) {
-//             Text(text = "move to sphere")
-//         }
 
-//         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
+         // TODO: 채팅방 임시 연결버튼. 나중에 지우기
 //         Button(
 //             onClick = {
 // //                navController.navigate(Screen.ChatRoom.route)
@@ -89,16 +81,6 @@ fun LandingComponent(navController: NavController, modifier: Modifier){
 //                 .padding(16.dp)
 //         ) {
 //             Text(text = "채팅방")
-//         }
-
-//         Button(
-//             onClick = {
-//                 navController.navigate(Screen.Camera.route)
-//             },
-//             modifier = Modifier
-//                 .padding(16.dp)
-//         ) {
-//             Text(text = "카메라")
 //         }
     }
 }
@@ -129,9 +111,9 @@ fun MediaDevice(modifier: Modifier) {
             }
     }
     DisposableEffect(Unit) {
-        onDispose{
+        onDispose {
             exoPlayer.release()
-            Log.d("EXOPLAYER","DISPOSED")
+            Log.d("EXOPLAYER", "DISPOSED")
         }
     }
     Box(modifier = modifier) {
@@ -142,9 +124,11 @@ fun MediaDevice(modifier: Modifier) {
                 resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
             }
         })
-        Box(modifier = Modifier
-            .matchParentSize()
-            .alpha(0.5f)
-            .background(Color.Black))
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .alpha(0.5f)
+                .background(Color.Black)
+        )
     }
 }

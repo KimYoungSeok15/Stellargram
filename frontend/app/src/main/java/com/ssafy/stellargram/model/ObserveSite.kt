@@ -13,3 +13,19 @@ data class SiteInfoResponse(
     val message: String,
     val data: SiteInfo
 )
+
+data class SiteInfoByIdResponse(
+    val code: Int,
+    val message: String,
+    val data: SiteInfoById
+)
+
+data class SiteInfoById(
+    val observeSite: String,
+    val name:String,
+    val latitude: Double,
+    val longitude: Double,
+    val reviewCount: Int,
+    val ratingSum: Int,
+    val memberId: Long
+)

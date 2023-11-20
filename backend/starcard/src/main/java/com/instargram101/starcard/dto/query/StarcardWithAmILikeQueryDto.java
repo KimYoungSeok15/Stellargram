@@ -19,6 +19,7 @@ public class StarcardWithAmILikeQueryDto {
     private Long memberId;
     private String observeSiteId;
     private String imagePath;
+    private String imageUrl;
     private String content;
     private LocalDateTime photoAt;
     private Enum<StarcardCategory> category;
@@ -33,6 +34,7 @@ public class StarcardWithAmILikeQueryDto {
                 .memberId(starcard.getMemberId())
                 .observeSiteId(starcard.getObserveSiteId())
                 .imagePath(starcard.getImagePath())
+                .imageUrl(starcard.getImageUrl())
                 .content(starcard.getContent())
                 .photoAt(starcard.getPhotoAt())
                 .category(starcard.getCategory())
