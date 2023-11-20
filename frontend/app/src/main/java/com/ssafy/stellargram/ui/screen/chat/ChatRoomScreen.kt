@@ -109,6 +109,7 @@ fun ChatRoomScreen(
         latitude = thisLatitude,
         longitude = thisLongitude,
         observeSiteId = observeSiteId,
+        navController = navController,
         customChild = {
             // 메세지들
             LazyColumn(

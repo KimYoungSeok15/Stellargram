@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ssafy.stellargram.ui.theme.Constant
 
 @Composable
@@ -23,7 +24,8 @@ fun ScreenContainer(
     isChatScreen: Boolean = true,
     latitude: Double = 1000.0,
     longitude: Double = 1000.0,
-    observeSiteId:String = ""
+    observeSiteId:String = "",
+            navController:NavController
 ) {
     // css. 스크린 컨테이너 modifier
     val screenModifier: Modifier = Modifier
@@ -46,7 +48,8 @@ fun ScreenContainer(
             isChatScreen = isChatScreen,
             longitude = longitude,
             latitude = latitude,
-                    observeSiteId = observeSiteId
+                    observeSiteId = observeSiteId,
+            navConroller = navController
         )
 
         // 사이

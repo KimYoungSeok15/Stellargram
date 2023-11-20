@@ -39,3 +39,14 @@ data class JoinChatCoomResponse(
 data class roomIdInfo(
     val roomNumber:Int
 )
+
+data class LeaveChatRoomResponse(
+    val code: Int,
+    val message: String,
+    val data: leaveChatRoomData
+
+)
+
+data class leaveChatRoomData(
+    val chatRoomId:Int
+)
