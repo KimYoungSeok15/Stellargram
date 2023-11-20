@@ -95,7 +95,7 @@ fun BaseFrame(
                         val navIconResource = when {
                             screen.route.startsWith("stardetail") -> R.drawable.back
                             screen.route == "skymap" -> R.drawable.menu
-                            screen.route == "mypage" && userId == memberID -> R.drawable.writing
+//                            screen.route == "mypage" && userId == memberID -> R.drawable.writing
                             else -> null
                         }
 

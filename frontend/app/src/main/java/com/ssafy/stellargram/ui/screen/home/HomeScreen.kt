@@ -95,6 +95,7 @@ fun HomeScreen(navController: NavController) {
     // baseTime을 hhmm 형식으로 설정
     val baseTime = SimpleDateFormat("HHmm").format(calendar.time)
     var coordinatesXy: CoordinatesXy? by remember { mutableStateOf(null) }
+    coordinatesXy =  CoordinatesXy(nx=61, ny=125)
     Log.d("Location1","날짜가져옴, 위치 가져오기전")
     // 현재 위경도를 받아오고, 변환 함수에 넣어 nx, ny를 coordinatesXy에 저장
     val locationListener = LocationListener { location ->
@@ -131,7 +132,7 @@ fun HomeScreen(navController: NavController) {
         }
     } else {
         // 위치 권한이 허용되지 않은 경우
-        // 사용자에게 위치 권한을 요청할 수 있음 ( 추후 구현 )
+        // 사용자에게 위치 권한을 요청할 수 있음
     }
 
     LaunchedEffect(Unit,memberID){
