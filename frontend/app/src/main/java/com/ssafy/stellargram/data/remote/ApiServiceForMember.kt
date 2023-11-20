@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.data.remote
 
+import androidx.room.Delete
 import com.ssafy.stellargram.model.AstronomicalEventResponse
 import com.ssafy.stellargram.model.CardDeleteResponse
 import com.ssafy.stellargram.model.CardLikeResponse
@@ -15,6 +16,7 @@ import com.ssafy.stellargram.model.IdListRequest
 import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
 import com.ssafy.stellargram.model.JoinChatCoomResponse
+import com.ssafy.stellargram.model.LeaveChatRoomResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
@@ -254,7 +256,11 @@ interface ApiServiceForChat {
         @Path("observeSiteId") observeSiteId: String,
     ): JoinChatCoomResponse
 
-
+    // 채팅방 나가기
+    @DELETE("chat/leave/{obserbeSiteId}")
+    suspend fun leaveChatRoom(
+        @Path("obserbeSiteId") observeSiteId: String,
+    ): LeaveChatRoomResponse
 }
 
 interface ApiServiceForObserveSite {
