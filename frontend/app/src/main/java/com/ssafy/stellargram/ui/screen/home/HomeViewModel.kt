@@ -353,6 +353,7 @@ fun TodaysPicture(viewModel: HomeViewModel) {
                     model = card.memberProfileImageUrl,
                     contentDescription = "123",
                     modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillWidth,
                 )
             }
 

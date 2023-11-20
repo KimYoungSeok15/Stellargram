@@ -28,9 +28,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,13 +61,18 @@ import com.ssafy.stellargram.StellargramApplication
 import com.ssafy.stellargram.data.remote.ApiServiceForCards
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.Card
+import com.ssafy.stellargram.model.IdListRequest
+import com.ssafy.stellargram.model.LikeData
 import com.ssafy.stellargram.model.Member
 import com.ssafy.stellargram.model.MemberMeResponse
 import com.ssafy.stellargram.model.MemberResponse
 import com.ssafy.stellargram.model.Star
+import com.ssafy.stellargram.model.StarLikeAllResponse
+import com.ssafy.stellargram.module.DBModule
 import com.ssafy.stellargram.util.StarCardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.internal.aggregatedroot.codegen._com_ssafy_stellargram_StellargramApplication
+import hilt_aggregated_deps._com_ssafy_stellargram_module_DBModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -73,22 +81,48 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @HiltViewModel
 class MypageViewModel @Inject constructor() : ViewModel() {
+
+    // 현재 페이지 주인의 정보
     private val _memberResults = mutableStateOf<List<Member>>(emptyList())
+    val memberResults: State<List<Member>> get() = _memberResults
+
+    // 현재 사용자의 팔로잉 목록
+    private val _followingList = mutableStateOf<List<Long>>(emptyList())
+    val followingList: State<List<Long>> = _followingList
+
+    // 탭 관련
     private val _tabIndex: MutableLiveData<Int> = MutableLiveData(0)
     val tabs = listOf("게시물", "즐겨찾기", "좋아요")
     val tabIndex: LiveData<Int> = _tabIndex
-    val memberResults: State<List<Member>> get() = _memberResults
     var isSwipeToTheLeft: Boolean = false
     private val draggableState = DraggableState { delta ->
         isSwipeToTheLeft= delta > 0
     }
-
     private val _dragState = MutableLiveData<DraggableState>(draggableState)
     val dragState: LiveData<DraggableState> = _dragState
 
+    // 모달 관련
+    var isDialogVisible by mutableStateOf(false) // 모달이 열려있는지
+
+    var dialogTitle by mutableStateOf("") // 모달 제목
+        private set
+
+    private val _modalList = mutableStateOf<List<Member>>(emptyList())
+    val modalList: State<List<Member>> get() = _modalList
+
+    var isActualDialogVisible by mutableStateOf(false) // Renamed to avoid conflicts
+
+    // 즐겨찾기 별 id 관련
+    private val _likeStarIds = mutableStateListOf<Int>()
+    val likeStarIds: List<Int> get() = _likeStarIds
+    private val _isLikeStar = mutableStateOf<Boolean>(false)
+    val isLikeStar:  MutableState<Boolean> get() = _isLikeStar
+
+    // swipe시 탭 변경
     fun updateTabIndexBasedOnSwipe(delta: Float) {
         if (delta > 0 && _tabIndex.value!! > 0) {
             // Swipe to the right
@@ -99,13 +133,12 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-
-    // Add these methods for managing tabs
+    // 실제 탭을 변경하는 함수
     fun updateTabIndex(index: Int) {
         _tabIndex.value = index
     }
 
-    // API 호출을 트리거하고 결과를 업데이트하는 함수
+    // 현재 페이지 주인 정보 가져오기
     fun getMemberInfo(id: Long) {
         viewModelScope.launch {
             _memberResults.value = try {
@@ -139,7 +172,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
-    // 사용자가 팔로우 하는 사람들의 목록을 가져온다. 보고있는 페이지의 주인이 아니다.
+    // 사용자가 팔로우 하는 사람들의 목록을 가져온다.
     suspend fun getFollowingList(id: Long): List<Long> {
         return try {
             val response = NetworkModule.provideRetrofitInstance().getFollowingList(memberId = id)
@@ -163,7 +196,164 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
 
     }
+    // 내가 팔로우 하는 사람들의 목록을 업데이트
+    fun updateFollowingList(list: List<Long>) {
+        _followingList.value = list
+    }
 
+    // 페이지 주인이 팔로우 하는 사람들의 목록을 가져온다.
+    fun getModalFollowing(id: Long) {
+        viewModelScope.launch {
+            try {
+                val response =
+                    NetworkModule.provideRetrofitInstance().getFollowingList(memberId = id)
+
+                if (response.isSuccessful) {
+                    _modalList.value = response?.body()!!.data.members
+                    dialogTitle = "팔로잉"
+                    isDialogVisible = true
+                } else {
+                    Log.e("마이페이지", "팔로잉 목록 조회 실패: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("마이페이지", "팔로잉 목록 조회 중 예외 발생: ${e.message}")
+            }
+        }
+    }
+
+    // 사용자를 팔로잉 하는 사람들의 목록을 가져온다.
+    fun getModalFollower(id: Long) {
+        viewModelScope.launch {
+            try {
+                val response =
+                    NetworkModule.provideRetrofitInstance().getFollowerList(memberId = id)
+
+                if (response.isSuccessful) {
+                    _modalList.value = response?.body()!!.data.members
+                    dialogTitle = "팔로워"
+                    isDialogVisible = true
+                } else {
+                    Log.e("마이페이지", "팔로워 목록 조회 실패: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("마이페이지", "팔로워 목록 조회 중 예외 발생: ${e.message}")
+            }
+        }
+    }
+
+    // 천체를 즐겨찾기하는 함수
+    fun favoriteStar(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.provideRetrofitInstance().favoriteStar(id)
+                Log.d("상세", "디버깅 : $response")
+                if (response.isSuccessful) {
+                    val likeResponse = response.body()
+                    likeResponse?.let {
+                        // 성공적으로 즐겨찾기를 추가한 경우의 로직을 여기에 작성
+                        updateLikeStarIds(likeStarIds + id)
+                        isLikeStar.value = false
+                        isActualDialogVisible = true
+                    }
+                } else {
+                    Log.d("상세", "API 호출 실패: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("상세", "API 호출 실패 $e")
+            }
+        }
+    }
+
+    // 즐겨찾기 취소
+    fun unfavoriteStar(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.provideRetrofitInstance().disLikeStar(id)
+                Log.d("상세", "디버깅 : $response")
+                if (response.isSuccessful) {
+                    val dislikeResponse = response.body()
+                    dislikeResponse?.let {
+                        // 성공적으로 즐겨찾기를 취소한 경우의 로직을 여기에 작성
+                        updateLikeStarIds(likeStarIds - id)
+                        isLikeStar.value = true
+                        isActualDialogVisible = true
+                    }
+                } else {
+                    Log.d("상세", "API 호출 실패: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("상세", "API 호출 실패 $e")
+            }
+        }
+    }
+
+    // 현재 사용자가 즐겨찾기한 천체 목록 조회 함수
+    suspend fun getFavoriteStars(): List<Int> {
+        return try {
+            val response = NetworkModule.provideRetrofitInstance().getAllFavoriteStars()
+            Log.d("상세", "디버깅 : $response")
+            if (response.isSuccessful) {
+                val likeResponse = response.body()
+                likeResponse?.data?.let { data ->
+                    // 필요한 데이터를 추출하고 Card 객체를 생성합니다.
+                    return data.map { star ->
+                        star.starId
+                    }
+                } ?: emptyList()
+            } else {
+                Log.d("상세", "API 호출 실패: ${response.code()} - ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("상세", "API 호출 실패 $e")
+            emptyList()
+        }
+    }
+    suspend fun updateLikeStarIds(newLikeStarIds: List<Int>) {
+        _likeStarIds.clear()
+        _likeStarIds.addAll(newLikeStarIds)
+    }
+
+    // 해당 카드를 좋아요한 멤버 목록을 가져오는 API 호출
+    fun getLikersList(cardId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.provideRetrofitCards().getCardLikers(cardId = cardId)
+
+                if (response.isSuccessful) {
+                    val likersResponse = response.body()
+                    val memberIds = likersResponse!!.data
+                    val likersDetails = getMemberListByIds(memberIds)
+                    _modalList.value = likersDetails
+                    dialogTitle = "좋아요"
+                    isDialogVisible = true
+                } else {
+                    // API 에러 응답을 처리합니다.
+                }
+            } catch (e: Exception) {
+                // 예외를 처리합니다 (예: 네트워크 오류).
+            }
+        }
+    }
+
+    // memberId 목록을 받아 해당 유저들의 상세 정보를 가져오는 API 호출
+    private suspend fun getMemberListByIds(memberIds: List<Long>): List<Member> {
+        return try {
+            val idListRequest = IdListRequest(memberIds = memberIds)
+            val response = NetworkModule.provideRetrofitInstance().getMemberListByIds(idListRequest)
+            if (response.isSuccessful) {
+                val membersResponse = response.body()
+                membersResponse?.data?.members ?: emptyList()
+            } else {
+                // API 에러 응답을 처리합니다.
+                emptyList()
+            }
+        } catch (e: Exception) {
+            // 예외를 처리합니다 (예: 네트워크 오류).
+            Log.e("마이페이지", "Error Response Body: $e")
+            emptyList()
+        }
+    }
 
     // 팔로우 또는 언팔로우 클릭시 실행하는 부분
     fun handleFollowButtonClick(memberId: Long, isFollowing: Boolean) {
@@ -248,7 +438,7 @@ class MypageViewModel @Inject constructor() : ViewModel() {
 
     // 실제 데이터들이 들어갈 변수
     var myCards = mutableStateOf<List<Card>>(emptyList())
-    var favStars = mutableStateOf<List<Star>>(emptyList())
+    var favStars = mutableStateOf<List<LikeData>>(emptyList())
     var likeCards = mutableStateOf<List<Card>>(emptyList())
 
     // 내 게시물 가져오기
@@ -291,33 +481,20 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun getFavStars(): List<Star> {
-        // shared preferences에서 id 값들을 받아 id에 맞는 별들을 리스트에 저장(예정)
-        // 현재는 더미데이터
-        val results : List<Star>
-        results = listOf<Star>(
-            Star(
-                name = "Vega",
-                constellation = "Lyra",
-                rightAscension = "18h 36m 56.19s",
-                declination = "+38° 46′ 58.8″",
-                apparentMagnitude = "0.03",
-                absoluteMagnitude = "0.58",
-                distanceLightYear = "25",
-                spectralClass = "A0Vvar"
-            ),
-            Star(
-                name = "Vega",
-                constellation = "Lyra",
-                rightAscension = "18h 36m 56.19s",
-                declination = "+38° 46′ 58.8″",
-                apparentMagnitude = "0.03",
-                absoluteMagnitude = "0.58",
-                distanceLightYear = "25",
-                spectralClass = "A0Vvar"
-            )
-        )
-        return results
+    suspend fun getFavStars(): List<LikeData> {
+        return try {
+            val response = NetworkModule.provideRetrofitInstance().getAllFavoriteStars()
+            Log.d("마이페이지", "디버깅 : $response")
+            if (response.isSuccessful) {
+                response.body()?.data ?: emptyList()
+            } else {
+                Log.d("마이페이지", "API 호출 실패: ${response.code()} - ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("마이페이지", "API 호출 실패 $e")
+            emptyList()
+        }
     }
 
     suspend fun fetchLikeCards(id: Long): List<Card> {
@@ -417,7 +594,7 @@ fun MyCardsScreen(viewModel: MypageViewModel, myCards: MutableState<List<Card>>,
 }
 
 @Composable
-fun FavStarsScreen(viewModel: MypageViewModel, favStars: MutableState<List<Star>>, navController: NavController) {
+fun FavStarsScreen(viewModel: MypageViewModel, favStars: MutableState<List<LikeData>>, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -542,22 +719,31 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
                 Image(
                     painter = likeIcon,
                     contentDescription = null, // 이미지 설명
-                    modifier = Modifier.size(24.dp).focusable(false)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-                            viewModel.handleLikeButtonClick(cardId = card.cardId, isLiked = card.amILikeThis)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .focusable(false)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            viewModel.handleLikeButtonClick(
+                                cardId = card.cardId,
+                                isLiked = card.amILikeThis
+                            )
                         }
                 )
-                Text(
-                    text = "좋아요 ${card.likeCount}",
-                    style = TextStyle(fontSize = 20.sp),
-                    modifier = Modifier.padding(start = 8.dp)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-//                            viewModel.handleLikersButtonClick(cardId = card.cardId)
+                ClickableText(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color.White)) {
+                            append("좋아요 ${card.likeCount}")
                         }
+                    },
+                    style = TextStyle(fontSize = 20.sp),
+                    modifier = Modifier.padding(start = 8.dp),
+                    onClick = { offset ->
+                        // 클릭 시 좋아요 멤버 목록 조회
+                        viewModel.getLikersList(cardId = card.cardId)
+                    }
                 )
             }
 
@@ -573,7 +759,8 @@ fun MyCardsUI(cardsState: MutableState<List<Card>>, navController: NavController
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavController, viewModel:MypageViewModel) {
+fun FavStarsUI(starsState: MutableState<List<LikeData>>, navController: NavController, viewModel:MypageViewModel) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -581,9 +768,27 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         starsState.value.forEach { star ->
+            val starData = DBModule.starMap[star.starId]
+            val starName = DBModule.nameMap[star.starId]
+            val imageUrl: String
+            val description: String
+            when (star.starId) {
+                32263 -> {
+                    imageUrl = "https://www.astronomy.com/wp-content/uploads/sites/2/2023/03/ASYSK1221_03.jpg?fit=600%2C771"
+                    description = "시리우스(Sirius)는 큰개자리 알파별(α Canis Majoris, α CMa)로, 밤 하늘에서 가장 밝은 별이다. 우리말로는 천랑성(天狼星)이라고 한다. 알파 센타우리와 함께 일반적으로 가장 잘 알려진 항성이다. 밤 하늘에서 가장 밝은 별이기 때문에 고대 이집트 시대부터 중요한 관찰 대상이었다. 특히 고대 이집트 문명에서는 해가 뜨기 전 새벽 시리우스가 동쪽하늘에서 떠오르는 시기에 나일강이 범람한다는 관계에서 알 수 있다."
+                }
+                11734 -> {
+                    imageUrl = "https://mblogthumb-phinf.pstatic.net/MjAxNzAyMjRfMjcy/MDAxNDg3OTEwMzM4MDg4.D3qbWLYlbLUrjJEl8r6-feFuGbfoKdhI0GudrjjHkqUg.rE-8LqrXLQ5AOfw6SULN3owzEWBSK9UHuTaAIYio_acg.JPEG.mozmov/Polaris-01w.jpg?type=w800"
+                    description = "폴라리스(Polaris)는 작은곰자리에서 가장 밝은 별(알파성)로, 현재의 북극성이기도 하다. 서기 3000년 경 이후에는 북극성에서 벗어난다. 하나의 별처럼 보이지만 사실은 다중성으로, 초거성 폴라리스 Aa가 다른 별들을 거느리고 있다."
+                }
+                else -> {
+                    imageUrl = "https://image.librewiki.net/c/c5/Vega.jpg"
+                    description = ""
+                }
+            }
             // 각 Star에 대한 정보 표시
             Text(
-                text = "${star.name}",
+                text = "$starName",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top=12.dp)
@@ -593,27 +798,36 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 GlideImage(
-                    model = "https://image.librewiki.net/c/c5/Vega.jpg",
+                    model = imageUrl,
                     contentDescription = "설명",
                     modifier = Modifier.padding(vertical = 12.dp),
                     contentScale = ContentScale.FillWidth
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp, 4.dp)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-                            // TODO: 실행할 함수 여기서 호출.
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 4.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            if (viewModel.likeStarIds.contains(star.starId)) {
+                                viewModel.unfavoriteStar(star.starId)
+                                viewModel.isActualDialogVisible = true
+                            } else {
+                                viewModel.favoriteStar(star.starId)
+                                viewModel.isActualDialogVisible = true
+                            }
                         },
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.like),
+                        painter = if (viewModel.likeStarIds.contains(star.starId)) painterResource(R.drawable.like) else painterResource(R.drawable.unfilledstar),
                         contentDescription = null, // 이미지 설명
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
-                        text = "즐겨찾기 취소",
+                        text = if (viewModel.likeStarIds.contains(star.starId)) "즐겨찾기 취소" else "즐겨찾기",
                         style = TextStyle(fontSize = 20.sp),
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -640,19 +854,21 @@ fun FavStarsUI(starsState: MutableState<List<Star>>, navController: NavControlle
 
                 // 두 번째 Column (details.constellation, details.rightAscension 등)
                 Column {
-                    Text(text = star.constellation, fontSize = 20.sp)
-                    Text(text = star.rightAscension, fontSize = 20.sp)
-                    Text(text = star.declination, fontSize = 20.sp)
-                    Text(text = star.apparentMagnitude, fontSize = 20.sp)
-                    Text(text = star.absoluteMagnitude, fontSize = 20.sp)
-                    Text(text = star.distanceLightYear, fontSize = 20.sp)
-                    Text(text = star.spectralClass, fontSize = 20.sp)
+                    starData?.let { details ->
+                        Text(text = details.con?:"", fontSize = 20.sp)
+                        Text(text = details.ra.toString(), fontSize = 20.sp)
+                        Text(text = details.dec.toString(), fontSize = 20.sp)
+                        Text(text = details.mag.toString(), fontSize = 20.sp)
+                        Text(text = details.absmag.toString(), fontSize = 20.sp)
+                        Text(text = details.dist.toString(), fontSize = 20.sp)
+                        Text(text = details.spect?:"", fontSize = 20.sp)
+                    }
                 }
             }
 
             // 설명
             Text(
-                text = "베가(Vega)는 거문고자리 알파별(α Lyrae, α Lyr)로, 알타이르, 데네브와 함께 여름의 대삼각형을 이루는 0등급 별이다. 직녀성이라고도 잘 알려져 있다.",
+                text = description,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
         }
@@ -746,17 +962,30 @@ fun LikeCardsUI(cardsState: MutableState<List<Card>>, navController:NavControlle
                 Image(
                     painter = likeIcon,
                     contentDescription = null, // 이미지 설명
-                    modifier = Modifier.size(24.dp)
-                        .clickable (
-                            interactionSource = remember{ MutableInteractionSource() },
-                            indication = null){
-                            viewModel.handleLikeButtonClick(cardId = card.cardId, isLiked = card.amILikeThis)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            viewModel.handleLikeButtonClick(
+                                cardId = card.cardId,
+                                isLiked = card.amILikeThis
+                            )
                         }
                 )
-                Text(
-                    text = "좋아요 ${card.likeCount}",
+                ClickableText(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color.White)) {
+                            append("좋아요 ${card.likeCount}")
+                        }
+                    },
                     style = TextStyle(fontSize = 20.sp),
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
+                    onClick = { offset ->
+                        // 클릭 시 좋아요 멤버 목록 조회
+                        viewModel.getLikersList(cardId = card.cardId)
+                    }
                 )
             }
 

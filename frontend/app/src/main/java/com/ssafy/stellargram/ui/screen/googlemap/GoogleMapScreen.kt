@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,18 +20,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,6 +63,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -68,7 +71,6 @@ import com.google.maps.android.compose.widgets.DisappearingScaleBar
 import com.ssafy.stellargram.R
 import com.ssafy.stellargram.BuildConfig
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GoogleMapScreen(navController: NavController){
     val viewModel: GoogleMapViewModel = viewModel() // Create an instance of GoogleMapViewModel
@@ -112,6 +114,8 @@ fun GoogleMapScreen(navController: NavController){
                     }
                 }
             }
+            NewMarkerForm(viewModel = viewModel)
+            PointDetail(viewModel = viewModel, navController)
         }
     }
 }
@@ -142,7 +146,7 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
     }
     var mapUiSettings by remember {
         mutableStateOf(
-            MapUiSettings(mapToolbarEnabled = false, myLocationButtonEnabled = false)
+            MapUiSettings(mapToolbarEnabled = false, myLocationButtonEnabled = false, rotationGesturesEnabled = false)
         )
     }
 
@@ -188,7 +192,8 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
         if (!cameraPositionState.isMoving) {
             // it will be done only when the map stops moving.
             val cameraPosition = cameraPositionState.position.target
-            viewModel.getAddress(cameraPosition)
+            viewModel.currentCameraLatLng = cameraPosition
+            viewModel.getAddress()
             try{
                 Log.d("content", "get inside")
                 viewModel.getObserveSiteLists()
@@ -198,10 +203,18 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
         }
     }
 
-    LaunchedEffect(key1 = viewModel.currentLatLong ){
+    LaunchedEffect(key1 = viewModel.currentLatLong ){ // 디바이스의 위치가 변할 때 따라온다
         viewModel.zoomLevel = cameraPositionState.position.zoom
         val update = CameraUpdateFactory.newLatLngZoom(viewModel.currentLatLong, viewModel.zoomLevel)
         cameraPositionState.move(update)
+    }
+
+    LaunchedEffect(key1 = viewModel.newMarkerLatLng ){// 새 마커를 생성하고 클릭할 때 따라온다
+        if(viewModel.formShowing){
+            viewModel.zoomLevel = cameraPositionState.position.zoom
+            val update = CameraUpdateFactory.newLatLngZoom(viewModel.newMarkerLatLng, viewModel.zoomLevel)
+            cameraPositionState.move(update)
+        }
     }
 
     val bitmap = AppCompatResources.getDrawable(context,R.drawable.telescope_svgrepo_com)!!.toBitmap(100,100)
@@ -212,18 +225,17 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
             uiSettings = mapUiSettings,
             cameraPositionState = cameraPositionState,
             modifier = Modifier.fillMaxSize(),
+            onMapClick = { _ -> viewModel.formShowing = false },
             onMapLongClick = { latLng ->
-                    try{
-                    viewModel.postObserveSite(latLng)
-                    viewModel.getObserveSiteLists()
-//                        markerList.add(Pair(latLng, viewModel.getFullAddress(latLng)))
-                } catch(e: Exception) {
-                    Log.d("error", e.message?:"")
-                }
+                viewModel.newMarkerShowing = true
+                viewModel.newMarkerLatLng = latLng
             },
             content = {
                 viewModel.markerList.forEach {
-                    CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap)
+                    CustomMarker(latlng = LatLng(it.latitude.toDouble(),it.longitude.toDouble()), title = it.name, bitmap = bitmap, viewModel)
+                }
+                if(viewModel.newMarkerShowing){
+                    NewMarker(latLng = viewModel.newMarkerLatLng , viewModel = viewModel , bitmap = bitmap )
                 }
             }
         )
@@ -236,8 +248,8 @@ fun GoogleMap(viewModel: GoogleMapViewModel ,navController: NavController) {
         )
         Text(text = viewModel.address,
             modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .sizeIn(maxWidth = 200.dp),
+                .align(Alignment.BottomCenter)
+                .sizeIn(maxWidth = 200.dp),
             overflow = TextOverflow.Ellipsis
         )
 
@@ -274,52 +286,42 @@ fun Searchbar(viewModel: GoogleMapViewModel){
 }
 
 @Composable
-fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap){
+fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap, viewModel: GoogleMapViewModel){
+    val roundLat = String.format("%.5f",latlng.latitude)
+    val roundLng =  String.format("%.5f",latlng.longitude)
+    val chatRoomID = String.format("%.3f",latlng.latitude).replace(".","")+"-" + String.format("%.3f",latlng.longitude).replace(".","")
     MarkerInfoWindow(
         title= title,
         state = MarkerState(latlng),
         icon = BitmapDescriptorFactory.fromBitmap(bitmap),
-        onClick = {false},
-        onInfoWindowClick = {
-            Log.d("IMHEREINFO","${it.title}")
+        tag = "$roundLat-$roundLng",
+        onClick = { marker ->
+            Log.d("MARKER",marker.tag.toString())
+            viewModel.getObserveSiteDetail(LatLng(roundLat.toDouble(),roundLng.toDouble()),chatRoomID)
+            false
         }
     ) {
         Box(
             modifier = Modifier
-                .sizeIn(maxWidth = 300.dp)
+                .sizeIn(maxWidth = 200.dp)
                 .background(
                     color = MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(20.dp, 20.dp, 35.dp, 35.dp)
+                    shape = RoundedCornerShape(20.dp)
                 )
-        ){
+        ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(16.dp,0.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.telescope_svgrepo_com),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .height(40.dp)
-                        .fillMaxWidth(),
-                )
-                Text(
-                    text = title,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+                Text(text = if(title!="") title else "이름 없음")
                 Text(
                     text = "lat: ${latlng.latitude} \n lng: ${latlng.longitude}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(10.dp)
                         .fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
@@ -327,4 +329,152 @@ fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap){
     }
 }
 
+@Composable
+fun NewMarker(latLng: LatLng, viewModel: GoogleMapViewModel, bitmap: Bitmap){
+    Marker(
+        state = MarkerState(position = latLng),
+//        icon = BitmapDescriptorFactory.fromBitmap(bitmap),
+        draggable = true,
+        onClick = { marker ->
+            viewModel.newMarkerLatLng = marker.position
+            viewModel.formShowing = true
+            true
+        },
+        )
+}
+@Composable
+fun NewMarkerForm(viewModel: GoogleMapViewModel){
+    if(viewModel.formShowing){
+        Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                    )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(R.drawable.back),
+                            contentDescription = "delete",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(40.dp)
+                                .clickable {
+                                    viewModel.formShowing = false
+                                    viewModel.newMarkerShowing = false
+                                }
+                        )
+                        Text(text = "관측지 등록")
+                        Image(
+                            painter = painterResource(id = R.drawable.add),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(40.dp)
+                                .clickable {
+                                    try {
+                                        viewModel.postObserveSite(viewModel.newMarkerLatLng)
+                                    } catch (e: Exception) {
+                                        Log.d("error", e.message ?: "")
+                                    }
+                                }
+                        )
 
+                    }
+
+                    OutlinedTextField(
+                        value = viewModel.newMarkerTitle,
+                        onValueChange = { if (it.length < 20) viewModel.newMarkerTitle = it },
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxWidth(),
+                        textStyle = MaterialTheme.typography.headlineSmall.copy(color = MaterialTheme.colorScheme.primary),
+                        label = { Text("Title") }
+                    )
+                    Text(
+                        text = "lat: ${viewModel.newMarkerLatLng.latitude} \n lng: ${viewModel.newMarkerLatLng.longitude}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(10.dp, 20.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PointDetail(viewModel: GoogleMapViewModel, navController: NavController){
+    if (viewModel.detailShowingID != ""){
+        Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                    )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(R.drawable.back),
+                            contentDescription = "delete",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(40.dp)
+                                .clickable {
+                                    viewModel.detailShowingID = ""
+                                }
+                        )
+                        Text(text = if (viewModel.detailMarker.name != "") viewModel.detailMarker.name else "이름 없음" )
+                        Image(
+                            painter = painterResource(id = R.drawable.chat),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(40.dp)
+                                .clickable {
+                                    try {
+                                        viewModel.enterChatRoom(navController =navController)
+                                        Log.d(
+                                            "MARKER",
+                                            "id : ${viewModel.detailShowingID} chatroom selected"
+                                        )
+                                    } catch (e: Exception) {
+                                        Log.d("error", e.message ?: "")
+                                    }
+                                }
+                        )
+                    }
+                    Text(
+                        text = "리뷰 수: ${viewModel.detailMarker.reviewCount}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(10.dp, 20.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = "관측지 평점: ${if(viewModel.detailMarker.reviewCount != 0) viewModel.detailMarker.ratingSum/viewModel.detailMarker.reviewCount else 0}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(10.dp, 20.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        }
+    }
+}
