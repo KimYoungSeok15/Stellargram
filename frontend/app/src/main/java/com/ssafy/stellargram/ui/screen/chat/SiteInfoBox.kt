@@ -14,6 +14,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.ssafy.stellargram.ui.common.CustomTextButton
@@ -29,7 +30,8 @@ fun SiteInfoBox(
     longitude: Double = 1000.0,
     isChatScreen: Boolean = true,
     modifierIn: Modifier,
-    observeSiteId:String=""
+    observeSiteId:String="",
+    navConroller:NavController
 ) {
     // 관측소 뷰모델 생성
     val viewModel: SiteViewModel = hiltViewModel()
@@ -74,14 +76,14 @@ fun SiteInfoBox(
             // 리뷰 수
             Text(text = "(${viewModel.reviewCount})", color = Color.Black)
 
-            // 채팅스크린이라면 리뷰 버튼
-            if (isChatScreen) {
-                CustomTextButtonDark(text = "탈퇴", onClick = { /*TODO*/ })
-            }
-            // 리뷰스크린이라면 채팅버튼
-            else {
-                CustomTextButtonDark(text = "채팅", onClick = { /*TODO*/ })
-            }
+//            // 채팅스크린이라면 리뷰 버튼
+//            if (isChatScreen) {
+//                CustomTextButtonDark(text = "탈퇴", onClick = { viewModel.leaveChatRoomByClick(observeSiteId,navConroller) })
+//            }
+//            // 리뷰스크린이라면 채팅버튼
+//            else {
+//                CustomTextButtonDark(text = "채팅", onClick = { /*TODO*/ })
+//            }
         }
     }
 }

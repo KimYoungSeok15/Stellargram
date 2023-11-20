@@ -7,10 +7,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.SiteInfo
 import com.ssafy.stellargram.model.SiteInfoById
+import com.ssafy.stellargram.ui.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,6 +49,26 @@ class SiteViewModel @Inject constructor() : ViewModel() {
             Log.d("관측포인트 정보 오류", e.toString())
         }
 
+
+    }
+
+    fun leaveChatRoomByClick(observeSiteId: String, navController: NavController) {
+        viewModelScope.launch {
+            try {
+                Log.d("leave chat test",observeSiteId)
+                val response =
+                    NetworkModule.provideRetrofitInstanceChat().leaveChatRoom(observeSiteId)
+
+                if (response?.code == 200) {
+                    Log.d("leave chat room", "success")
+                    navController.navigate("chatroomlist")
+
+                }
+            } catch (e: Exception) {
+                Log.d("leave chat room error", e.toString())
+
+            }
+        }
 
     }
 
