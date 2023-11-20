@@ -97,6 +97,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
             nextCursor = responseCursor.data
 
             if (roomId != initRoomId) {
+                if (nextCursor == -1) return
 
                 val response = NetworkModule.provideRetrofitInstanceChat()
                     .getPrevChats(myId = myId, chatRoomId = roomId, cursor = nextCursor)

@@ -29,3 +29,13 @@ data class CombinedChatRoom(
     val longitude: Double?,
     val latitude: Double?
 )
+
+data class JoinChatCoomResponse(
+    val code: Int,
+    val message: String,
+    val data: roomIdInfo
+)
+
+data class roomIdInfo(
+    val roomNumber:Int
+)

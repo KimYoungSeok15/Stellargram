@@ -28,14 +28,15 @@ fun SiteInfoBox(
     latitude: Double = 1000.0,
     longitude: Double = 1000.0,
     isChatScreen: Boolean = true,
-    modifierIn: Modifier
+    modifierIn: Modifier,
+    observeSiteId:String=""
 ) {
     // 관측소 뷰모델 생성
     val viewModel: SiteViewModel = hiltViewModel()
 
     // 관측소 데이터 받아오기
     LaunchedEffect(key1 = true) {
-        viewModel.getSiteInfo(latitude, longitude)
+        viewModel.getSiteInfo(observeSiteId)
     }
 
     // 별점 계산
@@ -75,7 +76,7 @@ fun SiteInfoBox(
 
             // 채팅스크린이라면 리뷰 버튼
             if (isChatScreen) {
-                CustomTextButtonDark(text = "리뷰", onClick = { /*TODO*/ })
+                CustomTextButtonDark(text = "탈퇴", onClick = { /*TODO*/ })
             }
             // 리뷰스크린이라면 채팅버튼
             else {

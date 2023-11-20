@@ -23,6 +23,7 @@ fun ScreenContainer(
     isChatScreen: Boolean = true,
     latitude: Double = 1000.0,
     longitude: Double = 1000.0,
+    observeSiteId:String = ""
 ) {
     // css. 스크린 컨테이너 modifier
     val screenModifier: Modifier = Modifier
@@ -44,7 +45,8 @@ fun ScreenContainer(
             modifierIn = whiteRoundModifier,
             isChatScreen = isChatScreen,
             longitude = longitude,
-            latitude = latitude
+            latitude = latitude,
+                    observeSiteId = observeSiteId
         )
 
         // 사이
