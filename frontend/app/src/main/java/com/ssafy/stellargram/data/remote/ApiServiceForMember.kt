@@ -14,6 +14,7 @@ import com.ssafy.stellargram.model.FollowersResponse
 import com.ssafy.stellargram.model.IdListRequest
 import com.ssafy.stellargram.model.IdentifyPhotoData
 import com.ssafy.stellargram.model.IdentifyResponse
+import com.ssafy.stellargram.model.JoinChatCoomResponse
 import com.ssafy.stellargram.model.MessageListResponse
 import com.ssafy.stellargram.model.RoomListResponse
 import com.ssafy.stellargram.model.MemberCheckDuplicateRequest
@@ -29,6 +30,7 @@ import com.ssafy.stellargram.model.MemberSignUpResponse
 import com.ssafy.stellargram.model.ObserveSiteListResponse
 import com.ssafy.stellargram.model.ObserveSiteRequest
 import com.ssafy.stellargram.model.ObserveSiteResponse
+import com.ssafy.stellargram.model.SiteInfoByIdResponse
 import com.ssafy.stellargram.model.SiteInfoResponse
 import com.ssafy.stellargram.model.StarDislikeResponse
 import com.ssafy.stellargram.model.StarLikeAllResponse
@@ -246,6 +248,13 @@ interface ApiServiceForChat {
     suspend fun getRecentCursor(
         @Path("chatRoomId") chatRoomId: Int,
     ): CursorResponse
+
+    @POST("chat/join/{observeSiteId}")
+    suspend fun joinChatRoom(
+        @Path("observeSiteId") observeSiteId: String,
+    ): JoinChatCoomResponse
+
+
 }
 
 interface ApiServiceForObserveSite {
@@ -277,6 +286,11 @@ interface ApiServiceForSite {
         @Path("latitude") latitude: Double,
         @Path("longitude") longitude: Double,
     ): SiteInfoResponse
+
+    @GET("observe-site/{observeSiteId}")
+    suspend fun getSiteInfoById(
+        @Path("observeSiteId")observeSiteId:String
+    ): SiteInfoByIdResponse
 
 }
 

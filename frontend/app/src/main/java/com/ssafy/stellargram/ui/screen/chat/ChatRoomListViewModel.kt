@@ -33,7 +33,7 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
     // 내가 참여한 채팅방 정보 가져오기
     suspend fun getRoomInfo() {
         // 실패여부 저장변수 리셋
-        _isFailed.value=false
+        _isFailed.value = false
 
         // 방 목록 리셋
         _rooms.clear()
@@ -53,9 +53,8 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
             for (room in tempRoomList) {
                 // 위도 경도 파싱
                 val latilong = room.observeSiteId.split("-")
-                val thisLatitude = latilong[0].toDouble()/1000
-                val thisLongitude = latilong[1].toDouble()/1000
-
+                val thisLatitude = latilong[0].toDouble() / 1000
+                val thisLongitude = latilong[1].toDouble() / 1000
                 // 새 방정보 dto에 담기
                 val newRoomInfo = CombinedChatRoom(
                     roomId = room.roomId,
@@ -69,18 +68,20 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
                 // 방 1개에 연결된 관측소 정보 요청
                 val responseSite =
                     NetworkModule.provideRetrofitInstanceSite()
-                        .getSiteInfo(thisLatitude+0.0001, thisLongitude+0.0001)
+                        .getSiteInfoById(
+                            room.observeSiteId
+                        )
 
                 // 응답이 성공적이었다면
                 if (responseSite?.code == 200) {
                     // 이름을 새 방정보에 담기
-                    newRoomInfo.siteName = responseSite.data.name
+                    if (responseSite.data != null)
+                        newRoomInfo.siteName = responseSite.data.name
                 }
 
                 // 새 방정보를 리스트에 추가
                 _rooms.add(newRoomInfo)
             }
-        }
-        else _isFailed.value=true
+        } else _isFailed.value = true
     }
 }

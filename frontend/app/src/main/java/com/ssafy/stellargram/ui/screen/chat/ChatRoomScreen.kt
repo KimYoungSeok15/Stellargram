@@ -108,6 +108,7 @@ fun ChatRoomScreen(
         isChatScreen = true,
         latitude = thisLatitude,
         longitude = thisLongitude,
+        observeSiteId = observeSiteId,
         customChild = {
             // 메세지들
             LazyColumn(

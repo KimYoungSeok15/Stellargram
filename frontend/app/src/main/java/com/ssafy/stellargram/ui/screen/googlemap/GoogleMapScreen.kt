@@ -115,7 +115,7 @@ fun GoogleMapScreen(navController: NavController){
                 }
             }
             NewMarkerForm(viewModel = viewModel)
-            PointDetail(viewModel = viewModel)
+            PointDetail(viewModel = viewModel, navController)
         }
     }
 }
@@ -289,7 +289,7 @@ fun Searchbar(viewModel: GoogleMapViewModel){
 fun CustomMarker(latlng: LatLng, title: String, bitmap: Bitmap, viewModel: GoogleMapViewModel){
     val roundLat = String.format("%.5f",latlng.latitude)
     val roundLng =  String.format("%.5f",latlng.longitude)
-    val chatRoomID = String.format("%.3f",latlng.latitude) + String.format("%.3f",latlng.longitude)
+    val chatRoomID = String.format("%.3f",latlng.latitude).replace(".","")+"-" + String.format("%.3f",latlng.longitude).replace(".","")
     MarkerInfoWindow(
         title= title,
         state = MarkerState(latlng),
@@ -411,7 +411,7 @@ fun NewMarkerForm(viewModel: GoogleMapViewModel){
 }
 
 @Composable
-fun PointDetail(viewModel: GoogleMapViewModel){
+fun PointDetail(viewModel: GoogleMapViewModel, navController: NavController){
     if (viewModel.detailShowingID != ""){
         Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
             Box(
@@ -444,6 +444,7 @@ fun PointDetail(viewModel: GoogleMapViewModel){
                                 .height(40.dp)
                                 .clickable {
                                     try {
+                                        viewModel.enterChatRoom(navController =navController)
                                         Log.d(
                                             "MARKER",
                                             "id : ${viewModel.detailShowingID} chatroom selected"

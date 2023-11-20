@@ -1,5 +1,6 @@
 package com.ssafy.stellargram.ui.screen.chat
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -8,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.ssafy.stellargram.data.remote.NetworkModule
 import com.ssafy.stellargram.model.SiteInfo
+import com.ssafy.stellargram.model.SiteInfoById
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -22,7 +24,7 @@ class SiteViewModel @Inject constructor() : ViewModel() {
     var reviewCount: Int by mutableIntStateOf(10)
 
     // 현재 뷰모델에 관측포인트 정보 설정
-    fun setSiteInfo(newInfo: SiteInfo) {
+    fun setSiteInfo(newInfo: SiteInfoById) {
         latitude = newInfo.latitude
         longitude = newInfo.longitude
         name = newInfo.name
@@ -31,13 +33,18 @@ class SiteViewModel @Inject constructor() : ViewModel() {
     }
 
     // 관측포인트 정보 가져오기
-    suspend fun getSiteInfo(latitude: Double, longitude: Double) {
-        val response =
-            NetworkModule.provideRetrofitInstanceSite()
-                .getSiteInfo(latitude + 0.0001, longitude + 0.0001)
-        if (response?.code == 200) {
-            setSiteInfo(response.data)
+    suspend fun getSiteInfo(observeSiteId: String) {
+        try {
+            val response =
+                NetworkModule.provideRetrofitInstanceSite()
+                    .getSiteInfoById(observeSiteId)
+            if (response?.code == 200) {
+                setSiteInfo(response.data)
+            }
+        } catch (e: Exception) {
+            Log.d("관측포인트 정보 오류", e.toString())
         }
+
 
     }
 
