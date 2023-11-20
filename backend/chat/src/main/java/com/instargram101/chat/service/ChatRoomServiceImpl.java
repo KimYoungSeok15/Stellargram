@@ -93,9 +93,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if (isExistRoom) {
             thisRoom = chatRoomRepository.findByObserveSiteId(siteId).get();
 
-            // 이미 참여했다면 에러
-            if (chatJoinRepository.existsByRoomAndMemberId(thisRoom, memberId))
-                throw new IllegalArgumentException("이미 참여한 채팅방입니다.");
+            // 이미 참여했다면 그대로 반환
+            if (chatJoinRepository.existsByRoomAndMemberId(thisRoom, memberId)) {
+                // 채팅방 인원수가 0이라면 Redis에 해당 방 토픽으로 리스너 추가
+                if (thisRoom.getPersonnel() == 0)
+                    topicService.addRoomTopicToRedis(listenerAdapter, thisRoom.getRoomId());
+//        listenerContainer.addMessageListener(listenerAdapter, new ChannelTopic("room/" + thisRoom.getRoomId()));
+
+                return RoomProcessResponse.of(thisRoom.getRoomId());
+
+            }
         }
         // 존재하지 않는다면 채팅방 생성
         else {
